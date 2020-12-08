@@ -13,6 +13,8 @@ paths:
       responses:
         '201':
           description: Created
+        '400':
+          description: Bad Request
         '403':
           description: Forbidden
           content:
@@ -39,8 +41,94 @@ paths:
                   minLength: 1
               required:
                 - id
+            examples: {}
       security:
         - import-key: []
+  /measurement:
+    post:
+      summary: Record Measurment. Allows for client specification of value type and asserts type-correctness on the server side.
+      tags: []
+      responses:
+        '201':
+          description: Created
+        '400':
+          description: Bad Request
+        '404':
+          description: Not Found
+      operationId: post-measurement
+      security:
+        - import-key: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              description: ''
+              type: object
+              properties:
+                clientID:
+                  type: string
+                  minLength: 1
+                data:
+                  type: object
+                  required:
+                    - date
+                  properties:
+                    date:
+                      type: number
+                    value:
+                      type:
+                        - string
+                        - number
+                        - boolean
+                typeID:
+                  type: string
+                groupID:
+                  type: string
+              required:
+                - clientID
+                - data
+                - typeID
+  /group:
+    post:
+      summary: ''
+      operationId: post-group
+      responses:
+        '201':
+          description: Created
+        '400':
+          description: Bad Request
+        '403':
+          description: Forbidden
+      security:
+        - import-key: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+  /type:
+    post:
+      summary: Create Data Type
+      tags: []
+      responses:
+        '201':
+          description: Created
+        '400':
+          description: Bad Request
+        '403':
+          description: Forbidden
+      operationId: post-type
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
 components:
   schemas: {}
   securitySchemes:
