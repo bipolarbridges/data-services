@@ -8,7 +8,7 @@ servers: []
 paths:
   /client:
     post:
-      summary: Create a Client Reference
+      summary: Create a Client Reference. This tracks the unique user-identifier in the external management system (e.g. firebase).
       tags: []
       responses:
         '201':
