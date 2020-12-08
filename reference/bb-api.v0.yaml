@@ -1,0 +1,50 @@
+openapi: 3.0.0
+info:
+  title: bb-api
+  version: '0.1'
+  license:
+    name: MIT
+servers: []
+paths:
+  /client:
+    post:
+      summary: Create a Client Reference
+      tags: []
+      responses:
+        '201':
+          description: Created
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                description: ''
+                type: object
+                properties:
+                  message:
+                    type: string
+                    minLength: 1
+                required:
+                  - message
+      operationId: post-client
+      requestBody:
+        content:
+          application/json:
+            schema:
+              description: ''
+              type: object
+              properties:
+                id:
+                  type: string
+                  minLength: 1
+              required:
+                - id
+      security:
+        - import-key: []
+components:
+  schemas: {}
+  securitySchemes:
+    import-key:
+      name: Import Service API Key
+      type: apiKey
+      in: header
