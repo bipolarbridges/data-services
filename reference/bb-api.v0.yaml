@@ -45,6 +45,6 @@ components:
   schemas: {}
   securitySchemes:
     import-key:
-      name: Import Service API Key
+      name: Authorization
       type: apiKey
       in: header
