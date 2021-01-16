@@ -80,10 +80,7 @@ paths:
                     date:
                       type: number
                     value:
-                      type:
-                        - string
-                        - number
-                        - boolean
+                      type: number
                 typeID:
                   type: string
                 groupID:
