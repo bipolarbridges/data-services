@@ -1,9 +1,13 @@
 openapi: 3.0.0
 info:
-  title: bb-api
+  title: Bipolar Bridges Data Services Interface
   version: '0.1'
   license:
     name: MIT
+  description: Provides endpoints for general-purpose data import and acquistion within the BB infrastructure.
+  contact:
+    name: Rowan Lindsay
+    email: rowdl22@students.cs.ubc.ca
 servers: []
 paths:
   /client:
