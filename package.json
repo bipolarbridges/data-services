@@ -7,7 +7,11 @@
     "test": "jest tests",
     "mock": "prism mock ./reference/bb-api.v0.yaml",
     "start:db": "docker-compose up -d db",
-    "stop:db": "docker-compose down"
+    "stop:db": "docker-compose down",
+    "status": "docker-compose logs -f db",
+    "status:db": "docker-compose logs -f db",
+    "db:shell": "docker-compose up -d db_shell && docker attach bb_data_services_db_shell",
+    "db:mock": "docker-compose up -d db_shell && docker-compose exec db_shell execute"
   },
   "repository": {
     "type": "git",

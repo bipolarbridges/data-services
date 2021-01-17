@@ -1,0 +1,15 @@
+#!/bin/bash
+PRG="./cypher-shell/cypher-shell -a"
+URL="neo4j://db:7687"
+
+_run_exec_ () {
+    cat "$1" "$PRG" "$URL"
+}
+
+q_file=$1
+if [[ -z "$q_file" ]]; then
+    echo "No query file specified"
+    exit 1
+else
+    _run_exec_ "$q_file"
+fi
