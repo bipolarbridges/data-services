@@ -10,9 +10,9 @@
     "db:start": "docker-compose up -d db",
     "db:stop": "docker-compose down",
     "db:status": "docker-compose logs -f db",
-    "db:shell": "docker-compose up -d db_shell && docker attach bb_data_services_db_shell",
+    "db:shell": "docker-compose up -d db_shell && docker attach bb_data_services_db_shell_1",
     "db:mock": "docker-compose up -d db_shell && docker-compose exec db_shell execute example_0",
-    "db:reset": "docker-compose down && rm -rf ./data"
+    "db:reset": "docker-compose down && docker volume rm bb_data_services_store"
   },
   "repository": {
     "type": "git",

@@ -2,17 +2,18 @@ version: '3'
 
 services:
   db:
-    container_name: bb_data_services_db
     build: services/db
     ports:
       - 7687:7687
     volumes:
-      - ./data:/data
+      - store:/data
   db_shell:
-    container_name: bb_data_services_db_shell
     depends_on:
       - db
     build: services/db_shell
     tty: true
     stdin_open: true
     command: bash -c "connect"
+
+volumes:
+  store:
