@@ -1,1 +1,0 @@
-CREATE (:User{uid: 1});
