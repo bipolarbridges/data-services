@@ -4,7 +4,7 @@ const axios = require('axios');
 const { fail } = require('assert');
 
 const ax = axios.create({
-	baseURL: "http://127.0.0.1:4010" // mocked service URL
+	baseURL: "http://127.0.0.1:8888" // mocked service URL
 });
 
 jestOpenAPI(path.resolve(process.cwd(), "reference/bb-api.v0.yaml"));

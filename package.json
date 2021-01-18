@@ -4,8 +4,9 @@
   "description": "Services for Bipolar Bridges Project",
   "main": "main.js",
   "scripts": {
+    "build": "docker-compose build",
+    "api:start": "docker-compose up api",
     "api:mock": "cd services/http/api && yarn mock",
-    "db:build": "docker-compose build",
     "db:start": "docker-compose up -d db",
     "db:stop": "docker-compose down",
     "db:status": "docker-compose logs -f db",

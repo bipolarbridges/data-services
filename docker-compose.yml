@@ -14,6 +14,13 @@ services:
     tty: true
     stdin_open: true
     command: bash -c "connect"
+  api:
+    depends_on:
+      - db
+    build: services/http/api
+    ports:
+      - 8888:8888
+    command: "yarn start"
 
 volumes:
   store:

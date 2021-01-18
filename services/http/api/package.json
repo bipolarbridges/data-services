@@ -4,11 +4,15 @@
     "main": "main.js",
     "scripts": {
       "test": "jest tests",
+      "start": "node main.js",
       "mock": "prism mock ./reference/bb-api.v0.yaml"
     },
     "author": "bipolarbridges",
     "license": "MIT",
-    "dependencies": {},
+    "dependencies": {
+        "express": "^4.17.1",
+        "neo4j-driver": "^4.1.2"
+    },
     "devDependencies": {
       "@stoplight/prism-cli": "^4.1.2",
       "axios": "^0.21.0",
