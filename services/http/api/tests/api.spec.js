@@ -133,4 +133,96 @@ describe("Paths", () => {
                 })
             })
     });
+    describe("/measurement", () => {
+        const validExampleData = {
+            clientID: "client2@email.com",
+            data: {
+                date: 1610997441,
+                dataType: 'sentiment',
+                value: 0.8
+            }
+        }
+        it("Should reject if a bad key is provided", async () => {
+            await ax.post("/measurement", validExampleData, {
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": "apikey2"
+                }
+            }).then(async (res) => {
+                fail("Should have rejected")
+            }).catch((err) => {
+                if (!err['response']) {
+                    fail()
+                }
+                const res = err['response']
+                spec("POST", "/measurement").match(res)
+                expect(res.status).toEqual(403)
+            })
+        })
+        const invalidData = [
+            {
+                data: {
+                    date: 1610997441,
+                    dataType: 'sentiment',
+                    value: 0.8
+                }
+            },
+            {
+                clientID: "client2@email.com"
+            },
+            {
+                clientID: "client2@email.com",
+                data: {
+                    dataType: 'sentiment',
+                    value: 0.8
+                }
+            },
+            {
+                clientID: "client2@email.com",
+                data: {
+                    date: 1610997441,
+                    value: 0.8
+                }
+            },
+            {
+                clientID: "client2@email.com",
+                data: {
+                    date: 1610997441,
+                    dataType: 'sentiment'
+                }
+            }
+        ]
+        it("Should reject if data fields are missing", async () => {
+            await Promise.all(invalidData.map((dat) =>
+                ax.post("/measurement", dat, {
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": "apikey1"
+                    }
+                }).then(async (res) => {
+                    fail("Should have rejected")
+                }).catch((err) => {
+                    if (!err['response']) {
+                        fail()
+                    }
+                    const res = err['response']
+                    spec("POST", "/measurement").match(res)
+                    expect(res.status).toEqual(400)
+                })))
+        })
+        it("Should respond properly upon success", async () => {
+            await ax.post("/measurement", validExampleData, {
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": "apikey1"
+                }
+            }).then(async (res) => {
+                spec("POST", "/measurement").match(res)
+                expect(res.status).toEqual(201)
+            }).catch((err) => {
+                console.log(err)
+                fail()
+            })
+        })
+    })
 });

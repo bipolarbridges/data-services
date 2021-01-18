@@ -145,11 +145,14 @@ paths:
                   required:
                     - date
                     - value
+                    - dataType
                   properties:
                     date:
-                      type: string
+                      type: number
                     value:
                       type: number
+                    dataType:
+                      type: string
               required:
                 - clientID
                 - data
