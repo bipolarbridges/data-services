@@ -71,13 +71,14 @@ app.post('/measurement', async (req, res) => {
         const day = date.getDate()
         const time = 3600*date.getHours() + 60*date.getMinutes() + date.getSeconds()
         let session = driver.session()
-        await session.run(
+        const result = await session.run(
             "MATCH (u:User{uid:$uid}) "                                                     +
             "MERGE (m:Measurement{type: $type, value: $value}) "                            +
             "-[:RecordedAt{time: $time}]-> (d:Date{day:$day, month:$month, year:$year}) "   +
             "MERGE (m) -[:RecordedBy]-> (u) "                                               +
             "MERGE (d) -[:Includes]-> (m) "                                                 +
-            "MERGE (u) -[:Recorded]-> (m);", {
+            "MERGE (u) -[:Recorded]-> (m) "                                                 +
+            "RETURN u;", {
                 uid: data.clientID,
                 type: data.data.dataType,
                 value: data.data.value,
@@ -87,9 +88,15 @@ app.post('/measurement', async (req, res) => {
                 year
             })
         await session.close()
-        res.status(201).send({
-            message: "Created"
-        })
+        if (result.records.length == 0) {
+            res.status(404).send({
+                message: "Specified client does not exist"
+            })
+        } else {
+            res.status(201).send({
+                message: "Created"
+            })
+        }
     }
 })
 

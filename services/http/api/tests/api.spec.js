@@ -135,7 +135,7 @@ describe("Paths", () => {
     });
     describe("/measurement", () => {
         const validExampleData = {
-            clientID: "client2@email.com",
+            clientID: "client0@email.com",
             data: {
                 date: 1610997441,
                 dataType: 'sentiment',
@@ -222,6 +222,26 @@ describe("Paths", () => {
             }).catch((err) => {
                 console.log(err)
                 fail()
+            })
+        })
+        it("Should reject if client does not exist", async () => {
+            await ax.post("/measurement", {
+                clientID: "doesnotexist@email.com",
+                data: validExampleData.data
+            }, {
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": "apikey1"
+                }
+            }).then(async (res) => {
+                fail("Should have rejected")
+            }).catch((err) => {
+                if (!err['response']) {
+                    fail()
+                }
+                const res = err['response']
+                spec("POST", "/measurement").match(res)
+                expect(res.status).toEqual(404)
             })
         })
     })
