@@ -4,7 +4,7 @@ const axios = require('axios');
 const { fail } = require('assert');
 
 const ax = axios.create({
-	baseURL: "http://127.0.0.1:8888" // mocked service URL
+	baseURL: "http://127.0.0.1:8888"
 });
 
 jestOpenAPI(path.resolve(process.cwd(), "reference/bb-api.v0.yaml"));
@@ -13,7 +13,21 @@ const methods = {
     "POST": ax.post
 };
 
-const match = (method, path, body, opts, status, desc = "Unspecified") => {
+function spec
+(method, path) {
+    return {
+        match: (res) => {
+            // TODO: why am I doing this? Is the package broken?
+            // different version of axios?
+            res.request['path'] = path;
+            res.request['method'] = method;
+            expect(res).toSatisfyApiSpec();
+        }
+    }
+}
+
+function match
+(method, path, body, opts, status, desc = "Unspecified") {
     describe(`${method} ${path} [ ${status}: ${desc} ]`, () => {
         const _f_ = methods[method]
         if (!_f_) {
@@ -23,13 +37,9 @@ const match = (method, path, body, opts, status, desc = "Unspecified") => {
             await methods[method](`${path}`, body, opts)
             .then((res) => {
                 // Should return the correct status code
-                    expect(res.status).toEqual(status);
+                expect(res.status).toEqual(status);
                 // Should respond according to the schema
-                    // TODO: why am I doing this? Is the package broken?
-                    // different version of axios?
-                    res.request['path'] = path;
-                    res.request['method'] = method;
-                    expect(res).toSatisfyApiSpec();
+                spec(method, path).match(res)
             })
             .catch((err) => {
                 if (!err['response']) {
@@ -38,9 +48,7 @@ const match = (method, path, body, opts, status, desc = "Unspecified") => {
                 } else {
                     const res = err['response']
                     expect(res.status).toEqual(status);
-                    res.request['path'] = path;
-                    res.request['method'] = method;
-                    expect(res).toSatisfyApiSpec();
+                    spec(method, path).match(res);
                 }
             }));
         }
@@ -89,5 +97,40 @@ describe("Paths", () => {
                 }
             }, 403,
             "Bad key");
+        it.only("Should disallow creation of clients with the same id", 
+            async () => {
+                await ax.post("/client", {
+                    id: "client2@email.com"
+                }, {
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": "apikey1"
+                    }
+                }).then(async (res) => {
+                    spec("POST", "/client").match(res)
+                    expect(res.status).toEqual(201)
+                    await ax.post("/client", {
+                        id: "client2@email.com"
+                    }, {
+                        headers: {
+                            "Content-Type": "application/json",
+                            "Authorization": "apikey1"
+                        }
+                    }).then((res) => {
+                        fail("Should have rejected")
+                    }).catch((err) => {
+                        if (!err['response']) {
+                            fail()
+                        }
+                        const res = err['response']
+                        spec("POST", "/client").match(res)
+                        expect(res.status).toEqual(403)
+                        console.log(res)
+                    })
+                }).catch((err) => {
+                    console.log(err)
+                    fail()
+                })
+            })
     });
 });

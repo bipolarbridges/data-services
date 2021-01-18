@@ -15,6 +15,7 @@ const driver = neo4j.driver("bolt://db:7687", null)
 const stubApiKey = "apikey1"
 
 app.post('/client', async (req, res) => {
+    console.log(`${req.method} ${req.path} ${req.hostname}`)
     const data = req.body
     const key = req.get('Authorization')
     if (!data['id']) {
