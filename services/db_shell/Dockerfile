@@ -10,3 +10,4 @@ RUN chmod +x /usr/bin/execute
 COPY bin/connect /usr/bin/connect
 RUN chmod +x /usr/bin/connect
 WORKDIR /home/cypher
+COPY ./fixtures queries

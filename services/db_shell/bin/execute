@@ -1,9 +1,11 @@
 #!/bin/bash
-PRG="./cypher-shell/cypher-shell -a"
-URL="neo4j://db:7687"
 
 _run_exec_ () {
-    cat "$1" "$PRG" "$URL"
+    echo "Running queries..."
+    file="queries/$1.cypher"
+    echo "Using file: $file"
+    cat $file | connect
+    echo "Done."
 }
 
 q_file=$1

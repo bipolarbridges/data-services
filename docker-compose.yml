@@ -6,6 +6,8 @@ services:
     build: services/db
     ports:
       - 7687:7687
+    volumes:
+      - ./data:/data
   db_shell:
     container_name: bb_data_services_db_shell
     depends_on:
