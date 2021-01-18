@@ -1,10 +1,10 @@
 openapi: 3.0.0
 info:
   title: Bipolar Bridges Data Services Interface
-  version: '0.1'
+  version: '0.2'
   license:
     name: MIT
-  description: Provides endpoints for general-purpose data import and acquistion within the BB infrastructure.
+  description: Provides endpoints for general-purpose data import and acquisition within the BB infrastructure.
   contact:
     name: Rowan Lindsay
     email: rowdl22@students.cs.ubc.ca
@@ -72,15 +72,61 @@ paths:
         - import-key: []
   /measurement:
     post:
-      summary: Record Measurment. Allows for client specification of value type and asserts type-correctness on the server side.
+      summary: Record Measurement. Allows for client specification of value type and asserts type-correctness on the server side.
       tags: []
       responses:
         '201':
           description: Created
+          content:
+            application/json:
+                schema:
+                  description: 'Creation message'
+                  type: object
+                  properties:
+                    message:
+                      type: string
+                      minLength: 1
+                  required:
+                    - message
         '400':
           description: Bad Request
+          content:
+            application/json:
+              schema:
+                description: 'Error Cause'
+                type: object
+                properties:
+                  message:
+                    type: string
+                    minLength: 1
+                required:
+                  - message
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                description: 'Error Cause'
+                type: object
+                properties:
+                  message:
+                    type: string
+                    minLength: 1
+                required:
+                  - message
         '404':
           description: Not Found
+          content:
+            application/json:
+              schema:
+                description: 'Error Cause'
+                type: object
+                properties:
+                  message:
+                    type: string
+                    minLength: 1
+                required:
+                  - message
       operationId: post-measurement
       security:
         - import-key: []
@@ -88,7 +134,7 @@ paths:
         content:
           application/json:
             schema:
-              description: ''
+              description: 'Measurement Request Contents'
               type: object
               properties:
                 clientID:
@@ -98,60 +144,15 @@ paths:
                   type: object
                   required:
                     - date
+                    - value
                   properties:
                     date:
-                      type: number
+                      type: string
                     value:
                       type: number
-                typeID:
-                  type: string
-                groupID:
-                  type: string
               required:
                 - clientID
                 - data
-                - typeID
-  /group:
-    post:
-      summary: ''
-      operationId: post-group
-      responses:
-        '201':
-          description: Created
-        '400':
-          description: Bad Request
-        '403':
-          description: Forbidden
-      security:
-        - import-key: []
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                id:
-                  type: string
-  /type:
-    post:
-      summary: Create Data Type
-      tags: []
-      responses:
-        '201':
-          description: Created
-        '400':
-          description: Bad Request
-        '403':
-          description: Forbidden
-      operationId: post-type
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                id:
-                  type: string
 components:
   schemas: {}
   securitySchemes:
