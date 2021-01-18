@@ -17,14 +17,36 @@ paths:
       responses:
         '201':
           description: Created
+          content:
+            application/json:
+                schema:
+                  description: 'Creation message'
+                  type: object
+                  properties:
+                    message:
+                      type: string
+                      minLength: 1
+                  required:
+                    - message
         '400':
           description: Bad Request
+          content:
+            application/json:
+              schema:
+                description: 'Error Cause'
+                type: object
+                properties:
+                  message:
+                    type: string
+                    minLength: 1
+                required:
+                  - message
         '403':
           description: Forbidden
           content:
             application/json:
               schema:
-                description: ''
+                description: 'Error Cause'
                 type: object
                 properties:
                   message:

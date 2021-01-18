@@ -71,15 +71,13 @@ describe("Paths", () => {
             }, 400,
             "Missing data fields");
         match("POST", "/client",
-            {
-                id: "client1@email.com"
-            },
+            "I'm not JSON",
             {
                 headers: {
                     "Authorization": "apikey1"
                 }
             }, 400,
-            "Missing headers");
+            "Invalid JSON in body");
         match("POST", "/client",
             {
                 id: "client1@email.com"
