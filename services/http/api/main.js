@@ -10,7 +10,7 @@ app.use(cors())
 
 // connects to the locally-running database
 // URL is hardcoded to match the container network config
-const driver = neo4j.driver("bolt://db:7687", null)
+const driver = neo4j.driver("bolt://localhost:7687", null)
 
 const stubApiKey = "apikey1"
 
@@ -27,10 +27,22 @@ app.post('/client', async (req, res) => {
             message: "Invalid API key"
         })
     } else {
-        // let session = driver.session()
-        res.status(201).send({
-            message: "Created"
-        })
+        const id = data['id']
+        let session = driver.session()
+        // TODO handle errors
+        const exist = await session.run(
+            "MATCH (u:User{uid: $uid}) RETURN u;", { uid: id })
+        if (exist.records.length > 0) {
+            res.status(403).send({
+                message: "Already exists"
+            })
+        } else {
+            // TODO: create database abstraction layer
+            await session.run("CREATE (:User{uid: $uid});", { uid: id })
+            res.status(201).send({
+                message: "Created"
+            })
+        }
     }
 })
 

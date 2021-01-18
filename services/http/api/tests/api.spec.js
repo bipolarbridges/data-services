@@ -97,7 +97,7 @@ describe("Paths", () => {
                 }
             }, 403,
             "Bad key");
-        it.only("Should disallow creation of clients with the same id", 
+        it("Should disallow creation of clients with the same id", 
             async () => {
                 await ax.post("/client", {
                     id: "client2@email.com"
@@ -125,7 +125,7 @@ describe("Paths", () => {
                         const res = err['response']
                         spec("POST", "/client").match(res)
                         expect(res.status).toEqual(403)
-                        console.log(res)
+                        expect(res.data['message']).toEqual("Already exists")
                     })
                 }).catch((err) => {
                     console.log(err)
