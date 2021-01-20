@@ -5,6 +5,7 @@
   "main": "main.js",
   "scripts": {
     "build": "docker-compose build",
+    "build:shell": "docker-compose build db_shell",
     "api:start": "docker-compose up api",
     "api:mock": "cd services/http/api && yarn mock",
     "api:start:dev": "cd services/http/api && yarn start",
@@ -13,7 +14,7 @@
     "stop": "docker-compose down",
     "db:status": "docker-compose logs -f db",
     "db:shell": "docker-compose up -d db_shell && docker attach bb_data_services_db_shell_1",
-    "db:load:example": "docker-compose up -d db_shell && docker-compose exec db_shell execute example_v0",
+    "db:load:example": "docker-compose up -d db_shell && docker-compose exec db_shell execute example",
     "db:load:test": "docker-compose up -d db_shell && docker-compose exec db_shell execute test_data",
     "db:reset": "docker-compose down && docker volume rm bb_data_services_store",
     "test:api": "cd services/http/api && yarn test"
