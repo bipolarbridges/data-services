@@ -77,10 +77,14 @@ app.post('/measurement', async (req, res) => {
 
 const port = 8888
 
-app.listen(port, () => {
+const server = app.listen(port, () => {
     console.log(`Example app listening at http://localhost:${port}`)
 });
 
-// on application exit:
-// TODO should manage a sesion maintaining an ephemeral driver instance
-//driver.close().then(() => { console.log("Done") });
+process.on('SIGINT', async () => {
+    await db.stop()
+    server.close(() => {
+        console.log("\n\nBye.")
+        process.exit()
+    })
+});

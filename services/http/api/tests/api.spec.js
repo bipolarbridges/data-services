@@ -17,8 +17,6 @@ function spec
 (method, path) {
     return {
         match: (res) => {
-            // TODO: why am I doing this? Is the package broken?
-            // different version of axios?
             res.request['path'] = path;
             res.request['method'] = method;
             expect(res).toSatisfyApiSpec();

@@ -1,8 +1,10 @@
 const neo4j = require('neo4j-driver')
 
+class DatabaseError extends Error {}
+
 class Database {
 
-    constructor() {
+    constructor () {
         this.driver = null
         this.initialized = false
     }
@@ -15,11 +17,19 @@ class Database {
     }
 
     async exec (proc) {
-        // TODO handle errors
         const session = this.driver.session()
-        const ret = await proc(session)
-        await session.close()
-        return ret
+        try {
+            const ret = await proc(session)
+            return ret
+        } catch (e) {
+            throw new DatabaseError()
+        } finally {
+            await session.close()
+        }
+    }
+
+    async stop () {
+        await this.driver.close()
     }
 }
 
