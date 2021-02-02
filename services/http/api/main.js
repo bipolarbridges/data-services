@@ -49,9 +49,12 @@ app.post('/measurement', async (req, res) => {
     } else if (!data['clientID'] 
                 || !data['data']
                 || !data.data['date'] || !data.data['dataType'] || !data.data['value']) {
-        // TODO provide type enforcements
         res.status(400).send({
             message: "Missing data fields"
+        })
+    } else if (isNaN(data.data['date'])) {
+        res.status(400).send({
+            message: "date must be a number"
         })
     } else {
         const me = {

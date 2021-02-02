@@ -160,6 +160,7 @@ describe("Paths", () => {
             })
         })
         const invalidData = [
+            // Missing fields
             {
                 data: {
                     date: 1610997441,
@@ -190,9 +191,19 @@ describe("Paths", () => {
                     date: 1610997441,
                     dataType: 'sentiment'
                 }
+            },
+            // Bad typing examples
+            {
+                clientID: "client0@email.com",
+                data: {
+                    date: 'Jun 1st',
+                    dataType: 'sentiment',
+                    value: 0.8
+                }
             }
         ]
-        it("Should reject if data fields are missing", async () => {
+        it("Should reject if data fields are missing or have wrong type", 
+            async () => {
             await Promise.all(invalidData.map((dat) =>
                 ax.post("/measurement", dat, {
                     headers: {
@@ -200,10 +211,10 @@ describe("Paths", () => {
                         "Authorization": "apikey1"
                     }
                 }).then(async (res) => {
-                    fail("Should have rejected")
+                    fail(`Should have rejected (${JSON.stringify(dat)})`)
                 }).catch((err) => {
                     if (!err['response']) {
-                        fail()
+                        fail(`Error: ${err}`)
                     }
                     const res = err['response']
                     spec("POST", "/measurement").match(res)
