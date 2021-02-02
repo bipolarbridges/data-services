@@ -10,13 +10,11 @@ app.use(cors())
 
 const db = database()
 
-const stubApiKey = "apikey1"
-
 app.post('/client', async (req, res) => {
     console.log(`${req.method} ${req.path} ${req.hostname}`)
     const data = req.body
     const key = req.get('Authorization')
-    if (key !== stubApiKey) {
+    if (!(await db.exec(api.validateAuthKey(key)))) {
         res.status(403).send({
             message: "Invalid API key"
         })
@@ -44,7 +42,7 @@ app.post('/measurement', async (req, res) => {
     console.log(`${req.method} ${req.path} ${req.hostname}`)
     const data = req.body
     const key = req.get('Authorization')
-    if (key !== stubApiKey) {
+    if (!(await db.exec(api.validateAuthKey(key)))) {
         res.status(403).send({
             message: "Invalid API key"
         })
@@ -62,7 +60,7 @@ app.post('/measurement', async (req, res) => {
             type: data.data.dataType,
             value: data.data.value
         }
-        if (!await db.exec(api.createMeasurement(me))) {
+        if (!(await db.exec(api.createMeasurement(me)))) {
             res.status(404).send({
                 message: "Specified client does not exist"
             })
