@@ -70,6 +70,67 @@ paths:
             examples: {}
       security:
         - import-key: []
+  /account:
+    post:
+      summary: Create an account which links a client with a coach reference. If client does not exist, it will be created.
+      tags: []
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+                schema:
+                  description: 'Creation message'
+                  type: object
+                  properties:
+                    message:
+                      type: string
+                      minLength: 1
+                  required:
+                    - message
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                description: 'Error Cause'
+                type: object
+                properties:
+                  message:
+                    type: string
+                    minLength: 1
+                required:
+                  - message
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                description: 'Error Cause'
+                type: object
+                properties:
+                  message:
+                    type: string
+                    minLength: 1
+                required:
+                  - message
+      operationId: post-account
+      requestBody:
+        content:
+          application/json:
+            schema:
+              description: ''
+              type: object
+              properties:
+                id:
+                  type: string
+                  minLength: 1
+              required:
+                - clientID
+                - coachID
+            examples: {}
+      security:
+        - import-key: [] 
   /measurement:
     post:
       summary: Record Measurement. Allows for client specification of value type and asserts type-correctness on the server side.

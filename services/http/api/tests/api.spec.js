@@ -131,6 +131,83 @@ describe("Paths", () => {
                 })
             })
     });
+    describe("/account", () => {
+        const validExampleData = {
+            clientID: "5PLhmSJ8vz86eTzy",
+            coachID: "w7lqCFGmq26LLCnJ"
+        }
+        it("Should reject if a bad key is provided", async () => {
+            await ax.post("/account", validExampleData, {
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": "apikey2"
+                }
+            }).then(async (res) => {
+                fail("Should have rejected")
+            }).catch((err) => {
+                if (!err['response']) {
+                    fail()
+                }
+                const res = err['response']
+                spec("POST", "/account").match(res)
+                expect(res.status).toEqual(403)
+            })
+        })
+        const invalidData = [
+            { clientId: validExampleData.clientID },
+            { coachId: validExampleData.coachID },
+        ]
+        it("Should reject if data fields are missing", 
+            async () => {
+            await Promise.all(invalidData.map((dat) =>
+                ax.post("/account", dat, {
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": "apikey1" // this is a valid key
+                    }
+                }).then(async (res) => {
+                    fail(`Should have rejected (${JSON.stringify(dat)})`)
+                }).catch((err) => {
+                    if (!err['response']) {
+                        fail(`Error: ${err}`)
+                    }
+                    const res = err['response']
+                    spec("POST", "/account").match(res)
+                    expect(res.status).toEqual(400)
+                })))
+        })
+        it("Should succeed for an existing client", async () => {
+            await ax.post("/account", {
+                clientID: "client0@email.com",
+                coachID: validExampleData.coachID
+            }, {
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": "apikey1"
+                }
+            }).then(async (res) => {
+                spec("POST", "/account").match(res)
+                expect(res.status).toEqual(201)
+            }).catch((err) => {
+                console.log(err)
+                fail()
+            })
+        })
+        it("Should succeed for a non-existent client", async () => {
+            await ax.post("/account", validExampleData, {
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": "apikey1"
+                }
+            }).then(async (res) => {
+                spec("POST", "/account").match(res)
+                expect(res.status).toEqual(201)
+            }).catch((err) => {
+                console.log(err)
+                fail()
+            })
+        })
+    });
     describe("/measurement", () => {
         const validExampleData = {
             clientID: "client0@email.com",
@@ -253,5 +330,5 @@ describe("Paths", () => {
                 expect(res.status).toEqual(404)
             })
         })
-    })
+    });
 });
