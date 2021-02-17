@@ -3,6 +3,7 @@ const cors = require('cors')
 const bodyParser = require('body-parser')
 const database = require('./lib/db')
 const api = require('./lib/interface')
+const { accept } = require('./lib/requests')
 
 const app = express()
 app.use(bodyParser.json())
@@ -10,8 +11,7 @@ app.use(cors())
 
 const db = database()
 
-app.post('/client', async (req, res) => {
-    console.log(`${req.method} ${req.path} ${req.hostname}`)
+app.post('/client', accept(async (req, res) => {
     const data = req.body
     const key = req.get('Authorization')
     if (!(await db.exec(api.validateAuthKey(key)))) {
@@ -36,10 +36,9 @@ app.post('/client', async (req, res) => {
             })
         }
     }
-})
+}))
 
-app.post('/measurement', async (req, res) => {
-    console.log(`${req.method} ${req.path} ${req.hostname}`)
+app.post('/measurement', accept(async (req, res) => {
     const data = req.body
     const key = req.get('Authorization')
     if (!(await db.exec(api.validateAuthKey(key)))) {
@@ -73,7 +72,7 @@ app.post('/measurement', async (req, res) => {
             })
         }
     }
-})
+}))
 
 const port = 8888
 
