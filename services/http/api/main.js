@@ -12,7 +12,7 @@ app.use(cors())
 
 const db = database()
 
-app.post('/client', accept(async (req, res) => {
+app.post('/client', accept(wrap(async (req, res) => {
     const data = req.body
     const key = req.get('Authorization')
     if (!(await db.exec(api.validateAuthKey(key)))) {
@@ -37,7 +37,7 @@ app.post('/client', accept(async (req, res) => {
             })
         }
     }
-}));
+})));
 
 app.post('/account', accept(wrap(async (req, res) => {
     const data = req.body
@@ -58,7 +58,7 @@ app.post('/account', accept(wrap(async (req, res) => {
     }
 })));
 
-app.post('/measurement', accept(async (req, res) => {
+app.post('/measurement', accept(wrap(async (req, res) => {
     const data = req.body
     const key = req.get('Authorization')
     if (!(await db.exec(api.validateAuthKey(key)))) {
@@ -92,7 +92,7 @@ app.post('/measurement', accept(async (req, res) => {
             })
         }
     }
-}));
+})));
 
 const port = 8888
 
