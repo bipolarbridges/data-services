@@ -2,4 +2,8 @@ function info(msg) {
     console.log(`[INFO] ${msg}`);
 }
 
-module.exports = { info };
+function error(msg) {
+    console.log(`[ERROR] ${msg}`);
+}
+
+module.exports = { info, error };

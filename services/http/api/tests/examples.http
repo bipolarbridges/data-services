@@ -1,0 +1,8 @@
+POST http://127.0.0.1:8888/account HTTP/1.1
+content-type: application/json
+authorization: apikey1
+
+{
+    "clientID": "5PLhmSJ8vz86eTzy",
+    "coachID": "w7lqCFGmq26LLCnJ"
+}
