@@ -4,6 +4,7 @@ const bodyParser = require('body-parser')
 const database = require('./lib/db')
 const api = require('./lib/interface')
 const { accept } = require('./lib/requests')
+const { wrap } = require('./lib/errors')
 
 const app = express()
 app.use(bodyParser.json())
@@ -36,7 +37,26 @@ app.post('/client', accept(async (req, res) => {
             })
         }
     }
-}))
+}));
+
+app.post('/account', accept(wrap(async (req, res) => {
+    const data = req.body
+    const key = req.get('Authorization')
+    if (!(await db.exec(api.validateAuthKey(key)))) {
+        res.status(403).send({
+            message: "Invalid API key"
+        })
+    } else if (!data['clientID'] || !data['coachID']) {
+        res.status(400).send({
+            message: "Missing id field"
+        })
+    } else {
+        await db.exec(api.createAccount(data['clientID'], data['coachID']));
+        res.status(201).send({
+            message: "Created"
+        });
+    }
+})));
 
 app.post('/measurement', accept(async (req, res) => {
     const data = req.body
@@ -72,7 +92,7 @@ app.post('/measurement', accept(async (req, res) => {
             })
         }
     }
-}))
+}));
 
 const port = 8888
 

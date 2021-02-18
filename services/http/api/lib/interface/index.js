@@ -27,8 +27,15 @@ module.exports = {
         return user.records.length > 0
     },
     validateAuthKey: (key) => async (db) => {
+        if (!key) return false;
         const results = await db.run(
             "MATCH (a: Authorization{key: $key}) RETURN a;", { key })
         return results.records.length > 0
+    },
+    createAccount: (cl, co) => async (db) => {
+        await db.run(
+            "MERGE (u:User{uid:$uid})" +
+            "MERGE (c:Coach{id:$cid})" +
+            "MERGE (u) -[:CoachedBy]-> (c);", { uid: cl, cid: co });
     }
 }
