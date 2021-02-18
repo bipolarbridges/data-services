@@ -201,6 +201,9 @@ paths:
                 clientID:
                   type: string
                   minLength: 1
+                coachID:
+                  type: string
+                  minLength: 1
                 data:
                   type: object
                   required:
@@ -216,6 +219,7 @@ paths:
                       type: string
               required:
                 - clientID
+                - coachID
                 - data
 components:
   schemas: {}

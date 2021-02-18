@@ -17,12 +17,14 @@ module.exports = {
         const time = 3600*date.getHours() + 60*date.getMinutes() + date.getSeconds()
         const user = await db.run(
             "MATCH (u:User{uid:$uid}) "                                                     +
+            "MATCH (c:Coach{id:$cid}) "                                                     +
             "MERGE (m:Measurement{type: $type, value: $value}) "                            +
             "-[:RecordedAt{time: $time}]-> (d:Date{day:$day, month:$month, year:$year}) "   +
             "MERGE (m) -[:RecordedBy]-> (u) "                                               +
+            "MERGE (m) -[:RecordedFor]-> (c)"                                               +
             "MERGE (d) -[:Includes]-> (m) "                                                 +
             "MERGE (u) -[:Recorded]-> (m) "                                                 +
-            "RETURN u;", 
+            "RETURN c;", 
             {...m, time, day, month, year })
         return user.records.length > 0
     },

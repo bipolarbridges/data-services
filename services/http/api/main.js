@@ -65,7 +65,7 @@ app.post('/measurement', accept(wrap(async (req, res) => {
         res.status(403).send({
             message: "Invalid API key"
         })
-    } else if (!data['clientID'] 
+    } else if (!data['clientID'] || !data['coachID'] 
                 || !data['data']
                 || !data.data['date'] || !data.data['dataType'] || !data.data['value']) {
         res.status(400).send({
@@ -79,12 +79,13 @@ app.post('/measurement', accept(wrap(async (req, res) => {
         const me = {
             date: data.data['date'],
             uid: data.clientID,
+            cid: data.coachID,
             type: data.data.dataType,
             value: data.data.value
         }
         if (!(await db.exec(api.createMeasurement(me)))) {
             res.status(404).send({
-                message: "Specified client does not exist"
+                message: "at least one of client or coach does not exist"
             })
         } else {
             res.status(201).send({

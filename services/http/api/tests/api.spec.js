@@ -211,6 +211,7 @@ describe("Paths", () => {
     describe("/measurement", () => {
         const validExampleData = {
             clientID: "client0@email.com",
+            coachID: "GUcXaXk6jOuw5fUw",
             data: {
                 date: 1610997441,
                 dataType: 'sentiment',
@@ -237,18 +238,9 @@ describe("Paths", () => {
         const invalidData = [
             // Missing fields
             {
+                coachID: "GUcXaXk6jOuw5fUw",
                 data: {
                     date: 1610997441,
-                    dataType: 'sentiment',
-                    value: 0.8
-                }
-            },
-            {
-                clientID: "client2@email.com"
-            },
-            {
-                clientID: "client2@email.com",
-                data: {
                     dataType: 'sentiment',
                     value: 0.8
                 }
@@ -257,11 +249,33 @@ describe("Paths", () => {
                 clientID: "client2@email.com",
                 data: {
                     date: 1610997441,
+                    dataType: 'sentiment',
                     value: 0.8
                 }
             },
             {
                 clientID: "client2@email.com",
+                coachID: "GUcXaXk6jOuw5fUw"
+            },
+            {
+                clientID: "client2@email.com",
+                coachID: "GUcXaXk6jOuw5fUw",
+                data: {
+                    dataType: 'sentiment',
+                    value: 0.8
+                }
+            },
+            {
+                clientID: "client2@email.com",
+                coachID: "GUcXaXk6jOuw5fUw",
+                data: {
+                    date: 1610997441,
+                    value: 0.8
+                }
+            },
+            {
+                clientID: "client2@email.com",
+                coachID: "GUcXaXk6jOuw5fUw",
                 data: {
                     date: 1610997441,
                     dataType: 'sentiment'
@@ -270,6 +284,7 @@ describe("Paths", () => {
             // Bad typing examples
             {
                 clientID: "client0@email.com",
+                coachID: "GUcXaXk6jOuw5fUw",
                 data: {
                     date: 'Jun 1st',
                     dataType: 'sentiment',
@@ -313,6 +328,7 @@ describe("Paths", () => {
         it("Should reject if client does not exist", async () => {
             await ax.post("/measurement", {
                 clientID: "doesnotexist@email.com",
+                coachID: "GUcXaXk6jOuw5fUw",
                 data: validExampleData.data
             }, {
                 headers: {
@@ -330,5 +346,26 @@ describe("Paths", () => {
                 expect(res.status).toEqual(404)
             })
         })
+        it("Should reject if coach does not exist", async () => {
+            await ax.post("/measurement", {
+                coachID: "doesnotexist",
+                clientID: validExampleData.clientID,
+                data: validExampleData.data
+            }, {
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": "apikey1"
+                }
+            }).then(async (res) => {
+                fail("Should have rejected")
+            }).catch((err) => {
+                if (!err['response']) {
+                    fail()
+                }
+                const res = err['response']
+                spec("POST", "/measurement").match(res)
+                expect(res.status).toEqual(404)
+            })
+        });
     });
 });

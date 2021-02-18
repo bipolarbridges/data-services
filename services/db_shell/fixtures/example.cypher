@@ -1,6 +1,9 @@
-// Set up basic client references
+// Set up entity references
+
 CREATE (:User{uid: 1});
 CREATE (:User{uid: 2});
+
+CREATE (:Coach{id: 1});
 
 // Syntax to log a user measurement at a certain time
 MATCH (u:User{uid:1})
@@ -23,5 +26,14 @@ MATCH (u:User{uid:2})
     MERGE (m:Measurement{type: "heart-rate", value: 70}) 
             -[:RecordedAt{time: 0}]-> (d:Date{day:1, month:1, year:2021})
     MERGE (m) -[:RecordedBy]-> (u)
+    MERGE (d) -[:Includes]-> (m)
+    MERGE (u) -[:Recorded]-> (m);
+
+// Include coach relation
+MATCH (u:User{uid:2}), (c:Coach{id: 1})
+    MERGE (m:Measurement{type: "heart-rate", value: 70}) 
+            -[:RecordedAt{time: 0}]-> (d:Date{day:1, month:1, year:2021})
+    MERGE (m) -[:RecordedBy]-> (u)
+    MERGE (m) -[:RecordedFor]-> (c)
     MERGE (d) -[:Includes]-> (m)
     MERGE (u) -[:Recorded]-> (m);
