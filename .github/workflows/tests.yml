@@ -20,6 +20,8 @@ jobs:
         run: docker-compose up -d api
       - name: Await server
         run: sleep 5
+      - name: Install testing dependencies
+        run: yarn
       - name: Run tests
         working-directory: services/http/api
         run: yarn test
