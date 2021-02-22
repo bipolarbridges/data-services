@@ -1,0 +1,23 @@
+name: tests
+on: push
+jobs:
+  api:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+      - name: Build services containers
+        run: docker-compose build
+      - name: Start containers
+        run: docker-compose up -d
+      - name: Show container logs
+        run: docker-compose logs
+      - name: Await containers
+        run: sleep 15
+      - name: Clean database
+        run: yarn db:reset
+      - name: Set up database
+        run: yarn db:load:test
+      - name: Run tests
+        working-directory: services/http/api
+        run: yarn test
