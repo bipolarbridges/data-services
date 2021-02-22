@@ -15,7 +15,7 @@ jobs:
       - name: Show database logs
         run: docker-compose logs db
       - name: Load test fixtures
-        run: docker-compose up -d db_shell && docker-compose exec db_shell execute test_data
+        run: docker-compose run --rm db_shell execute test_data
       - name: Start server
         run: docker-compose up -d api
       - name: Await server
