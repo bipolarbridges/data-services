@@ -28,4 +28,4 @@ jobs:
       - name: Run tests
         working-directory: services/http/api
         run: yarn test
-        timeout-seconds: 30
+        timeout-minutes: 1
