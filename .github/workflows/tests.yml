@@ -6,18 +6,20 @@ jobs:
     steps:
       - name: Check out code
         uses: actions/checkout@v2
-      - name: Build services containers
+      - name: Build service images
         run: docker-compose build
-      - name: Start containers
-        run: docker-compose up -d
-      - name: Show container logs
-        run: docker-compose logs
-      - name: Await containers
+      - name: Start database container
+        run: docker-compose up -d db
+      - name: Await database
         run: sleep 15
-      - name: Clean database
-        run: yarn db:reset
-      - name: Set up database
-        run: yarn db:load:test
+      - name: Show database logs
+        run: docker-compose logs db
+      - name: Load test fixtures
+        run: docker-compose up -d db_shell && docker-compose exec db_shell execute test_data
+      - name: Start server
+        run: docker-compose up -d api
+      - name: Await server
+        run: sleep 5
       - name: Run tests
         working-directory: services/http/api
         run: yarn test
