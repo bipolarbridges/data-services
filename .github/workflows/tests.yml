@@ -29,3 +29,5 @@ jobs:
         working-directory: services/http/api
         run: yarn test
         timeout-minutes: 1
+      - name: Show complete server logs
+        run: docker-compose logs api
