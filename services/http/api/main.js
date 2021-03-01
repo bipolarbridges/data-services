@@ -1,3 +1,5 @@
+require('dotenv').config()
+
 const express = require('express')
 const cors = require('cors')
 const bodyParser = require('body-parser')
@@ -76,7 +78,7 @@ app.post('/measurement', async (req, res) => {
 })
 
 const port = 8888
-const host = "0.0.0.0"
+const host = process.env.API_ADDR
 
 const server = app.listen(port, host, () => {
     console.log(`Example app listening at http://${host}:${port}`)

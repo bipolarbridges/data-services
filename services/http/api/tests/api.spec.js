@@ -4,7 +4,7 @@ const axios = require('axios');
 const { fail } = require('assert');
 
 const ax = axios.create({
-	baseURL: "http://0.0.0.0:8888"
+	baseURL: "http://127.0.0.1:8888"
 });
 
 jestOpenAPI(path.resolve(process.cwd(), "reference/bb-api.v0.yaml"));
