@@ -12,7 +12,7 @@ class Database {
     init () {
         // connects to the locally-running database
         // URL is hardcoded to match the container network config
-        this.driver = neo4j.driver("bolt://localhost:7687", null)
+        this.driver = neo4j.driver("bolt://db:7687", null)
         this.initialized = true
     }
 
