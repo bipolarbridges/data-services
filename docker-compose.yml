@@ -21,6 +21,9 @@ services:
     ports:
       - 8888:8888
     command: "yarn start"
-
+networks:
+  default:
+    external:
+      name: bb_default
 volumes:
   store:

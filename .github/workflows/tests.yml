@@ -6,6 +6,8 @@ jobs:
     steps:
       - name: Check out code
         uses: actions/checkout@v2
+      - name: Create network
+        run: docker network create bb_default
       - name: Build service images
         run: docker-compose build
       - name: Start database container
