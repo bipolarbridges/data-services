@@ -1,4 +1,5 @@
 FROM node:14
 WORKDIR /app
 COPY . .
-RUN yarn
+COPY .docker.env .env
+RUN yarn install --prod
