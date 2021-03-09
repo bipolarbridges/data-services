@@ -8,6 +8,7 @@
     "build:shell": "docker-compose build db_shell",
     "api:start": "docker-compose up api",
     "start": "docker-compose up -d db && sleep 15 && docker-compose up -d api",
+	"start:test": "docker-compose up -d db && sleep 15 && yarn db:load:test && docker-compose up -d api",
     "api:mock": "cd services/http/api && yarn mock",
     "api:start:dev": "cd services/http/api && yarn start",
     "api:start:test": "yarn db:reset && yarn db:load:test && yarn api:start:dev",
