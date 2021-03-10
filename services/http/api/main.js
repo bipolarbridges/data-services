@@ -7,6 +7,7 @@ const database = require('./lib/db')
 const api = require('./lib/interface')
 const { accept } = require('./lib/requests')
 const { wrap } = require('./lib/errors')
+require('./lib/auth')
 
 
 const app = express()
