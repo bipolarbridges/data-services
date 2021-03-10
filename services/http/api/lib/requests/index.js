@@ -1,9 +1,9 @@
 const logs = require('../logging');
 
-function accept(handler) {
-    return (req,res) => {
+function accept() {
+    return async (req,res, next) => {
         logs.info(`${req.method} ${req.path} ${req.hostname}`);
-        handler(req,res);
+        await next();
     }
 }
 
