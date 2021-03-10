@@ -2,10 +2,10 @@ const logs = require('../logging');
 
 class InternalError extends Error {}
 
-function wrap(proc) {
-    return async (req, res) => {
+function wrap() {
+    return async (req, res, next) => {
         try {
-            await proc(req, res)
+            await next();
         } catch (e) {
             logs.error(e)
             res.status(500).send({
