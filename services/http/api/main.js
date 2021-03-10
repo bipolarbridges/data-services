@@ -17,7 +17,6 @@ app.use(wrap())
 const db = database()
 
 app.post('/client', accept(async (req, res) => {
-    console.log(`${req.method} ${req.path} ${req.hostname}`)
     const data = req.body
     const key = req.get('Authorization')
     if (!(await db.exec(api.validateAuthKey(key)))) {
@@ -45,7 +44,6 @@ app.post('/client', accept(async (req, res) => {
 }));
 
 app.post('/measurement', accept(async (req, res) => {
-    console.log(`${req.method} ${req.path} ${req.hostname}`)
     const data = req.body
     const key = req.get('Authorization')
     if (!(await db.exec(api.validateAuthKey(key)))) {
