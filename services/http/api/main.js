@@ -13,10 +13,11 @@ const app = express()
 app.use(bodyParser.json())
 app.use(cors())
 app.use(wrap())
+app.use(accept())
 
 const db = database()
 
-app.post('/client', accept(async (req, res) => {
+app.post('/client', async (req, res) => {
     const data = req.body
     const key = req.get('Authorization')
     if (!(await db.exec(api.validateAuthKey(key)))) {
@@ -41,9 +42,9 @@ app.post('/client', accept(async (req, res) => {
             })
         }
     }
-}));
+});
 
-app.post('/measurement', accept(async (req, res) => {
+app.post('/measurement', async (req, res) => {
     const data = req.body
     const key = req.get('Authorization')
     if (!(await db.exec(api.validateAuthKey(key)))) {
@@ -77,7 +78,7 @@ app.post('/measurement', accept(async (req, res) => {
             })
         }
     }
-}));
+});
 
 const port = 8888
 const host = process.env.API_ADDR
