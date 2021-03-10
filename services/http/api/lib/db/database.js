@@ -1,6 +1,7 @@
-const neo4j = require('neo4j-driver')
+const neo4j = require('neo4j-driver');
+const { InternalError } = require('../errors');
 
-class DatabaseError extends Error {}
+class DatabaseError extends InternalError {};
 
 class Database {
 
@@ -20,7 +21,7 @@ class Database {
             const ret = await proc(session)
             return ret
         } catch (e) {
-            throw new DatabaseError()
+            throw new DatabaseError(e)
         } finally {
             await session.close()
         }
