@@ -12,10 +12,11 @@ const { wrap } = require('./lib/errors')
 const app = express()
 app.use(bodyParser.json())
 app.use(cors())
+app.use(wrap())
 
 const db = database()
 
-app.post('/client', accept(wrap(async (req, res) => {
+app.post('/client', accept(async (req, res) => {
     console.log(`${req.method} ${req.path} ${req.hostname}`)
     const data = req.body
     const key = req.get('Authorization')
@@ -41,9 +42,9 @@ app.post('/client', accept(wrap(async (req, res) => {
             })
         }
     }
-})));
+}));
 
-app.post('/measurement', accept(wrap(async (req, res) => {
+app.post('/measurement', accept(async (req, res) => {
     console.log(`${req.method} ${req.path} ${req.hostname}`)
     const data = req.body
     const key = req.get('Authorization')
@@ -78,7 +79,7 @@ app.post('/measurement', accept(wrap(async (req, res) => {
             })
         }
     }
-})));
+}));
 
 const port = 8888
 const host = process.env.API_ADDR
