@@ -5,6 +5,9 @@ const cors = require('cors')
 const bodyParser = require('body-parser')
 const database = require('./lib/db')
 const api = require('./lib/interface')
+const { accept } = require('./lib/requests')
+const { wrap } = require('./lib/errors')
+
 
 const app = express()
 app.use(bodyParser.json())
@@ -12,7 +15,7 @@ app.use(cors())
 
 const db = database()
 
-app.post('/client', async (req, res) => {
+app.post('/client', accept(wrap(async (req, res) => {
     console.log(`${req.method} ${req.path} ${req.hostname}`)
     const data = req.body
     const key = req.get('Authorization')
@@ -38,9 +41,9 @@ app.post('/client', async (req, res) => {
             })
         }
     }
-})
+})));
 
-app.post('/measurement', async (req, res) => {
+app.post('/measurement', accept(wrap(async (req, res) => {
     console.log(`${req.method} ${req.path} ${req.hostname}`)
     const data = req.body
     const key = req.get('Authorization')
@@ -75,7 +78,7 @@ app.post('/measurement', async (req, res) => {
             })
         }
     }
-})
+})));
 
 const port = 8888
 const host = process.env.API_ADDR
