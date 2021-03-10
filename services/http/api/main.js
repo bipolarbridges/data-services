@@ -6,45 +6,46 @@ const bodyParser = require('body-parser')
 const database = require('./lib/db')
 const api = require('./lib/interface')
 const { accept } = require('./lib/requests')
-const { wrap } = require('./lib/errors')
+const { wrap, handle } = require('./lib/errors')
+require('./lib/auth')
 
 
 const app = express()
 app.use(bodyParser.json())
 app.use(cors())
-app.use(wrap())
 app.use(accept())
 
 const db = database()
 
-app.post('/client', async (req, res) => {
-    const data = req.body
-    const key = req.get('Authorization')
-    if (!(await db.exec(api.validateAuthKey(key)))) {
-        res.status(403).send({
-            message: "Invalid API key"
-        })
-    } else if (!data['id']) {
-        res.status(400).send({
-            message: "Missing id field"
-        })
-    } else {
-        const id = data['id']
-        const exists = await db.exec(api.userExists(id))
-        if (exists) {
+app.post('/client', wrap(async (req, res) => {
+        const data = req.body
+        const key = req.get('Authorization')
+        let auth = await db.exec(api.validateAuthKey(key));
+        if (!auth) {
             res.status(403).send({
-                message: "Already exists"
+                message: "Invalid API key"
+            })
+        } else if (!data['id']) {
+            res.status(400).send({
+                message: "Missing id field"
             })
         } else {
-            await db.exec(api.createUser(id))
-            res.status(201).send({
-                message: "Created"
-            })
+            const id = data['id']
+            const exists = await db.exec(api.userExists(id))
+            if (exists) {
+                res.status(403).send({
+                    message: "Already exists"
+                })
+            } else {
+                await db.exec(api.createUser(id))
+                res.status(201).send({
+                    message: "Created"
+                })
+            }
         }
-    }
-});
+    }));
 
-app.post('/measurement', async (req, res) => {
+app.post('/measurement', wrap(async (req, res) => {
     const data = req.body
     const key = req.get('Authorization')
     if (!(await db.exec(api.validateAuthKey(key)))) {
@@ -78,7 +79,9 @@ app.post('/measurement', async (req, res) => {
             })
         }
     }
-});
+}));
+
+app.use(handle());
 
 const port = 8888
 const host = process.env.API_ADDR

@@ -5,8 +5,11 @@ function info(...msg) {
 function error(...msg) {
     console.log('[ERROR]', ...msg);
 }
+function debug(...msg) {
+    console.log('[DEBUG]', ...msg);
+}
 
 info('Logging enabled')
 
-module.exports = { info, error };
+module.exports = { info, error, debug };
 
