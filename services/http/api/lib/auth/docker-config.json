@@ -1,4 +1,7 @@
 {
-    "auth_server_addr": "0.0.0.0",
-    "auth_server_port": "4000"
+    "auth_server": {
+        "protocol": "http",
+        "addr": "0.0.0.0",
+        "port": "4000"
+    }
 }
