@@ -1,0 +1,4 @@
+{
+    "auth_server_addr": "0.0.0.0",
+    "auth_server_port": "4000"
+}
