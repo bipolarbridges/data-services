@@ -6,7 +6,7 @@ const bodyParser = require('body-parser')
 const database = require('./lib/db')
 const api = require('./lib/interface')
 const { accept } = require('./lib/requests')
-const { wrap, handle } = require('./lib/errors')
+const { handle } = require('./lib/errors')
 
 
 const app = express()
@@ -16,35 +16,35 @@ app.use(accept())
 
 const db = database()
 
-app.post('/client', wrap(async (req, res) => {
-        const data = req.body
-        const key = req.get('Authorization')
-        let auth = await db.exec(api.validateAuthKey(key));
-        if (!auth) {
+app.post('/client', async (req, res) => {
+    const data = req.body
+    const key = req.get('Authorization')
+    let auth = await db.exec(api.validateAuthKey(key));
+    if (!auth) {
+        res.status(403).send({
+            message: "Invalid API key"
+        })
+    } else if (!data['id']) {
+        res.status(400).send({
+            message: "Missing id field"
+        })
+    } else {
+        const id = data['id']
+        const exists = await db.exec(api.userExists(id))
+        if (exists) {
             res.status(403).send({
-                message: "Invalid API key"
-            })
-        } else if (!data['id']) {
-            res.status(400).send({
-                message: "Missing id field"
+                message: "Already exists"
             })
         } else {
-            const id = data['id']
-            const exists = await db.exec(api.userExists(id))
-            if (exists) {
-                res.status(403).send({
-                    message: "Already exists"
-                })
-            } else {
-                await db.exec(api.createUser(id))
-                res.status(201).send({
-                    message: "Created"
-                })
-            }
+            await db.exec(api.createUser(id))
+            res.status(201).send({
+                message: "Created"
+            })
         }
-    }));
+    }
+});
 
-app.post('/measurement', wrap(async (req, res) => {
+app.post('/measurement', async (req, res) => {
     const data = req.body
     const key = req.get('Authorization')
     if (!(await db.exec(api.validateAuthKey(key)))) {
@@ -78,7 +78,7 @@ app.post('/measurement', wrap(async (req, res) => {
             })
         }
     }
-}));
+});
 
 app.use(handle());
 
