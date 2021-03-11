@@ -6,12 +6,11 @@ const bodyParser = require('body-parser')
 const database = require('./lib/db')
 const api = require('./lib/interface')
 const { accept } = require('./lib/requests')
-const { wrap } = require('./lib/errors')
+const { handle } = require('./lib/errors')
 
 const app = express()
 app.use(bodyParser.json())
 app.use(cors())
-app.use(wrap())
 app.use(accept())
 
 const db = database()
@@ -19,7 +18,8 @@ const db = database()
 app.post('/client', async (req, res) => {
     const data = req.body
     const key = req.get('Authorization')
-    if (!(await db.exec(api.validateAuthKey(key)))) {
+    let auth = await db.exec(api.validateAuthKey(key));
+    if (!auth) {
         res.status(403).send({
             message: "Invalid API key"
         })
@@ -98,6 +98,8 @@ app.post('/measurement', async (req, res) => {
         }
     }
 });
+
+app.use(handle());
 
 const port = 8888
 const host = process.env.API_ADDR

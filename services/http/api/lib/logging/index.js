@@ -1,9 +1,15 @@
-function info(msg) {
-    console.log(`[INFO] ${msg}`);
+function info(...msg) {
+    console.log('[INFO]', ...msg);
 }
 
-function error(msg) {
-    console.log(`[ERROR] ${msg}`);
+function error(...msg) {
+    console.log('[ERROR]', ...msg);
+}
+function debug(...msg) {
+    console.log('[DEBUG]', ...msg);
 }
 
-module.exports = { info, error };
+info('Logging enabled')
+
+module.exports = { info, error, debug };
+
