@@ -56,57 +56,48 @@ function match
 
 describe("Paths", () => {
     describe("/client", () => {
-        match("POST", "/client",
-            {
-                id: "client1@email.com"
-            },
-            {
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": "apikey1"
-                }
-            }, 201,
-            "Normal happy case");
-        match("POST", "/client",
-            {},
-            {
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": "apikey1"
-                }
-            }, 400,
-            "Missing data fields");
-        match("POST", "/client",
-            "I'm not JSON",
-            {
-                headers: {
-                    "Authorization": "apikey1"
-                }
-            }, 400,
-            "Invalid JSON in body");
-        match("POST", "/client",
-            {
-                id: "client1@email.com"
-            },
-            {
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": "apikey2"
-                }
-            }, 403,
-            "Bad key");
-        it("Should disallow creation of clients with the same id", 
-            async () => {
-                await ax.post("/client", {
-                    id: "client2@email.com"
-                }, {
+        describe("POST", () => {
+            match("POST", "/client",
+                {
+                    id: "client1@email.com"
+                },
+                {
                     headers: {
                         "Content-Type": "application/json",
                         "Authorization": "apikey1"
                     }
-                }).then(async (res) => {
-                    spec("POST", "/client").match(res)
-                    expect(res.status).toEqual(201)
+                }, 201,
+                "Normal happy case");
+            match("POST", "/client",
+                {},
+                {
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": "apikey1"
+                    }
+                }, 400,
+                "Missing data fields");
+            match("POST", "/client",
+                "I'm not JSON",
+                {
+                    headers: {
+                        "Authorization": "apikey1"
+                    }
+                }, 400,
+                "Invalid JSON in body");
+            match("POST", "/client",
+                {
+                    id: "client1@email.com"
+                },
+                {
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": "apikey2"
+                    }
+                }, 403,
+                "Bad key");
+            it("Should disallow creation of clients with the same id", 
+                async () => {
                     await ax.post("/client", {
                         id: "client2@email.com"
                     }, {
@@ -114,22 +105,33 @@ describe("Paths", () => {
                             "Content-Type": "application/json",
                             "Authorization": "apikey1"
                         }
-                    }).then((res) => {
-                        fail("Should have rejected")
-                    }).catch((err) => {
-                        if (!err['response']) {
-                            fail()
-                        }
-                        const res = err['response']
+                    }).then(async (res) => {
                         spec("POST", "/client").match(res)
-                        expect(res.status).toEqual(403)
-                        expect(res.data['message']).toEqual("Already exists")
+                        expect(res.status).toEqual(201)
+                        await ax.post("/client", {
+                            id: "client2@email.com"
+                        }, {
+                            headers: {
+                                "Content-Type": "application/json",
+                                "Authorization": "apikey1"
+                            }
+                        }).then((res) => {
+                            fail("Should have rejected")
+                        }).catch((err) => {
+                            if (!err['response']) {
+                                fail()
+                            }
+                            const res = err['response']
+                            spec("POST", "/client").match(res)
+                            expect(res.status).toEqual(403)
+                            expect(res.data['message']).toEqual("Already exists")
+                        })
+                    }).catch((err) => {
+                        console.log(err)
+                        fail()
                     })
-                }).catch((err) => {
-                    console.log(err)
-                    fail()
                 })
-            })
+            });
     });
     describe("/measurement", () => {
         const validExampleData = {
