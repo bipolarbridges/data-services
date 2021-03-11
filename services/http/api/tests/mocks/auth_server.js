@@ -1,8 +1,3 @@
-
-AUTH_VALID_EMAIL = 'test@email.com';
-AUTH_VALID_TOKEN= 'abcdefghijklmnop';
-
-
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
@@ -12,31 +7,31 @@ const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 
-app.get('/validate', (req, res) => {
+DATA = {
+    'client0token': 'client0@email.com'
+}
+
+app.post('/validate', (req, res) => {
     const data = req.body;
-    if (!data['token'] || !data['email']) {
+    if (!data['token']) {
         res.status(400).send({
-            message: "Missing fields"
+            message: "Missing token"
         });
     } else {
-        if (
-                data.token === AUTH_VALID_TOKEN &&
-                data.email === AUTH_VALID_EMAIL) {
+        if (DATA[data.token]) {
+            // match found, reply true and id
             res.status(200).send({
-                result: true
+                result: true,
+                id: DATA[data.token]
             });
         } else {
+            // no match, reply false nad no id
             res.status(200).send({
                 result: false
             });
         }
     }
 });
-
-module.exports = {
-    AUTH_VALID_EMAIL,
-    AUTH_VALID_TOKEN
-};
 
 const port = 4000;
 const host = '127.0.0.1';
