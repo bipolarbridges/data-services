@@ -26,9 +26,4 @@ module.exports = {
             {...m, time, day, month, year })
         return user.records.length > 0
     },
-    validateAuthKey: (key) => async (db) => {
-        const results = await db.run(
-            "MATCH (a: Authorization{key: $key}) RETURN a;", { key })
-        return results.records.length > 0
-    }
 }

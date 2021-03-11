@@ -7,24 +7,22 @@ const database = require('./lib/db')
 const api = require('./lib/interface')
 const { accept } = require('./lib/requests')
 const { wrap, handle } = require('./lib/errors')
+const { auth } = require('./lib/auth');
+const logs = require('./lib/logging');
 
 
 const app = express()
+const db = database()
+
 app.use(bodyParser.json())
 app.use(cors())
 app.use(accept())
-
-const db = database()
+app.use(auth(db))
 
 app.post('/client', wrap(async (req, res) => {
+		logs.info(req.path);
         const data = req.body
-        const key = req.get('Authorization')
-        let auth = await db.exec(api.validateAuthKey(key));
-        if (!auth) {
-            res.status(403).send({
-                message: "Invalid API key"
-            })
-        } else if (!data['id']) {
+        if (!data['id']) {
             res.status(400).send({
                 message: "Missing id field"
             })
@@ -46,12 +44,7 @@ app.post('/client', wrap(async (req, res) => {
 
 app.post('/measurement', wrap(async (req, res) => {
     const data = req.body
-    const key = req.get('Authorization')
-    if (!(await db.exec(api.validateAuthKey(key)))) {
-        res.status(403).send({
-            message: "Invalid API key"
-        })
-    } else if (!data['clientID'] 
+    if (!data['clientID'] 
                 || !data['data']
                 || !data.data['date'] || !data.data['dataType'] || !data.data['value']) {
         res.status(400).send({
