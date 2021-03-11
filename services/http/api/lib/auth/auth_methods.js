@@ -1,9 +1,15 @@
 const fs = require('fs');
 const path = require('path');
 const logs = require('../logging');
+const crypt = require('crypto');
 
 const config = JSON.parse(fs.readFileSync((path.join(__dirname, 'config.json'))));
 logs.info('Config: ', config);
+
+function basicHash(sec) {
+    return crypt.createHash('sha256')
+        .update(sec).digest('hex');
+}
 
 module.exports = {
     authMethods: [
@@ -15,7 +21,7 @@ module.exports = {
                 "MATCH (i)-[c:Can{method: $method}]->(r)" +
                 "RETURN i,r,c;", 
                 {
-                    check: auth,
+                    check: basicHash(auth),
                     path: req.path,
                     method: req.method
                 });
