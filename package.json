@@ -13,7 +13,7 @@
     "db:start": "docker-compose up -d db",
     "stop": "docker-compose down",
     "db:status": "docker-compose logs -f db",
-    "db:shell": "docker-compose up -d db_shell && docker attach bb_data_services_db_shell_1",
+    "db:shell": "docker-compose run --rm db_shell connect",
     "db:load:example": "docker-compose run --rm db_shell execute example",
     "db:load:test": "docker-compose run --rm db_shell execute test_data",
     "db:reset": "docker-compose run --rm db_shell execute delete_all",
