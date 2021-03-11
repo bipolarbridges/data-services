@@ -41,6 +41,10 @@ app.post('/client', async (req, res) => {
     }
 });
 
+app.get('/client/:clientId', async (req, res) => {
+    res.status(200).send('hi'); // TODO
+});
+
 app.post('/measurement', async (req, res) => {
     const data = req.body
     if (!data['clientID'] 

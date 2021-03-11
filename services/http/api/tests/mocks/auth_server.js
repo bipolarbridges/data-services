@@ -8,7 +8,8 @@ app.use(cors());
 app.use(bodyParser.json());
 
 DATA = {
-    'client0token': 'client0@email.com'
+    'client0token': 'client0@email.com',
+    'client1token': 'client1@email.com',
 }
 
 app.post('/validate', (req, res) => {

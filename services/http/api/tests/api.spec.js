@@ -132,6 +132,71 @@ describe("Paths", () => {
                     })
                 })
             });
+        describe("GET", () => {
+            it("Should reject if no authorization provided", async () => {
+                await ax.get("/client/client0@email.com")
+                    .then(async (res) => {
+                        fail("Should have rejected");
+                    })
+                    .catch((err) => {
+                        if (!err['response']) {
+                            fail();
+                        }
+                        const res = err['response']
+                        spec("GET", "/client").match(res)
+                        expect(res.status).toEqual(403)
+                    });
+            });
+            it("Should reject if unauthorized identity provided", async () => {
+                await ax.get("/client/client0@email.com", {
+                        headers: {
+                            "Authorization": "client1token"
+                        }
+                    })
+                    .then(async (res) => {
+                        fail("Should have rejected");
+                    })
+                    .catch((err) => {
+                        if (!err['response']) {
+                            fail();
+                        }
+                        const res = err['response']
+                        spec("GET", "/client").match(res)
+                        expect(res.status).toEqual(403)
+                    });
+            });
+            it("Should allow a client to access own data", async () => {
+                await ax.get("/client/client0@email.com", {
+                        headers: {
+                            // this maps to the client0 id in the auth server
+                            "Authorization": "client0token"
+                        }
+                    })
+                    .then(async (res) => {
+                        spec("GET", "/client").match(res)
+                        expect(res.status).toEqual(200);
+                    })
+                    .catch((err) => {
+                        console.log(err)
+                        fail();
+                    });
+            });
+            // TODO should modify the semantics below:
+            it("Should reject if client id does not exist", async () => {
+                await ax.get("/client/client(-1)@email.com")
+                    .then(async (res) => {
+                        fail("Should have rejected");
+                    })
+                    .catch((err) => {
+                        if (!err['response']) {
+                            fail();
+                        }
+                        const res = err['response']
+                        spec("GET", "/client").match(res)
+                        expect(res.status).toEqual(403);
+                    });
+            });
+        });
     });
     describe("/measurement", () => {
         const validExampleData = {

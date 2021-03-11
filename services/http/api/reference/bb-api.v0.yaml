@@ -70,6 +70,36 @@ paths:
             examples: {}
       security:
         - import-key: []
+    get: 
+      summary: Get information about a specific client
+      tags: []
+      responses:
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+                schema:
+                  description: 'Message'
+                  type: object
+                  properties:
+                    message:
+                      type: string
+                      minLength: 1
+                  required:
+                    - message
+        '200':
+          description: Good
+          content:
+            application/json:
+                schema:
+                  description: 'Client info'
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                      minLength: 1
+                  required:
+                    - id
   /measurement:
     post:
       summary: Record Measurement. Allows for client specification of value type and asserts type-correctness on the server side.
