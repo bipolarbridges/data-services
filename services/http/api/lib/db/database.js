@@ -21,7 +21,11 @@ class Database {
             const ret = await proc(session)
             return ret
         } catch (e) {
-            throw new DatabaseError(e)
+            if (e instanceof InternalError) {
+                throw e;
+            } else {
+                throw new DatabaseError(e);
+            }
         } finally {
             await session.close()
         }
