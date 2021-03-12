@@ -21,6 +21,11 @@ services:
     ports:
       - 8888:8888
     command: "yarn start"
+  mock_auth_server:
+    build: services/http/api/tests/mocks/auth_server
+    ports:
+      - 4000:4000
+    command: "yarn start"
 networks:
   default:
     external:
