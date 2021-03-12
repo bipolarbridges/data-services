@@ -23,6 +23,10 @@ jobs:
         run: docker-compose run --rm db_shell execute test_data
       - name: Start auth server
         run: docker-compose up -d mock_auth_server
+      - name: Await auth server
+        run: sleep 5
+      - name: Show auth server logs
+        run: docker-compose logs mock_auth_server
       - name: Start server
         run: docker-compose up -d api
       - name: Await server
