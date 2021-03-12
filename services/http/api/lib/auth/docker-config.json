@@ -1,7 +1,7 @@
 {
     "auth_server": {
         "protocol": "http",
-        "addr": "0.0.0.0",
+        "addr": "mock_auth_server",
         "port": "4000"
     }
 }
