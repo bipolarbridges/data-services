@@ -6,7 +6,7 @@
     "test": "jest tests",
     "start": "node main.js",
     "mock:api": "prism mock ./reference/bb-api.v0.yaml",
-    "mock:auth": "cd tests/mocks && yarn start",
+    "mock:auth": "cd tests/mocks/auth_server && yarn start",
     "start:dev": "concurrently --kill-others 'yarn start' 'yarn mock:auth'"
   },
   "author": "bipolarbridges",
