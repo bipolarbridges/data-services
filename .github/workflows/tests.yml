@@ -37,4 +37,5 @@ jobs:
         run: yarn test
         timeout-minutes: 1
       - name: Show complete server logs
+        if: always()
         run: docker-compose logs api
