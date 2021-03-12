@@ -59,14 +59,23 @@ module.exports = {
                 });
             return results.records.length > 0;
         },
-        // TODO: add id token option
-        (req, auth) => async (_) => {
+        (req, auth) => async (db) => {
             const id = await getRemoteId(auth);
             if (!id) {
                 return false;
             } else {
                 logs.info('Authenticated: ', id);
-                return true; // TODO
+                const results = await db.run(
+                    "MATCH (u:User{uid: $uid}) " +
+                    "MATCH (r:Resource{path: $path}) " +
+                    "MATCH (u)-[c:Can{method: $method}]->(r)" +
+                    "RETURN u,r,c;", 
+                    {
+                        uid: id,
+                        path: req.path,
+                        method: req.method
+                    });
+                return results.records.length > 0;
             }
         }
     ]

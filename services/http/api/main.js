@@ -42,7 +42,9 @@ app.post('/client', async (req, res) => {
 });
 
 app.get('/client/:clientId', async (req, res) => {
-    res.status(200).send('hi'); // TODO
+    res.status(200).send({
+        id: req.params.clientId
+    });
 });
 
 app.post('/measurement', async (req, res) => {
