@@ -196,6 +196,35 @@ describe("Paths", () => {
                         expect(res.status).toEqual(403);
                     });
             });
+            it("Should allow a new client to access own data", async () => {
+                await ax.post("/client", {
+                    id: "client3@email.com"
+                }, {
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": "apikey1"
+                    }
+                }).then(async (res) => {
+                    spec("POST", "/client").match(res)
+                    expect(res.status).toEqual(201)
+                    return await ax.get("/client/client3@email.com", {
+                        headers: {
+                            "Authorization": "client3token"
+                        }
+                    })
+                    .then(async (res) => {
+                        spec("GET", "/client").match(res)
+                        expect(res.status).toEqual(200);
+                    })
+                    .catch((err) => {
+                        console.log(err)
+                        fail();
+                    });
+                }).catch((err) => {
+                    console.log(err)
+                    fail()
+                })
+            });
         });
     });
     describe("/measurement", () => {

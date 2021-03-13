@@ -12,6 +12,8 @@ app.use(bodyParser.json());
 DATA = {
     'client0token': 'client0@email.com',
     'client1token': 'client1@email.com',
+    'client2token': 'client2@email.com',
+    'client3token': 'client3@email.com',
 }
 
 app.post('/validate', (req, res) => {
