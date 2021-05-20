@@ -2,7 +2,6 @@ require('dotenv').config()
 
 const express = require('express')
 const cors = require('cors')
-const bodyParser = require('body-parser')
 const database = require('./lib/db')
 const api = require('./lib/interface')
 const { accept } = require('./lib/requests')
@@ -14,7 +13,7 @@ const logs = require('./lib/logging');
 const app = express()
 const db = database()
 
-app.use(bodyParser.json())
+app.use(express.json())
 app.use(cors())
 app.use(accept())
 app.use(auth(db))
@@ -76,6 +75,16 @@ app.post('/measurement', async (req, res) => {
             })
         }
     }
+});
+
+app.post('/survey', (req, res) => {
+    res.status(200).send({
+        message: 'Received'
+    })
+});
+
+app.get('/', (req, res) => {
+    return res.status(200).end();
 });
 
 app.use(handle());

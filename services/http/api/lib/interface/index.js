@@ -33,4 +33,8 @@ module.exports = {
             {...m, time, day, month, year })
         return user.records.length > 0
     },
+
+    createSurvey: (m) => async (db) => {
+        
+    }
 }
