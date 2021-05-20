@@ -34,7 +34,12 @@ module.exports = {
         return user.records.length > 0
     },
 
-    createSurvey: (m) => async (db) => {
-        
+    createSurvey: (s) => async (db) => {
+        const date = new Date(s.date * 1000)
+        const year = date.getFullYear()
+        const month = date.getMonth()
+        const day = date.getDate()
+        const time = 3600*date.getHours() + 60*date.getMinutes() + date.getSeconds()
+        const user = await db.run("", {...s, time, day, month, year })
     }
 }
