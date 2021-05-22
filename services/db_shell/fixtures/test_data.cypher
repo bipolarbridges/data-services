@@ -2,6 +2,8 @@ CREATE (:User{uid: "client0@email.com"});
 
 CREATE (:Resource{path: "/client"});
 CREATE (:Resource{path: "/measurement"});
+CREATE (:Resource{path: "/survey"});
+CREATE (:Resource{path: "/"});
 
 CREATE (:Identity{
     type: "key",
@@ -15,6 +17,12 @@ MATCH (i:Identity{name: "test_export_key"})
 MATCH (i:Identity{name: "test_export_key"})
     MATCH (r:Resource{path: "/measurement"})
     CREATE (i)-[:Can{method: "POST"}]->(r);
+MATCH (i:Identity{name: "test_export_key"})
+    MATCH (r:Resource{path: "/survey"})
+    CREATE (i)-[:Can{method: "POST"}]->(r);
+MATCH (i:Identity{name: "test_export_key"})
+    MATCH (r:Resource{path: "/"})
+    CREATE (i)-[:Can{method: "GET"}]->(r);
 
 MATCH (u:User{uid: "client0@email.com"}) 
     CREATE (r:Resource{path: "/client/client0@email.com"})
