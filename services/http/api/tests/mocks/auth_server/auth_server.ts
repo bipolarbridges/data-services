@@ -1,24 +1,31 @@
-require('dotenv').config();
-
-const express = require('express');
-const cors = require('cors');
-const bodyParser = require('body-parser');
+import express from 'express';
+import cors from 'cors';
+import { json } from 'body-parser';
+import dotenv from 'dotenv';
+dotenv.config();
 
 const app = express();
 
 app.use(cors());
-app.use(bodyParser.json());
+app.use(json());
 
-DATA = {
+type Data = {
+    [key:string]: string
+}
+const DATA : Data = {
     'client0token': 'client0@email.com',
     'client1token': 'client1@email.com',
     'client2token': 'client2@email.com',
     'client3token': 'client3@email.com',
 }
 
+type ValidationBody = {
+    token?: string
+};
+
 app.post('/validate', (req, res) => {
-    const data = req.body;
-    if (!data['token']) {
+    const data: ValidationBody = req.body;
+    if (!data?.token) {
         res.status(400).send({
             message: "Missing token"
         });
@@ -39,7 +46,7 @@ app.post('/validate', (req, res) => {
 });
 
 const port = 4000;
-const host = process.env.SERVER_ADDR;
+const host: string = process.env['SERVER_ADDR'];
 
 const server = app.listen(port, host, () => {
     console.log(`Mock auth server listening at http://${host}:${port}`)

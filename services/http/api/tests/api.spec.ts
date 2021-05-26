@@ -1,22 +1,25 @@
-const jestOpenAPI = require('jest-openapi');
-const path = require('path')
-const axios = require('axios');
-const { fail } = require('assert');
+import jestOpenAPI from 'jest-openapi';
+import { resolve } from 'path';
+import axios, {AxiosInstance, AxiosRequestConfig, AxiosResponse} from 'axios';
+import { fail } from 'assert';
 
 const ax = axios.create({
 	baseURL: "http://127.0.0.1:8888"
 });
 
-jestOpenAPI(path.resolve(process.cwd(), "reference/bb-api.v0.yaml"));
+jestOpenAPI(resolve(process.cwd(), "reference/bb-api.v0.yaml"));
 
-const methods = {
+type Method = {
+    [key: string]: AxiosInstance["post"]
+}
+
+const methods: Method = {
     "POST": ax.post
 };
 
-function spec
-(method, path) {
+function spec(method: string, path: string) {
     return {
-        match: (res) => {
+        match: (res: AxiosResponse<any>) => {
             res.request['path'] = path;
             res.request['method'] = method;
             expect(res).toSatisfyApiSpec();
@@ -24,8 +27,7 @@ function spec
     }
 }
 
-function match
-(method, path, body, opts, status, desc = "Unspecified") {
+function match(method: string, path: string, body: any, opts: AxiosRequestConfig, status: number, desc = "Unspecified") {
     describe(`${method} ${path} [ ${status}: ${desc} ]`, () => {
         const _f_ = methods[method]
         if (!_f_) {
@@ -33,7 +35,7 @@ function match
         } else {
             it("Should match API spec", async () =>
             await methods[method](`${path}`, body, opts)
-            .then((res) => {
+            .then((res: AxiosResponse<any>) => {
                 // Should return the correct status code
                 expect(res.status).toEqual(status);
                 // Should respond according to the schema

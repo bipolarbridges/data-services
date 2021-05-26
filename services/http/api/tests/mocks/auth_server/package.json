@@ -1,7 +1,8 @@
 {
   "name": "mock_auth_server",
   "scripts": {
-    "start": "node auth_server.js"
+    "build": "rm -rf ./dist && tsc",
+    "start": "node dist/auth_server.js"
   },
   "dependencies": {
     "body-parser": "^1.19.0",
