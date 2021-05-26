@@ -33,8 +33,5 @@
   "bugs": {
     "url": "https://github.com/bipolarbridges/data-services/issues"
   },
-  "homepage": "https://github.com/bipolarbridges/data-services#readme",
-  "dependencies": {
-    "typescript": "^4.3.2"
-  }
+  "homepage": "https://github.com/bipolarbridges/data-services#readme"
 }
