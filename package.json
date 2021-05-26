@@ -5,7 +5,7 @@
   "main": "main.js",
   "scripts": {
     "tsc:api": "cd services/http/api && yarn build",
-    "tsc:mock":"cd services/http/api && yarn build:mock",
+    "tsc:mock": "cd services/http/api && yarn build:mock",
     "lint": "eslint . --ext .ts",
     "build": "docker-compose build",
     "build:shell": "docker-compose build db_shell",
@@ -33,5 +33,8 @@
   "bugs": {
     "url": "https://github.com/bipolarbridges/data-services/issues"
   },
-  "homepage": "https://github.com/bipolarbridges/data-services#readme"
+  "homepage": "https://github.com/bipolarbridges/data-services#readme",
+  "dependencies": {
+    "typescript": "^4.3.2"
+  }
 }
