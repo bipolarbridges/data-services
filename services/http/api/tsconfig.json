@@ -19,6 +19,7 @@
             "models/*": ["/lib/models/index.ts"],
             "client/*": ["/lib/models/client.ts"],
             "measurement/*": ["/lib/models/measurement.ts"],
+            "resource/*": ["/lib/models/resource.ts"],
             "*": [
               "*",
               "node_modules/*"

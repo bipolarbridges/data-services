@@ -24,6 +24,12 @@ function userExists(id: string) {
     };
 }
 
+function createUserX(id: string) {
+    return async (): Promise<void> => {
+        await models.user.UserModel.createOne({uid: id})
+    }
+}
+
 function createUser(id:string) {
     return async (session: Session): Promise<null> => {
         await session.run("CREATE (:User{uid: $uid});", { uid: id });
