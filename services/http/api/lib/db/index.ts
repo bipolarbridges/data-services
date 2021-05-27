@@ -1,9 +1,9 @@
-import { Driver, driver, Result, Session } from 'neo4j-driver';
+import { Driver, Result, Session } from 'neo4j-driver';
 import { TransactionConfig } from 'neo4j-driver/types/session';
 import {Parameters} from 'neo4j-driver/types/query-runner'
 import { InternalError } from '../errors';
-import { DatabaseCallback, DatabaseResponse } from 'lib/auth/auth_methods';
-
+import { DatabaseResponse } from 'lib/auth/auth_methods';
+import { Neogma } from 'neogma';
 class DatabaseError extends InternalError {
     constructor(error: string) {
         super(error);
@@ -13,14 +13,27 @@ class DatabaseError extends InternalError {
 export class Database {
     driver: Driver | null;
     initialized: boolean;
+    public neogma: Neogma;
 
     constructor () {
         this.driver = null;
+        this.neogma = null;
         this.initialized = false;
     }
 
-    init ():void {
-        this.driver = driver(`bolt://${process.env['DB_ADDR']}:7687`, null);
+    init (): void {
+        this.neogma = new Neogma(
+            {
+                // use your connection details
+                url: `bolt://${process.env['DB_ADDR']}:7687`,
+                username: 'neo4j',
+                password: 'password',
+            },
+            {
+                logger: console.log,
+            },
+        );        
+        this.driver = this.neogma.driver;
         this.initialized = true;
     }
 

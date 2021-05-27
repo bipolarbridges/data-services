@@ -16,6 +16,7 @@
             "interface/*": ["/lib/interface/index.ts"],
             "logging/*": ["/lib/logging/index.ts"],
             "requests/*": ["/lib/requests/index.ts"],
+            "models/*": ["/lib/models/index.ts"],
             "*": [
               "*",
               "node_modules/*"

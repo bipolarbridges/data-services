@@ -1,5 +1,19 @@
 import { Session } from "neo4j-driver";
+import models from '../models';
 
+function userExistsX(id: string) {
+    return async (session: Session): Promise<boolean> => {
+        const exist = await models.client.ClientModel.findOne({
+            session: session,
+            where: {
+                id: id,
+            }
+        });
+        if (exist) return true
+        else return false
+
+    }
+}
 function userExists(id: string) {
     return async (session: Session): Promise<boolean> => {
         const exist = await session.run(
@@ -54,5 +68,6 @@ function createMeasurement(m: MeasurementInput) {
 export default {
     userExists,
     createUser,
-    createMeasurement
+    createMeasurement,
+    userExistsX
 }

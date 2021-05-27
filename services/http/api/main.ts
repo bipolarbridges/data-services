@@ -27,7 +27,7 @@ app.post('/client', async (req, res) => {
         })
     } else {
         const id = data['id']
-        const exists = await db.exec(api.userExists(id))
+        const exists = await db.exec(api.userExistsX(id))
         if (exists) {
             res.status(403).send({
                 message: "Already exists"
