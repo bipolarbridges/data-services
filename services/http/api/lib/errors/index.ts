@@ -1,5 +1,5 @@
 import { Response } from 'express';
-import {error} from '../logging/index';
+import {error} from '../logging';
 
 
 export class InternalError extends Error {

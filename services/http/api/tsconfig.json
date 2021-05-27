@@ -17,6 +17,8 @@
             "logging/*": ["/lib/logging/index.ts"],
             "requests/*": ["/lib/requests/index.ts"],
             "models/*": ["/lib/models/index.ts"],
+            "client/*": ["/lib/models/client.ts"],
+            "measurement/*": ["/lib/models/measurement.ts"],
             "*": [
               "*",
               "node_modules/*"

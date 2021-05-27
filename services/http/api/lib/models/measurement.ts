@@ -1,4 +1,4 @@
-import { database } from "db/*";
+import { database } from "../db";
 import { ModelFactory, ModelRelatedNodesI, NeogmaInstance, NeogmaModel } from "neogma";
 import { ClientModel, ClientInstance } from "./client";
 
