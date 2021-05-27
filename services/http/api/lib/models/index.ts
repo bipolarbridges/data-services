@@ -1,8 +1,8 @@
 
-import * as client from './client';
+import * as user from './user';
 import * as measurement from './measurement';
 
 export default {
-    client,
+    user,
     measurement,
 }

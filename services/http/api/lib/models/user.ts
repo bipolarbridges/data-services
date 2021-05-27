@@ -2,29 +2,29 @@ import { database } from "../db";
 import { ModelFactory, ModelRelatedNodesI, NeogmaInstance, NeogmaModel } from "neogma";
 import { MeasurementModel, MeasurementInstance } from "./measurement";
 
-type ClientProperties = {
-    id: string,
+type UserProperties = {
+    uid: string,
     name?: string
 }
 
-type ClientRelatedNode = {
+type UserRelatedNode = {
     Measurement: ModelRelatedNodesI<
         typeof MeasurementModel,
         MeasurementInstance
     >
 }
 
-interface MethodsI {
-    clientId: (this: ClientInstance) => string
-}
+export type UserInstance = NeogmaInstance<UserProperties, UserRelatedNode>;
 
-export type ClientInstance = NeogmaInstance<ClientProperties, ClientRelatedNode, MethodsI>;
-
-export const ClientModel: NeogmaModel<ClientProperties, ClientRelatedNode, undefined, MethodsI> = ModelFactory<ClientProperties, ClientRelatedNode, undefined, MethodsI>(
+export const UserModel: NeogmaModel<
+    UserProperties,
+    UserRelatedNode> = ModelFactory<
+    UserProperties, 
+    UserRelatedNode>(
         {
-            label: 'Client',
+            label: 'User',
             schema: {
-                id: {
+                uid: {
                     type: 'string',
                     required: true,
                 },
@@ -42,12 +42,7 @@ export const ClientModel: NeogmaModel<ClientProperties, ClientRelatedNode, undef
                     }
                 }
             },
-            primaryKeyField: 'id',
-            methods: {
-                clientId(this: ClientInstance) {
-                    return this.id;
-                }
-            }
+            primaryKeyField: 'uid',
         },
         database().neogma
-)
+);

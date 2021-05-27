@@ -1,19 +1,21 @@
 import { Session } from "neo4j-driver";
 import models from '../models';
+import * as loggers from '../logging'
 
 function userExistsX(id: string) {
-    return async (session: Session): Promise<boolean> => {
-        const exist = await models.client.ClientModel.findOne({
-            session: session,
+    return async (): Promise<boolean> => {
+        const exist = await models.user.UserModel.findOne({
             where: {
-                id: id,
+                uid: id,
             }
         });
+        loggers.info(exist);
         if (exist) return true
         else return false
 
     }
 }
+
 function userExists(id: string) {
     return async (session: Session): Promise<boolean> => {
         const exist = await session.run(

@@ -1,6 +1,6 @@
 import { database } from "../db";
 import { ModelFactory, ModelRelatedNodesI, NeogmaInstance, NeogmaModel } from "neogma";
-import { ClientModel, ClientInstance } from "./client";
+import { UserModel, UserInstance } from "./user";
 
 type MeasurementProperties = {
     date: number,
@@ -10,9 +10,9 @@ type MeasurementProperties = {
 }
 
 type MeasurementRelatedNode = {
-    Client: ModelRelatedNodesI<
-        typeof ClientModel,
-        ClientInstance
+    User: ModelRelatedNodesI<
+        typeof UserModel,
+        UserInstance
     >
 }
 
@@ -40,8 +40,8 @@ export const MeasurementModel: NeogmaModel<MeasurementProperties, MeasurementRel
             }
         },
         relationships: {
-            Client: {
-                model: ClientModel,
+            User: {
+                model: UserModel,
                 direction: 'in',
                 name: '',
             }
