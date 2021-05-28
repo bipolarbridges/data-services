@@ -2,7 +2,7 @@
   "name": "mock_auth_server",
   "scripts": {
     "build": "rm -rf ./dist && tsc",
-    "start": "node dist/auth_server.js"
+    "start": "ts-node auth_server.ts"
   },
   "dependencies": {
     "cors": "^2.8.5",
