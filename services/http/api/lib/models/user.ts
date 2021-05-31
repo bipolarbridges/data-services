@@ -27,25 +27,25 @@ export const UserModel: NeogmaModel<
                     type: 'string',
                     required: true,
                 },
-                name: {
-                    type: 'string',
-                }
             },
             relationships: {
                 Measurement: {
                     model: MeasurementModel,
                     direction: 'out',
-                    name: '',
-                    properties: {
-    
-                    }
+                    name: 'Recorded',
+                    properties: {}
                 },
                 Resource: {
                     model: ResourceModel,
                     direction: 'out',
-                    name: '',
+                    name: 'Can',
                     properties: {
-    
+                        method: {
+                            property: 'method',
+                            schema: {
+                                type: 'string'
+                            }
+                        }
                     }
                 }
             },

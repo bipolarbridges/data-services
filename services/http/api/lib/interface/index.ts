@@ -1,6 +1,7 @@
 import { Session } from "neo4j-driver";
 import models from '../models';
 import * as loggers from '../logging'
+import { UserInstance } from "lib/models/user";
 
 function userExistsX(id: string) {
     return async (): Promise<boolean> => {
@@ -16,6 +17,10 @@ function userExistsX(id: string) {
     }
 }
 
+/**
+ * 
+ * @depreciated 
+ */
 function userExists(id: string) {
     return async (session: Session): Promise<boolean> => {
         const exist = await session.run(
@@ -25,8 +30,21 @@ function userExists(id: string) {
 }
 
 function createUserX(id: string) {
-    return async (): Promise<void> => {
-        await models.user.UserModel.createOne({uid: id})
+    return async (session: Session): Promise<null> => {
+        const createdUser: UserInstance = await models.user.UserModel.createOne({uid: id}, { session });
+        await models.resource.ResourceModel.createOne({path: `/client/${id}`}, { session });
+        await createdUser.relateTo(
+            {
+                alias: 'Resource',
+                where: {
+                    path: `/client/${id}`,
+                },
+                properties: {
+                    method: 'GET'
+                },
+                session: session,
+            });
+            return null;
     }
 }
 
@@ -73,9 +91,18 @@ function createMeasurement(m: MeasurementInput) {
     };
 }
 
+function createMeasurementX(m: MeasurementInput) {
+    return async (session: Session): Promise<boolean> => {
+        
+        return false;
+    }
+}
+
 export default {
     userExists,
+    userExistsX,
     createUser,
+    createUserX,
     createMeasurement,
-    userExistsX
+    
 }

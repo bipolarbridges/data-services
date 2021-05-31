@@ -7,10 +7,7 @@ type ResourceProperties = {
 }
 
 type ResourceRelatedNode = {
-    User: ModelRelatedNodesI<
-        typeof UserModel,
-        UserInstance
-    >
+    User: ModelRelatedNodesI<typeof UserModel,UserInstance>
 }
 
 export type ResourceInstance = NeogmaInstance<ResourceProperties, ResourceRelatedNode>;
@@ -28,13 +25,7 @@ export const ResourceModel: NeogmaModel<
                     required: true
                 }
             },
-            relationships: {
-                User: {
-                    model: UserModel,
-                    direction: 'in',
-                    name: '',
-                }
-            }
+            relationships: {}
         },
         database().neogma
     )
