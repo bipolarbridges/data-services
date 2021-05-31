@@ -17,5 +17,7 @@ module.exports = {
         "@typescript-eslint"
     ],
     "rules": {
+        "no-explicit-any": 0,
+        "no-unused-vars": 0
     }
 };

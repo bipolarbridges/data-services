@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import jestOpenAPI from 'jest-openapi';
 import { resolve } from 'path';
 import axios, {AxiosInstance, AxiosRequestConfig, AxiosResponse} from 'axios';
@@ -19,7 +20,7 @@ const methods: Method = {
 
 function spec(method: string, path: string) {
     return {
-        match: (res: AxiosResponse<any>) => {
+        match: (res: AxiosResponse<unknown>) => {
             res.request['path'] = path;
             res.request['method'] = method;
             expect(res).toSatisfyApiSpec();
@@ -27,7 +28,7 @@ function spec(method: string, path: string) {
     }
 }
 
-function match(method: string, path: string, body: any, opts: AxiosRequestConfig, status: number, desc = "Unspecified") {
+function match(method: string, path: string, body: unknown, opts: AxiosRequestConfig, status: number, desc = "Unspecified") {
     describe(`${method} ${path} [ ${status}: ${desc} ]`, () => {
         const _f_ = methods[method]
         if (!_f_) {
@@ -35,7 +36,7 @@ function match(method: string, path: string, body: any, opts: AxiosRequestConfig
         } else {
             it("Should match API spec", async () =>
             await methods[method](`${path}`, body, opts)
-            .then((res: AxiosResponse<any>) => {
+            .then((res: AxiosResponse<unknown>) => {
                 // Should return the correct status code
                 expect(res.status).toEqual(status);
                 // Should respond according to the schema
@@ -118,7 +119,7 @@ describe("Paths", () => {
                                 "Authorization": "apikey1"
                             }
                         }).then((res) => {
-                            fail("Should have rejected")
+                            fail("Should have rejected");
                         }).catch((err) => {
                             if (!err['response']) {
                                 fail()

@@ -4,9 +4,9 @@
   "description": "Services for Bipolar Bridges Project",
   "main": "main.js",
   "scripts": {
-    "tsc:api": "cd services/http/api && yarn build",
-    "tsc:mock": "cd services/http/api && yarn build:mock",
-    "lint": "eslint . --ext .ts",
+    "build:api": "cd services/http/api && yarn build",
+    "build:mock:auth": "cd services/http/api && yarn build:mock:auth",
+    "lint": "cd services/http/api && yarn lint",
     "build": "docker-compose build",
     "build:shell": "docker-compose build db_shell",
     "api:start": "docker-compose up api",
