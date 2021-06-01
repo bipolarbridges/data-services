@@ -5,14 +5,19 @@ import { Session } from 'neo4j-driver'
 
 function userExistsX(id: string) {
     return async (): Promise<boolean> => {
-        const exist = await models.user.UserModel.findOne({
-            where: {
-                uid: id,
-            }
-        });
-        loggers.info(exist?.__existsInDatabase);
-        return exist? exist?.__existsInDatabase : false;
+        try {
+            const exist = await models.user.UserModel.findOne({
+                where: {
+                    uid: id,
+                }
+            });
 
+            loggers.info(exist?.__existsInDatabase);
+            return exist? exist?.__existsInDatabase : false;
+        } catch (err) {
+            loggers.error(err);
+            return false;
+        }
     }
 }
 
@@ -30,18 +35,26 @@ function userExists(id: string) {
 
 function createUserX(id: string) {
     return async (): Promise<null> => {
-        await models.user.UserModel.createOne(
-            {
-                uid: id,
-                Resource: {
-                    
-                    properties: [{
-                        path: `/client/${id}`,
-                        method: 'GET'
-                    }],
+        try {
+            await models.user.UserModel.createOne(
+                {
+                    uid: id,
+                    Resource: {
+                        
+                        properties: [{
+                            path: `/client/${id}`,
+                            method: 'GET'
+                        }],
+                    }
                 }
-            });
+            ); 
+            
             return null;
+        } catch (err) {
+            loggers.error(err)
+        }
+        
+            
     }
 }
 
