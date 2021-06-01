@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import jestOpenAPI from 'jest-openapi';
 import { resolve } from 'path';
-import axios, {AxiosInstance, AxiosRequestConfig, AxiosResponse} from 'axios';
+import axios, {AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse} from 'axios';
 import { fail } from 'assert';
 
 const ax = axios.create({
@@ -129,8 +129,8 @@ describe("Paths", () => {
                             expect(res.status).toEqual(403)
                             expect(res.data['message']).toEqual("Already exists")
                         })
-                    }).catch((err) => {
-                        console.log(err)
+                    }).catch((err: AxiosError) => {
+                        console.log(err.response.data)
                         fail()
                     })
                 })
@@ -180,7 +180,7 @@ describe("Paths", () => {
                         expect(res.status).toEqual(200);
                     })
                     .catch((err) => {
-                        console.log(err)
+                        console.log(err.response.data)
                         fail();
                     });
             });
@@ -220,11 +220,11 @@ describe("Paths", () => {
                         expect(res.status).toEqual(200);
                     })
                     .catch((err) => {
-                        console.log(err)
+                        console.log(err.response.data)
                         fail();
                     });
                 }).catch((err) => {
-                    console.log(err)
+                    console.log(err.response.data)
                     fail()
                 })
             });
@@ -328,7 +328,7 @@ describe("Paths", () => {
                 spec("POST", "/measurement").match(res)
                 expect(res.status).toEqual(201)
             }).catch((err) => {
-                console.log(err)
+                console.log(err.response.data)
                 fail()
             })
         })

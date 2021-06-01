@@ -1,9 +1,8 @@
-import { Driver, Result, Session } from 'neo4j-driver';
-import { TransactionConfig } from 'neo4j-driver/types/session';
-import {Parameters} from 'neo4j-driver/types/query-runner'
 import { InternalError } from '../errors';
-import { DatabaseResponse } from 'lib/auth/auth_methods';
+import { DatabaseResponse } from '../auth/auth_methods';
 import { Neogma } from 'neogma';
+import {Driver, Session, Result} from 'neo4j-driver'
+import { TransactionConfig } from 'neo4j-driver/types/session';
 class DatabaseError extends InternalError {
     constructor(error: string) {
         super(error);
@@ -37,9 +36,8 @@ export class Database {
         this.initialized = true;
     }
 
-    async exec (proc: (session: Session)=> DatabaseResponse): Promise<boolean | null> {
-        const session: Session = this.driver.session()
-        
+    async exec (proc: (session: Session) => DatabaseResponse): Promise<boolean | null> {
+        const session = this.driver.session();
         try {
             const ret = await proc(session);
             return ret
@@ -54,7 +52,7 @@ export class Database {
         }
     }
 
-    run (query: string, parameters?: Parameters, config?: TransactionConfig): Result {
+    run (query: string, parameters?: unknown, config?: TransactionConfig): Result {
         const session: Session = this.driver.session();
         return session.run(query, parameters, config);
     }

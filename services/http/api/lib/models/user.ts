@@ -33,7 +33,6 @@ export const UserModel: NeogmaModel<
                     model: MeasurementModel,
                     direction: 'out',
                     name: 'Recorded',
-                    properties: {}
                 },
                 Resource: {
                     model: ResourceModel,

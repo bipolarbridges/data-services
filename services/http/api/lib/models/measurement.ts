@@ -4,8 +4,6 @@ import { UserModel, UserInstance } from "./user";
 import { DateInstance, DateModel } from "./date";
 
 type MeasurementProperties = {
-    date: number,
-    uid: string,
     type: string,
     value: number
 }
@@ -21,14 +19,6 @@ export const MeasurementModel: NeogmaModel<MeasurementProperties, MeasurementRel
     {
         label: 'Measurement',
         schema: {
-            date: {
-                type: 'number',
-                required: true
-            },
-            uid: {
-                type: 'string',
-                required: true
-            },
             type: {
                 type: 'string',
                 required: true
@@ -48,6 +38,14 @@ export const MeasurementModel: NeogmaModel<MeasurementProperties, MeasurementRel
                 model: DateModel,
                 direction: 'out',
                 name: 'Recorded At',
+                properties: {
+                    time: {
+                        property: 'time',
+                        schema: {
+                            type: 'number'
+                        }
+                    }
+                }
             }
         }
     },

@@ -4,7 +4,7 @@ dotenv.config();
 import express from 'express';
 import cors from 'cors';
 import {database, Database} from './lib/db';
-import api from './lib/interface';
+import api, { MeasurementInput } from './lib/interface';
 import accept from './lib/requests';
 import { handle } from './lib/errors';
 import { auth } from './lib/auth';
@@ -60,13 +60,13 @@ app.post('/measurement', async (req, res) => {
             message: "date must be a number"
         })
     } else {
-        const me = {
+        const me: MeasurementInput = {
             date: data.data['date'],
             uid: data.clientID,
             type: data.data.dataType,
             value: data.data.value
         }
-        if (!(await db.exec(api.createMeasurement(me)))) {
+        if (!(await db.exec(api.createMeasurementX(me)))) {
             res.status(404).send({
                 message: "Specified client does not exist"
             })

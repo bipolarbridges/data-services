@@ -1,7 +1,7 @@
-import { Session } from "neo4j-driver";
 import models from '../models';
 import * as loggers from '../logging'
-import { UserInstance } from "lib/models/user";
+// import Session from 'neo4j-driver-core/types/session';
+import { Session } from 'neo4j-driver'
 
 function userExistsX(id: string) {
     return async (): Promise<boolean> => {
@@ -10,9 +10,8 @@ function userExistsX(id: string) {
                 uid: id,
             }
         });
-        loggers.info(exist);
-        if (exist) return true
-        else return false
+        loggers.info(exist?.__existsInDatabase);
+        return exist? exist?.__existsInDatabase : false;
 
     }
 }
@@ -30,19 +29,17 @@ function userExists(id: string) {
 }
 
 function createUserX(id: string) {
-    return async (session: Session): Promise<null> => {
-        const createdUser: UserInstance = await models.user.UserModel.createOne({uid: id}, { session });
-        await models.resource.ResourceModel.createOne({path: `/client/${id}`}, { session });
-        await createdUser.relateTo(
+    return async (): Promise<null> => {
+        await models.user.UserModel.createOne(
             {
-                alias: 'Resource',
-                where: {
-                    path: `/client/${id}`,
-                },
-                properties: {
-                    method: 'GET'
-                },
-                session: session,
+                uid: id,
+                Resource: {
+                    
+                    properties: [{
+                        path: `/client/${id}`,
+                        method: 'GET'
+                    }],
+                }
             });
             return null;
     }
@@ -73,28 +70,76 @@ function createMeasurement(m: MeasurementInput) {
     return async (session: Session): Promise<boolean> => {
         // decoding the timestamp per the format of this post:
         // https://stackoverflow.com/a/847196
-        const date = new Date(m.date * 1000);
-        const year = date.getFullYear();
-        const month = date.getMonth();
-        const day = date.getDate();
-        const time = 3600 * date.getHours() + 60 * date.getMinutes() + date.getSeconds();
+        const date = dateTransformer(m.date);
         const user = await session.run(
-            "MATCH (u:User{uid:$uid}) " +
-            "MERGE (m:Measurement{type: $type, value: $value}) " +
-            "-[:RecordedAt{time: $time}]-> (d:Date{day:$day, month:$month, year:$year}) " +
-            "MERGE (m) -[:RecordedBy]-> (u) " +
-            "MERGE (d) -[:Includes]-> (m) " +
-            "MERGE (u) -[:Recorded]-> (m) " +
-            "RETURN u;",
-            { ...m, time, day, month, year });
-        return user.records.length > 0;
+            "MATCH (u:User{uid:$uid}) "                                                     +
+            "MERGE (m:Measurement{type: $type, value: $value}) "                            +
+            "MERGE (d) -[:Includes]-> (m) "                                                 +
+            "MERGE (u) -[:Recorded]-> (m) "                                                 +
+            "RETURN u;", 
+            {...m, time: date.time, day: date.day, month: date.month, year: date.year })
+        return user.records.length > 0
     };
 }
 
 function createMeasurementX(m: MeasurementInput) {
-    return async (session: Session): Promise<boolean> => {
-        
-        return false;
+    return async (): Promise<boolean> => {
+        const date = dateTransformer(m.date);
+        try {
+            const user = await models.user.UserModel.findOne({
+                where: {
+                    uid: m.uid,
+                },
+            });
+            if (user?.__existsInDatabase) {
+                const createdMeasurement = await models.measurement.MeasurementModel.createOne(
+                    {
+                        type: m.type,
+                        value: m.value,   
+                    }
+                );
+                await models.date.DateModel.createOne({day: date.day, month: date.month, year: date.month});
+
+                createdMeasurement.relateTo({
+                    alias: 'Date',
+                    where: {day: date.day, month: date.month, year: date.month},
+                    properties: {
+                        time: date.time
+                    }
+                });
+
+                user.relateTo({
+                    alias: 'Measurement',
+                    where: {
+                        type: m.type,
+                        value: m.value,
+                        
+                    },
+                });
+                return true;
+            } else {
+                return false;
+            }          
+            
+        } catch (err) {
+            loggers.error(err);
+            return false;
+        }
+    }
+}
+
+function dateTransformer(input: number) {
+    const date = new Date(input * 1000);
+    const year = date.getFullYear();
+    const month = date.getMonth();
+    const day = date.getDate();
+    const time = 3600 * date.getHours() + 60 * date.getMinutes() + date.getSeconds();
+
+    return {
+        year, 
+        month,
+        day, 
+        time
     }
 }
 
@@ -104,5 +149,6 @@ export default {
     createUser,
     createUserX,
     createMeasurement,
+    createMeasurementX,
     
 }
