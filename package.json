@@ -7,6 +7,7 @@
     "build:api": "cd services/http/api && yarn build",
     "build:mock:auth": "cd services/http/api && yarn build:mock:auth",
     "lint": "cd services/http/api && yarn lint",
+    "lint:fix": "cd services/http/api && yarn lint:fix",
     "build": "docker-compose build",
     "build:shell": "docker-compose build db_shell",
     "api:start": "docker-compose up api",

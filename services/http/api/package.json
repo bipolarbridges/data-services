@@ -6,6 +6,7 @@
     "build": "rm -rf ./dist && tsc",
     "build:mock:auth": "cd tests/mocks/auth_server && yarn build",
     "lint": "eslint . --ext .ts",
+    "lint:fix": "eslint . --ext .ts --fix",
     "test": "jest tests",
     "start": "ts-node main.ts",
     "mock:api": "prism mock ./reference/bb-api.v0.yaml",

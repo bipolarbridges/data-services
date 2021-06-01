@@ -25,7 +25,6 @@ export const ResourceModel: NeogmaModel<
                     required: true
                 }
             },
-            relationships: {}
         },
         database().neogma
     )

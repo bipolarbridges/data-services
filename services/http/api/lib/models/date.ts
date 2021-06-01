@@ -36,7 +36,6 @@ export const DateModel: NeogmaModel<DateProperties, DateRelatedNode> = ModelFact
                 model: MeasurementModel,
                 direction: 'out',
                 name: 'Includes',
-                
             }
         }
     },
