@@ -7,10 +7,11 @@
     "build:mock:auth": "cd tests/mocks/auth_server && yarn build",
     "lint": "eslint . --ext .ts",
     "test": "jest tests",
-    "start": "ts-node main.ts",
+    "start": "node ./dist/main.js",
+    "start:lazy": "ts-node main.ts",
     "mock:api": "prism mock ./reference/bb-api.v0.yaml",
     "mock:auth": "cd tests/mocks/auth_server && yarn start",
-    "start:dev": "concurrently --kill-others 'yarn start' 'yarn mock:auth'"
+    "start:dev": "concurrently --kill-others 'yarn start:lazy' 'yarn mock:auth'"
   },
   "author": "bipolarbridges",
   "license": "MIT",
