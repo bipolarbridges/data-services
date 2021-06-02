@@ -4,25 +4,25 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: andymckay/cancel-action@0.2
-        if: failure()
       - name: Check out code
         uses: actions/checkout@v2
       - name: Install dependencies
         run: yarn all
       - name: Lint
         run: yarn lint
+      - uses: andymckay/cancel-action@0.2
+        if: failure()
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: andymckay/cancel-action@0.2
-        if: failure()
       - name: Check out code
         uses: actions/checkout@v2
       - name: Install dependencies
         run: yarn all
       - name: Build
         run: yarn build:api
+      - uses: andymckay/cancel-action@0.2
+        if: failure()
   test:
     runs-on: ubuntu-latest
     steps:
