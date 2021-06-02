@@ -94,7 +94,7 @@ export function initMeasurementModel(db: Neogma, dateModel: date.DateModel): mea
                 Date: {
                     model: dateModel,
                     direction: 'out',
-                    name: 'Recorded At',
+                    name: 'Recorded-At',
                     properties: {
                         time: {
                             property: 'time',
