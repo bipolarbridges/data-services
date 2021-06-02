@@ -18,6 +18,6 @@ module.exports = {
     ],
     "rules": {
         "no-explicit-any": 0,
-        "no-unused-vars": 0
+        "no-unused-vars": "error"
     }
 };
