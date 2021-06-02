@@ -10,6 +10,7 @@ jobs:
         run: yarn lint
   build:
     runs-on: ubuntu-latest
+    steps:
       - name: Check out code
         uses: actions/checkout@v2
       - name: Build
