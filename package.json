@@ -23,7 +23,7 @@
     "db:reset:deep": "docker-compose down && docker volume rm bb_data_services_store",
     "db:reset:test": "yarn db:reset && yarn db:load:test",
     "test:api": "yarn db:reset:test && cd services/http/api && yarn test",
-	"all": "yarn install && cd services/http/api && yarn all"
+    "all": "yarn install && cd services/http/api && yarn all"
   },
   "repository": {
     "type": "git",
