@@ -56,6 +56,7 @@ function createUserX(id: string) {
                         ],
                         properties: [{
                             path: `/client/${id}`,
+                            method: 'GET',
                             
                         }],
                     },
@@ -152,9 +153,7 @@ function createMeasurementX(m: MeasurementInput) {
                             ],
                             properties: [
                                 {
-                                    day: date.day,
-                                    month: date.month,
-                                    year: date.year,
+                                    ...date,
                                     id: `${date.year}-${date.month}-${date.day}`,                                    
                                 }
                             ],
