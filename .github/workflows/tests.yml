@@ -4,6 +4,8 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
+      - uses: andymckay/cancel-action@0.2
+        if: failure()
       - name: Check out code
         uses: actions/checkout@v2
       - name: Install dependencies
@@ -13,6 +15,8 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      - uses: andymckay/cancel-action@0.2
+        if: failure()
       - name: Check out code
         uses: actions/checkout@v2
       - name: Install dependencies
