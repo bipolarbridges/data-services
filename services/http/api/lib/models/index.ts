@@ -5,7 +5,7 @@ import * as resource from './resource';
 import * as identity from './identity';
 import * as date from './date';
 
-export default {
+export {
     user,
     measurement,
     resource,

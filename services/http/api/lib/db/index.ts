@@ -3,6 +3,8 @@ import { DatabaseResponse } from '../auth/auth_methods';
 import { Neogma } from 'neogma';
 import {Driver, Session, Result} from 'neo4j-driver'
 import { TransactionConfig } from 'neo4j-driver/types/session';
+import {debug} from '../logging'
+import { allModels, initAllModels } from '../models/initializers';
 class DatabaseError extends InternalError {
     constructor(error: string) {
         super(error);
@@ -12,7 +14,8 @@ class DatabaseError extends InternalError {
 export class Database {
     driver: Driver | null;
     initialized: boolean;
-    public neogma: Neogma;
+    neogma: Neogma;
+    models: allModels;
 
     constructor () {
         this.driver = null;
@@ -29,17 +32,18 @@ export class Database {
                 password: 'password',
             },
             {
-                logger: console.log,
+                logger: debug,
             },
-        );        
+        );
+        this.models = initAllModels(this.neogma);
         this.driver = this.neogma.driver;
         this.initialized = true;
     }
 
-    async exec (proc: (session: Session) => DatabaseResponse): Promise<boolean | null> {
+    async exec (proc: (session: Session, all: allModels) => DatabaseResponse): Promise<boolean | null> {
         const session = this.driver.session();
         try {
-            const ret = await proc(session);
+            const ret = await proc(session, this.models);
             return ret
         } catch (e) {
             if (e instanceof InternalError) {
