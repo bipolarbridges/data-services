@@ -1,10 +1,11 @@
 import { InternalError } from '../errors';
-import { DatabaseResponse } from '../auth/auth_methods';
 import { Neogma } from 'neogma';
 import {Driver, Session, Result} from 'neo4j-driver'
 import { TransactionConfig } from 'neo4j-driver/types/session';
 import {debug} from '../logging'
 import { allModels, initAllModels } from '../models/initializers';
+import { DatabaseResponse } from 'lib/auth/auth_methods';
+
 class DatabaseError extends InternalError {
     constructor(error: string) {
         super(error);

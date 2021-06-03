@@ -8,10 +8,12 @@
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
     "test": "jest tests",
-    "start": "ts-node main.ts",
+    "start": "node ./dist/main.js",
+    "start:lazy": "ts-node main.ts",
     "mock:api": "prism mock ./reference/bb-api.v0.yaml",
     "mock:auth": "cd tests/mocks/auth_server && yarn start",
-    "start:dev": "concurrently --kill-others 'yarn start' 'yarn mock:auth'"
+    "start:dev": "concurrently --kill-others 'yarn start:lazy' 'yarn mock:auth'",
+    "all": "yarn install && cd tests/mocks/auth_server && yarn install"
   },
   "author": "bipolarbridges",
   "license": "MIT",
