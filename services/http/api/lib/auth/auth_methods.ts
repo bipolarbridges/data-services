@@ -39,7 +39,6 @@ const axiosConfig: AxiosRequestConfig = {
 };
 const remote: AxiosInstance = axios.create(axiosConfig)
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 async function getRemoteId(token: BinaryLike) {
     try {
         const res = await remote.post('/validate', { token }, {
@@ -90,7 +89,7 @@ export const authMethods: AuthMethod[] = [
             });
         return results.records.length > 0;
     },
-    /* (req: Request, auth: BinaryLike) => async (db: Session): Promise<boolean | null> => {
+    (req: Request, auth: BinaryLike) => async (db: Session): Promise<boolean | null> => {
         const id = await getRemoteId(auth);
         if (!id) {
             return false;
@@ -108,5 +107,5 @@ export const authMethods: AuthMethod[] = [
                 });
             return results.records.length > 0;
         }
-    } */
+    }
 ];

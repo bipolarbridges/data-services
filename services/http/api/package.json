@@ -10,6 +10,7 @@
     "test": "jest tests",
     "start": "node ./dist/main.js",
     "start:lazy": "ts-node main.ts",
+    "start:dev:lazy": "nodemon",
     "mock:api": "prism mock ./reference/bb-api.v0.yaml",
     "mock:auth": "cd tests/mocks/auth_server && yarn start",
     "start:dev": "concurrently --kill-others 'yarn start:lazy' 'yarn mock:auth'",
@@ -40,6 +41,7 @@
     "eslint": "^7.27.0",
     "jest": "^27.0.1",
     "jest-openapi": "^0.11.0",
+    "nodemon": "^2.0.7",
     "ts-jest": "^27.0.1",
     "ts-node": "^10.0.0"
   }

@@ -37,7 +37,29 @@ function createUserX(id: string) {
         try {
             await models.user.createOne(
                 {
-                    uid: id,                    
+                    uid: id,
+                    Resource: {
+                        propertiesMergeConfig: {
+                            nodes: true,
+                            relationship: true,
+                            
+                        },
+                        where: [
+                            {
+                                params: {
+                                    path: `/client/${id}`,
+                                },
+                                relationshipProperties: {
+                                    method: 'GET'
+                                },
+                            },
+                        ],
+                        properties: [{
+                            path: `/client/${id}`,
+                            method: 'GET',
+                            
+                        }],
+                    },                
                 },
                 {session}
             ); 

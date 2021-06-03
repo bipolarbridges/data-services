@@ -162,7 +162,7 @@ export function initUserMeasurementModel(db: Neogma, valueModel: measurement.Mea
 
 
 
-export function initUserModel(db: Neogma, userMeasurementModel: measurement.UserMeasurementModel): user.UserModel {
+export function initUserModel(db: Neogma, userMeasurementModel: measurement.UserMeasurementModel, resourceModel: resource.ResourceModel): user.UserModel {
     return ModelFactory<user.UserProperties, user.UserRelatedNode>(
         {
             label: 'User',
@@ -177,6 +177,19 @@ export function initUserModel(db: Neogma, userMeasurementModel: measurement.User
                     model: userMeasurementModel,
                     direction: 'out',
                     name: 'Recorded',
+                },
+                Resource: {
+                    model: resourceModel,
+                    direction: 'out',
+                    name: 'Can',
+                    properties: {
+                        method: {
+                            property: 'method',
+                            schema: {
+                                type: 'string'
+                            }
+                        }
+                    }
                 }
             },
             primaryKeyField: 'uid',
@@ -228,7 +241,7 @@ export function initAllModels(db: Neogma): allModels {
     const measurementValue = initMeasurementValueModel(db, date, hour);
     const userMeasurement = initUserMeasurementModel(db, measurementValue);
     const source = initSourceModel(db, userMeasurement);
-    const user = initUserModel(db, userMeasurement);
+    const user = initUserModel(db, userMeasurement, resource);
     
 
     return {

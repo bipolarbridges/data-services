@@ -27,10 +27,11 @@
         }
     },
     "exclude": [
-        "./tests/mocks/auth_server",
+        "./tests",
         "./dist",
         "node_modules",
-        ".eslintrc.js"
+        ".eslintrc.js",
+        "./jest.config.js"
     ]
     
 }
