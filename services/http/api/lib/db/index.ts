@@ -2,7 +2,7 @@ import { Driver, driver, Result, Session } from 'neo4j-driver';
 import { TransactionConfig } from 'neo4j-driver/types/session';
 import {Parameters} from 'neo4j-driver/types/query-runner'
 import { InternalError } from '../errors';
-import { DatabaseCallback, DatabaseResponse } from 'lib/auth/auth_methods';
+import { DatabaseResponse } from 'lib/auth/auth_methods';
 
 class DatabaseError extends InternalError {
     constructor(error: string) {
