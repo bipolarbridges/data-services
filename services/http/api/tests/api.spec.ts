@@ -130,7 +130,7 @@ describe("Paths", () => {
                             expect(res.data['message']).toEqual("Already exists")
                         })
                     }).catch((err: AxiosError) => {
-                        console.log(err.response.data)
+                        console.log(err?.response?.data)
                         fail()
                     })
                 })
@@ -180,7 +180,7 @@ describe("Paths", () => {
                         expect(res.status).toEqual(200);
                     })
                     .catch((err) => {
-                        console.log(err.response.data)
+                        console.log('message', err?.response)
                         fail();
                     });
             });
@@ -220,11 +220,11 @@ describe("Paths", () => {
                         expect(res.status).toEqual(200);
                     })
                     .catch((err) => {
-                        console.log(err.response.data)
+                        console.log(err)
                         fail();
                     });
                 }).catch((err) => {
-                    console.log(err.response.data)
+                    console.log(err)
                     fail()
                 })
             });
@@ -345,6 +345,7 @@ describe("Paths", () => {
                 fail("Should have rejected")
             }).catch((err) => {
                 if (!err['response']) {
+                    console.log(err);
                     fail()
                 }
                 const res = err['response']

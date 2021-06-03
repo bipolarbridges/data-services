@@ -37,30 +37,7 @@ function createUserX(id: string) {
         try {
             await models.user.createOne(
                 {
-                    uid: id,
-                    Resource: {
-                        propertiesMergeConfig: {
-                            nodes: true,
-                            relationship: true,
-                            
-                        },
-                        where: [
-                            {
-                                params: {
-                                    path: `/client/${id}`,
-                                },
-                                relationshipProperties: {
-                                    method: 'GET'
-                                },
-                            },
-                        ],
-                        properties: [{
-                            path: `/client/${id}`,
-                            method: 'GET',
-                            
-                        }],
-                    },
-                    
+                    uid: id,                    
                 },
                 {session}
             ); 
@@ -122,77 +99,82 @@ function createMeasurementX(m: MeasurementInput) {
     return async (session: Session, models: allModels): Promise<boolean> => {
         const date = dateTransformer(m.date);
         try {
-            const user = await models.user.findOne({
-                where: {
-                    uid: m.uid,
-                },
-                session,
-            });
-            if (user?.__existsInDatabase) {
-                await models.measurement.createOne(
+            await models.userMeasurement.createOne(
                     {
                         type: m.type,
-                        value: m.value,  
-                        Date: {
-                            
-
+                        User: {
                             propertiesMergeConfig: {
                                 nodes: true,
                                 relationship: true,
                                 
                             },
-                            where: [
-                                {
-                                    params: {
-                                        id: `${date.year}-${date.month}-${date.day}`,
-                                    },
-                                    relationshipProperties: {
-                                        time: date.time
-                                    },
-                                },
-                            ],
+                            where: {
+                                params: {
+                                    uid: m.uid,
+                                }
+                            },
+                        },
+                        MeasurementValue: {
+                            propertiesMergeConfig: {
+                                nodes: true,
+                                relationship: true,
+                                
+                            },
+                            where: {
+                                params: {
+                                    value: m.value,
+                                }
+                            },
                             properties: [
                                 {
-                                    ...date,
-                                    id: `${date.year}-${date.month}-${date.day}`,                                    
+                                    value: m.value,
+                                    Date: {
+                                        propertiesMergeConfig: {
+                                            nodes: true,
+                                            relationship: true,
+                                        },
+                                        where: [
+                                            {
+                                                params: {
+                                                    id: `${date.year}-${date.month}-${date.day}`,
+                                                }
+                                            },
+                                        ],
+                                        properties: [
+                                            {
+                                                year: date.year,
+                                                month: date.month,
+                                                day: date.day,                                                
+                                                id: `${date.year}-${date.month}-${date.day}`,                                    
+                                            }
+                                        ],
+            
+                                    },
+                                    Hour: {
+                                        propertiesMergeConfig: {
+                                            nodes: true,
+                                            relationship: true,
+                                        },
+                                        where: [
+                                            {
+                                                params: {
+                                                    time: date.time,
+                                                }
+                                            },
+                                        ],
+                                        properties: [
+                                            {
+                                                time: date.time,                                 
+                                            }
+                                        ],
+                                    }
                                 }
-                            ],
-
-                        },  
-                        
+                            ]
+                        },                        
                     },
                     { session, merge: true }
                 );
-                /* await models.date.createOne(
-                    {
-                        day: date.day, 
-                        month: date.month, 
-                        year: date.year,
-                        id: `${date.year}-${date.month}-${date.day}`
-                }, {session});
-
-                createdMeasurement.relateTo({
-                    alias: 'Date',
-                    where: {day: date.day, month: date.month, year: date.month},
-                    properties: {
-                        time: date.time
-                    },
-                    session,
-                }); */
-
-                user.relateTo({
-                    alias: 'Measurement',
-                    where: {
-                        type: m.type,
-                        value: m.value,
-                        
-                    },
-                    session,
-                });
-                return true;
-            } else {
-                return false;
-            }          
+            return true;        
             
         } catch (err) {
             loggers.error(err);
@@ -223,5 +205,4 @@ export default {
     createUserX,
     createMeasurement,
     createMeasurementX,
-    
 }

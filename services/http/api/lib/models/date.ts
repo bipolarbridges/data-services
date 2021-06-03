@@ -1,5 +1,5 @@
 import { ModelRelatedNodesI, NeogmaInstance, NeogmaModel } from "neogma";
-import { MeasurementInstance, MeasurementModel } from "./measurement";
+import { MeasurementValueInstance, MeasurementValueModel } from "./measurement";
 
 export type DateProperties = {
     day: number,
@@ -9,7 +9,7 @@ export type DateProperties = {
 }
 
 export type DateRelatedNode = {
-    Measurement: ModelRelatedNodesI<MeasurementModel, MeasurementInstance>;
+    MeasurementValue: ModelRelatedNodesI<MeasurementValueModel, MeasurementValueInstance>;
 }
 
 export type DateInstance = NeogmaInstance<DateProperties, DateRelatedNode>;

@@ -66,9 +66,13 @@ app.post('/measurement', async (req, res) => {
             type: data.data.dataType,
             value: data.data.value
         }
-        if (!(await db.exec(api.createMeasurementX(me)))) {
+        if (!(await db.exec(api.userExistsX(me.uid)))) {
             res.status(404).send({
                 message: "Specified client does not exist"
+            })
+        } else if (!(await db.exec(api.createMeasurementX(me)))) {
+            res.status(400).send({
+                message: "measurement could not be created"
             })
         } else {
             res.status(201).send({
