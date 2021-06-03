@@ -39,6 +39,7 @@ const axiosConfig: AxiosRequestConfig = {
 };
 const remote: AxiosInstance = axios.create(axiosConfig)
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 async function getRemoteId(token: BinaryLike) {
     try {
         const res = await remote.post('/validate', { token }, {
@@ -76,6 +77,7 @@ export type DatabaseResponse = Promise<boolean | null>
 export const authMethods: AuthMethod[] = [
     (req: Request, auth: BinaryLike) => async (db: Session): Promise<boolean | null> => {
         // KEY AUTHENTICATION
+        info(`Path: ${req.path}`)
         const results = await db.run(
             "MATCH (i:Identity{type: 'key', check: $check}) " +
             "MATCH (r:Resource{path: $path}) " +
@@ -88,7 +90,7 @@ export const authMethods: AuthMethod[] = [
             });
         return results.records.length > 0;
     },
-    (req: Request, auth: BinaryLike) => async (db: Session): Promise<boolean | null> => {
+    /* (req: Request, auth: BinaryLike) => async (db: Session): Promise<boolean | null> => {
         const id = await getRemoteId(auth);
         if (!id) {
             return false;
@@ -106,5 +108,5 @@ export const authMethods: AuthMethod[] = [
                 });
             return results.records.length > 0;
         }
-    }
+    } */
 ];
