@@ -1,17 +1,18 @@
-require('dotenv').config()
+import dotenv from 'dotenv';
+dotenv.config();
 
-const express = require('express')
-const cors = require('cors')
-const database = require('./lib/db')
-const api = require('./lib/interface')
-const { accept } = require('./lib/requests')
-const { handle } = require('./lib/errors')
-const { auth } = require('./lib/auth');
-const logs = require('./lib/logging');
+import express from 'express';
+import cors from 'cors';
+import {database, Database} from './lib/db';
+import api, { MeasurementInput } from './lib/interface';
+import accept from './lib/requests';
+import { handle } from './lib/errors';
+import { auth } from './lib/auth';
+//import logs from './lib/logging';
 
 
 const app = express()
-const db = database()
+const db: Database = database()
 
 app.use(express.json())
 app.use(cors())
@@ -26,13 +27,13 @@ app.post('/client', async (req, res) => {
         })
     } else {
         const id = data['id']
-        const exists = await db.exec(api.userExists(id))
+        const exists = await db.exec(api.userExistsX(id))
         if (exists) {
             res.status(403).send({
                 message: "Already exists"
             })
         } else {
-            await db.exec(api.createUser(id))
+            await db.exec(api.createUserX(id))
             res.status(201).send({
                 message: "Created"
             })
@@ -59,15 +60,19 @@ app.post('/measurement', async (req, res) => {
             message: "date must be a number"
         })
     } else {
-        const me = {
+        const me: MeasurementInput = {
             date: data.data['date'],
             uid: data.clientID,
             type: data.data.dataType,
             value: data.data.value
         }
-        if (!(await db.exec(api.createMeasurement(me)))) {
+        if (!(await db.exec(api.userExistsX(me.uid)))) {
             res.status(404).send({
                 message: "Specified client does not exist"
+            })
+        } else if (!(await db.exec(api.createMeasurementX(me)))) {
+            res.status(400).send({
+                message: "measurement could not be created"
             })
         } else {
             res.status(201).send({

@@ -1,4 +1,5 @@
 yarn-error.log
-node_modules
 **/.DS_Store
 /io-ts/
+package-lock.json
+node_modules

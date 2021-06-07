@@ -1,0 +1,18 @@
+{
+    "compilerOptions": {
+        "module": "CommonJS",
+        "outDir": "./dist",
+        "noImplicitAny": true,
+        "esModuleInterop": true,
+        "sourceMap": true,
+        "allowJs": true,
+        "checkJs": true,
+        "strictBindCallApply": true,
+        "moduleResolution": "node",
+    },
+    "exclude": [
+        "./node_modules",
+        "./dist"
+    ]
+    
+}

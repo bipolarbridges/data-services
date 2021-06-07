@@ -1,22 +1,26 @@
-const jestOpenAPI = require('jest-openapi');
-const path = require('path')
-const axios = require('axios');
-const { fail } = require('assert');
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import jestOpenAPI from 'jest-openapi';
+import { resolve } from 'path';
+import axios, {AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse} from 'axios';
+import { fail } from 'assert';
 
 const ax = axios.create({
 	baseURL: "http://127.0.0.1:8888"
 });
 
-jestOpenAPI(path.resolve(process.cwd(), "reference/bb-api.v0.yaml"));
+jestOpenAPI(resolve(process.cwd(), "reference/bb-api.v0.yaml"));
 
-const methods = {
+type Method = {
+    [key: string]: AxiosInstance["post"]
+}
+
+const methods: Method = {
     "POST": ax.post
 };
 
-function spec
-(method, path) {
+function spec(method: string, path: string) {
     return {
-        match: (res) => {
+        match: (res: AxiosResponse<unknown>) => {
             res.request['path'] = path;
             res.request['method'] = method;
             expect(res).toSatisfyApiSpec();
@@ -24,8 +28,7 @@ function spec
     }
 }
 
-function match
-(method, path, body, opts, status, desc = "Unspecified") {
+function match(method: string, path: string, body: unknown, opts: AxiosRequestConfig, status: number, desc = "Unspecified") {
     describe(`${method} ${path} [ ${status}: ${desc} ]`, () => {
         const _f_ = methods[method]
         if (!_f_) {
@@ -33,7 +36,7 @@ function match
         } else {
             it("Should match API spec", async () =>
             await methods[method](`${path}`, body, opts)
-            .then((res) => {
+            .then((res: AxiosResponse<unknown>) => {
                 // Should return the correct status code
                 expect(res.status).toEqual(status);
                 // Should respond according to the schema
@@ -116,7 +119,7 @@ describe("Paths", () => {
                                 "Authorization": "apikey1"
                             }
                         }).then((res) => {
-                            fail("Should have rejected")
+                            fail("Should have rejected");
                         }).catch((err) => {
                             if (!err['response']) {
                                 fail()
@@ -126,8 +129,8 @@ describe("Paths", () => {
                             expect(res.status).toEqual(403)
                             expect(res.data['message']).toEqual("Already exists")
                         })
-                    }).catch((err) => {
-                        console.log(err)
+                    }).catch((err: AxiosError) => {
+                        console.log(err?.response?.data)
                         fail()
                     })
                 })
@@ -177,7 +180,7 @@ describe("Paths", () => {
                         expect(res.status).toEqual(200);
                     })
                     .catch((err) => {
-                        console.log(err)
+                        console.log('message', err?.response)
                         fail();
                     });
             });
@@ -325,7 +328,7 @@ describe("Paths", () => {
                 spec("POST", "/measurement").match(res)
                 expect(res.status).toEqual(201)
             }).catch((err) => {
-                console.log(err)
+                console.log(err.response.data)
                 fail()
             })
         })
@@ -342,6 +345,7 @@ describe("Paths", () => {
                 fail("Should have rejected")
             }).catch((err) => {
                 if (!err['response']) {
+                    console.log(err);
                     fail()
                 }
                 const res = err['response']
