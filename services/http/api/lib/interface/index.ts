@@ -1,6 +1,7 @@
 import * as loggers from '../logging'
-import { Session } from 'neo4j-driver'
+import { Integer, Session, Time } from 'neo4j-driver'
 import { allModels } from 'lib/models/initializers';
+import { ValueProperties } from 'lib/models/measurement';
 
 function userExistsX(id: string) {
     return async (session: Session, models: allModels): Promise<boolean> => {
@@ -91,17 +92,16 @@ function createUser(id:string) {
     };
 }
 
-export type MeasurementInput = {
+export type typeOldInput = {
     date: number,
     uid: string,
     type: string,
     value: number
-}
-
+};
 /**
  * @depreciated 
  */
-function createMeasurement(m: MeasurementInput) {
+function createMeasurement(m: typeOldInput) {
     return async (session: Session): Promise<boolean> => {
         // decoding the timestamp per the format of this post:
         // https://stackoverflow.com/a/847196
@@ -117,13 +117,21 @@ function createMeasurement(m: MeasurementInput) {
     };
 }
 
+export type MeasurementInput = {
+    uid: string,
+    data: ValueProperties,
+    source: string,
+    date: number,
+}
+
 function createMeasurementX(m: MeasurementInput) {
     return async (session: Session, models: allModels): Promise<boolean> => {
-        const date = dateTransformer(m.date);
+        
         try {
+            const {year, month, day, time} = dateTransformer(m.date);
             await models.userMeasurement.createOne(
                     {
-                        type: m.type,
+                        type: m.source,
                         User: {
                             propertiesMergeConfig: {
                                 nodes: true,
@@ -144,12 +152,13 @@ function createMeasurementX(m: MeasurementInput) {
                             },
                             where: {
                                 params: {
-                                    value: m.value,
+                                    value: m.data.value,
                                 }
                             },
                             properties: [
                                 {
-                                    value: m.value,
+                                    subtype: m.data?.subtype,
+                                    value: m.data.value,
                                     Date: {
                                         propertiesMergeConfig: {
                                             nodes: true,
@@ -158,19 +167,18 @@ function createMeasurementX(m: MeasurementInput) {
                                         where: [
                                             {
                                                 params: {
-                                                    id: `${date.year}-${date.month}-${date.day}`,
+                                                    id: `${year}-${month}-${day}`,
                                                 }
                                             },
                                         ],
                                         properties: [
                                             {
-                                                year: date.year,
-                                                month: date.month,
-                                                day: date.day,                                                
-                                                id: `${date.year}-${date.month}-${date.day}`,                                    
+                                                year: year,
+                                                month: month,
+                                                day: day,                                                
+                                                id: `${year}-${month}-${day}`,                                    
                                             }
                                         ],
-            
                                     },
                                     Hour: {
                                         propertiesMergeConfig: {
@@ -180,19 +188,36 @@ function createMeasurementX(m: MeasurementInput) {
                                         where: [
                                             {
                                                 params: {
-                                                    time: date.time,
+                                                    time: time,
                                                 }
                                             },
                                         ],
                                         properties: [
                                             {
-                                                time: date.time,                                 
+                                                time: time,                                 
                                             }
                                         ],
                                     }
                                 }
                             ]
-                        },                        
+                        },
+                        Source: {
+                            propertiesMergeConfig: {
+                                nodes: true,
+                                relationship: true,
+                                
+                            },
+                            where: {
+                                params: {
+                                    type: m.source,
+                                }
+                            },
+                            properties: [
+                                {
+                                    type: m.source
+                                }
+                            ]
+                        }                  
                     },
                     { session, merge: true }
                 );
@@ -206,11 +231,14 @@ function createMeasurementX(m: MeasurementInput) {
 }
 
 function dateTransformer(input: number) {
+    // decoding the timestamp per the format of this post:
+    // https://stackoverflow.com/a/847196
     const date = new Date(input * 1000);
     const year = date.getFullYear();
     const month = date.getMonth();
     const day = date.getDate();
-    const time = 3600 * date.getHours() + 60 * date.getMinutes() + date.getSeconds();
+    const time = Time.fromStandardDate(date) as unknown as Time<Integer>;
+    // const time = 3600 * date.getHours() + 60 * date.getMinutes() + date.getSeconds();
 
     return {
         year, 

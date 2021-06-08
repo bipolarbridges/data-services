@@ -235,8 +235,9 @@ describe("Paths", () => {
             clientID: "client0@email.com",
             data: {
                 date: 1610997441,
-                dataType: 'sentiment',
-                value: 0.8
+                subtype: 'sentiment',
+                value: 0.2,
+                source: 'measurement'
             }
         }
         it("Should reject if a bad key is provided", async () => {
@@ -259,34 +260,53 @@ describe("Paths", () => {
         const invalidData = [
             // Missing fields
             {
+                //clientID: ...
                 data: {
                     date: 1610997441,
-                    dataType: 'sentiment',
-                    value: 0.8
+                    subtype: 'sentiment',
+                    value: 0.8,
+                    source: 'measurement'
+
                 }
             },
             {
                 clientID: "client2@email.com"
+                // data: ...
             },
             {
                 clientID: "client2@email.com",
                 data: {
-                    dataType: 'sentiment',
-                    value: 0.8
+                    // data: ...
+                    subtype: 'sentiment',
+                    value: 0.8,
+                    source: 'measurement'
                 }
             },
             {
                 clientID: "client2@email.com",
                 data: {
                     date: 1610997441,
-                    value: 0.8
+                    // subtype: ...
+                    value: 1.3,
+                    source: 'measurement'
                 }
             },
             {
                 clientID: "client2@email.com",
                 data: {
                     date: 1610997441,
-                    dataType: 'sentiment'
+                    subtype: 'sentiment',
+                    // value: ...,
+                    source: 'measurement'
+                }
+            },
+            {
+                clientID: "client2@email.com",
+                data: {
+                    date: 1610997433,
+                    subtype: 'sentiment',
+                    value: 1.3,
+                    // source: ...
                 }
             },
             // Bad typing examples

@@ -1,6 +1,7 @@
 import { ModelRelatedNodesI, NeogmaInstance, NeogmaModel } from "neogma";
 import { DateInstance, DateModel } from "./date";
 import { HourInstance, HourModel } from "./hour";
+import { SourceInstance, SourceModel } from "./source";
 import { UserInstance, UserModel } from "./user";
 
 export type UserMeasurementProperties = {
@@ -9,7 +10,8 @@ export type UserMeasurementProperties = {
 
 export type UserMeasurementRelatedNodesI = {
     MeasurementValue: ModelRelatedNodesI<MeasurementValueModel, MeasurementValueInstance>,
-    User: ModelRelatedNodesI<UserModel, UserInstance>;
+    User: ModelRelatedNodesI<UserModel, UserInstance>,
+    Source: ModelRelatedNodesI<SourceModel, SourceInstance>;
 };
 
 export type UserMeasurementInstance = NeogmaInstance<UserMeasurementProperties, UserMeasurementRelatedNodesI>;
@@ -19,7 +21,8 @@ export type UserMeasurementModel = NeogmaModel<UserMeasurementProperties, UserMe
 // ----------------------------------------------------------------------------------------------------------
 
 export type ValueProperties = {
-    value: number
+    value: number,
+    subtype: string,
 }
 
 export type ValueRelatedNodeI = {
