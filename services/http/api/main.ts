@@ -105,6 +105,7 @@ measurementRouter.route('/')
         }
     })
 
+app.use('/measurement', measurementRouter);
 app.use(handle());
 
 const port = 8888
