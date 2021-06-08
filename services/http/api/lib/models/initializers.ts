@@ -101,7 +101,7 @@ export function initHourModel(db: Neogma): hour.HourModel {
             primaryKeyField: 'time',
             schema: {
                 time: {
-                    type: "object",
+                    type: "number",
                     required: true
                 }
             }
@@ -254,7 +254,15 @@ export function initAllModels(db: Neogma): allModels {
                 direction: 'in',
                 name: 'Includes',
             }
-        })
+        });
+    userMeasurement.addRelationships(
+        {
+            User: {
+                model: user,
+                direction: 'in',
+                name: 'Recorded',
+            }
+        });
     return {
         date,
         source,

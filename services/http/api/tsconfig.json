@@ -24,14 +24,14 @@
               "*",
               "node_modules/*"
             ]
-        }
+        },
+        "types": ["jest", "node"],
+        "typeRoots": ["./node_modules/@types"]
     },
     "exclude": [
-        "./tests",
         "./dist",
         "node_modules",
         ".eslintrc.js",
-        "./jest.config.js"
     ]
     
 }

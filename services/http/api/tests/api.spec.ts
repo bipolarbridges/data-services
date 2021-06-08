@@ -44,7 +44,6 @@ function match(method: string, path: string, body: unknown, opts: AxiosRequestCo
             })
             .catch((err) => {
                 if (!err['response']) {
-                    console.log(err)
                     fail()
                 } else {
                     const res = err['response']
@@ -220,11 +219,11 @@ describe("Paths", () => {
                         expect(res.status).toEqual(200);
                     })
                     .catch((err) => {
-                        console.log(err)
+                        console.log(err?.response?.error)
                         fail();
                     });
                 }).catch((err) => {
-                    console.log(err)
+                    console.log(err?.response?.error)
                     fail()
                 })
             });

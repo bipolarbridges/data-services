@@ -1,5 +1,5 @@
 import * as loggers from '../logging'
-import { Integer, Session, Time } from 'neo4j-driver'
+import { Session } from 'neo4j-driver';
 import { allModels } from 'lib/models/initializers';
 import { ValueProperties } from 'lib/models/measurement';
 
@@ -225,10 +225,12 @@ function createMeasurementX(m: MeasurementInput) {
             
         } catch (err) {
             loggers.error(err);
+            loggers.error(err?.data?.errors)
             return false;
         }
     }
 }
+
 
 function dateTransformer(input: number) {
     // decoding the timestamp per the format of this post:
@@ -237,8 +239,9 @@ function dateTransformer(input: number) {
     const year = date.getFullYear();
     const month = date.getMonth();
     const day = date.getDate();
-    const time = Time.fromStandardDate(date) as unknown as Time<Integer>;
-    // const time = 3600 * date.getHours() + 60 * date.getMinutes() + date.getSeconds();
+    // const time = new Time(date.getHours(), date.getMinutes(), date.getSeconds(), date.getMilliseconds() * 1000000, date.getTimezoneOffset() *60)
+    
+    const time = 3600 * date.getHours() + 60 * date.getMinutes() + date.getSeconds();
 
     return {
         year, 
