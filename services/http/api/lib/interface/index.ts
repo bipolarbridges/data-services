@@ -45,24 +45,15 @@ function createUserX(id: string) {
                             relationship: true,
                             
                         },
-                        where: [
+                        properties: [
                             {
-                                params: {
-                                    path: `/client/${id}`,
-                                },
-                                relationshipProperties: {
-                                    method: 'GET'
-                                },
+                                path: `/client/${id}`,
+                                method: 'GET'
                             },
                         ],
-                        properties: [{
-                            path: `/client/${id}`,
-                            method: 'GET',
-                            
-                        }],
                     },                
                 },
-                {session}
+                {merge: true, session}
             ); 
             
             return null;
@@ -138,22 +129,14 @@ function createMeasurementX(m: MeasurementInput) {
                                 relationship: true,
                                 
                             },
-                            where: {
-                                params: {
-                                    uid: m.uid,
-                                }
-                            },
+                            properties: [{
+                                uid: m.uid,
+                            }]
                         },
                         MeasurementValue: {
                             propertiesMergeConfig: {
                                 nodes: true,
                                 relationship: true,
-                                
-                            },
-                            where: {
-                                params: {
-                                    value: m.data.value,
-                                }
                             },
                             properties: [
                                 {
@@ -164,13 +147,6 @@ function createMeasurementX(m: MeasurementInput) {
                                             nodes: true,
                                             relationship: true,
                                         },
-                                        where: [
-                                            {
-                                                params: {
-                                                    id: `${year}-${month}-${day}`,
-                                                }
-                                            },
-                                        ],
                                         properties: [
                                             {
                                                 year: year,
@@ -185,13 +161,6 @@ function createMeasurementX(m: MeasurementInput) {
                                             nodes: true,
                                             relationship: true,
                                         },
-                                        where: [
-                                            {
-                                                params: {
-                                                    time: time,
-                                                }
-                                            },
-                                        ],
                                         properties: [
                                             {
                                                 time: time,                                 
@@ -206,11 +175,6 @@ function createMeasurementX(m: MeasurementInput) {
                                 nodes: true,
                                 relationship: true,
                                 
-                            },
-                            where: {
-                                params: {
-                                    type: m.source,
-                                }
                             },
                             properties: [
                                 {
