@@ -60,6 +60,7 @@ export function initResourceModel(db: Neogma): resource.ResourceModel {
                     required: true
                 }
             },
+            primaryKeyField: 'path'
         },
         db
     )
@@ -88,7 +89,6 @@ export function initDateModel(db: Neogma): date.DateModel {
                     required: true
                 },
             },
-            relationships: {}
         },
         db
     )
@@ -220,6 +220,7 @@ export function initSourceModel(db: Neogma, userMeasurementModel: measurement.Us
                     name: 'Includes',
                 }
             },
+            primaryKeyField: 'type'
         },
         db);
 }
