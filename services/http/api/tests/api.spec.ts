@@ -234,7 +234,7 @@ describe("Paths", () => {
             clientID: "client0@email.com",
             data: {
                 date: 1610997441,
-                subtype: 'sentiment',
+                name: 'sentiment',
                 value: 0.2,
                 source: 'measurement'
             }
@@ -262,7 +262,7 @@ describe("Paths", () => {
                 //clientID: ...
                 data: {
                     date: 1610997441,
-                    subtype: 'sentiment',
+                    name: 'sentiment',
                     value: 0.8,
                     source: 'measurement'
 
@@ -276,7 +276,7 @@ describe("Paths", () => {
                 clientID: "client2@email.com",
                 data: {
                     // data: ...
-                    subtype: 'sentiment',
+                    name: 'sentiment',
                     value: 0.8,
                     source: 'measurement'
                 }
@@ -285,7 +285,7 @@ describe("Paths", () => {
                 clientID: "client2@email.com",
                 data: {
                     date: 1610997441,
-                    // subtype: ...
+                    // name: ...
                     value: 1.3,
                     source: 'measurement'
                 }
@@ -294,7 +294,7 @@ describe("Paths", () => {
                 clientID: "client2@email.com",
                 data: {
                     date: 1610997441,
-                    subtype: 'sentiment',
+                    name: 'sentiment',
                     // value: ...,
                     source: 'measurement'
                 }
@@ -303,7 +303,7 @@ describe("Paths", () => {
                 clientID: "client2@email.com",
                 data: {
                     date: 1610997433,
-                    subtype: 'sentiment',
+                    name: 'sentiment',
                     value: 1.3,
                     // source: ...
                 }

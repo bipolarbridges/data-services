@@ -4,33 +4,32 @@ import { HourInstance, HourModel } from "./hour";
 import { SourceInstance, SourceModel } from "./source";
 import { UserInstance, UserModel } from "./user";
 
-export type UserMeasurementProperties = {
-    type: string,
+export type MeasurementTypeProperties = {
+    name: string,
 }
 
-export type UserMeasurementRelatedNodesI = {
-    MeasurementValue: ModelRelatedNodesI<MeasurementValueModel, MeasurementValueInstance>,
-    User: ModelRelatedNodesI<UserModel, UserInstance>,
+export type MeasurementTypeRelatedNodesI = {
+    Measurement: ModelRelatedNodesI<MeasurementModel, MeasurementInstance>,
     Source: ModelRelatedNodesI<SourceModel, SourceInstance>;
 };
 
-export type UserMeasurementInstance = NeogmaInstance<UserMeasurementProperties, UserMeasurementRelatedNodesI>;
+export type MeasurementTypeInstance = NeogmaInstance<MeasurementTypeProperties, MeasurementTypeRelatedNodesI>;
 
-export type UserMeasurementModel = NeogmaModel<UserMeasurementProperties, UserMeasurementRelatedNodesI>;
+export type MeasurementTypeModel = NeogmaModel<MeasurementTypeProperties, MeasurementTypeRelatedNodesI>;
 
 // ----------------------------------------------------------------------------------------------------------
 
-export type ValueProperties = {
+export type MeasurementProperties = {
     value: number,
-    subtype: string,
 }
 
-export type ValueRelatedNodeI = {
+export type MeasurementRelatedNodeI = {
+    User: ModelRelatedNodesI<UserModel, UserInstance>,
     Date: ModelRelatedNodesI<DateModel, DateInstance>;
     Hour: ModelRelatedNodesI<HourModel, HourInstance>;
 }
 
 
-export type MeasurementValueModel = NeogmaModel<ValueProperties, ValueRelatedNodeI>;
+export type MeasurementModel = NeogmaModel<MeasurementProperties, MeasurementRelatedNodeI>;
 
-export type MeasurementValueInstance = NeogmaInstance<ValueProperties, ValueRelatedNodeI>;
+export type MeasurementInstance = NeogmaInstance<MeasurementProperties, MeasurementRelatedNodeI>;
