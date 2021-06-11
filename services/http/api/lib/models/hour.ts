@@ -1,13 +1,13 @@
 // import { Integer, Time } from "neo4j-driver";
 import { ModelRelatedNodesI, NeogmaInstance, NeogmaModel } from "neogma";
-import { MeasurementValueModel, UserMeasurementModel } from "./measurement";
+import { MeasurementModel, MeasurementTypeModel } from "./measurement";
 
 export type HourProperties = {
     time: number
 }
 
 export type HourRelatedNodeI = {
-    Value: ModelRelatedNodesI<UserMeasurementModel, MeasurementValueModel>
+    Value: ModelRelatedNodesI<MeasurementTypeModel, MeasurementModel>
 }
 
 export type HourInstance = NeogmaInstance<HourProperties, HourRelatedNodeI>;
