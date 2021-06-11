@@ -13,7 +13,7 @@
     "api:start": "docker-compose up api",
     "api:mock": "cd services/http/api && yarn mock",
     "api:start:dev": "cd services/http/api && yarn start",
-    "api:start:dev:lazy": "cd services/http/api && yarn start:lazy",
+    "api:start:dev:lazy": "cd services/http/api && yarn start:dev:lazy",
     "api:start:test": "yarn db:reset && yarn db:start && sleep 15 && yarn db:load:test && yarn api:start:dev",
     "db:start": "docker-compose up -d db",
     "stop": "docker-compose down",
