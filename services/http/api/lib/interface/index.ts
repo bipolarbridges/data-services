@@ -1,7 +1,6 @@
 import * as loggers from '../logging'
 import { Session } from 'neo4j-driver';
 import { allModels } from 'lib/models/initializers';
-import { ValueProperties } from 'lib/models/measurement';
 
 function userExistsX(id: string) {
     return async (session: Session, models: allModels): Promise<boolean> => {
@@ -110,81 +109,175 @@ function createMeasurement(m: typeOldInput) {
 
 export type MeasurementInput = {
     uid: string,
-    data: ValueProperties,
+    value: number,
+    name: string,
     source: string,
     date: number,
 }
+/* 
+async function measurementExist(uid: string, type: string, models: allModels, session: Session) {
+    try {
+        const instance = await models.MeasurementType.findOne({
+            where: {
+                uid,
+                type,
+            },
+            session,
+        });
+        return {
+            status: instance? instance?.__existsInDatabase : false,
+            instance: (instance as measurement.MeasurementTypeInstance)
+        };
+    } catch (err) {
+        loggers.error(err);
+        return {
+            status: false
+        };
+    }
+}
+
+async function valueExist(value: number, models: allModels, session: Session) {
+    try {
+        const instance = await models.measurementValue.findOne({
+            where: {
+                value,
+            },
+            session,
+        });
+        return {
+            status: instance? instance?.__existsInDatabase : false,
+            instance: instance as measurement.MeasurementInstance
+        };
+    } catch (err) {
+        loggers.error(err);
+        return {
+            status: false
+        };
+    }
+}
+
+async function dateExist(id: string, models: allModels, session: Session) {
+    try {
+        const instance = await models.date.findOne({
+            where: {
+                id,
+            },
+            session,
+        });
+        return {
+            status: instance? instance?.__existsInDatabase : false,
+            instance: instance as date.DateInstance
+        };
+    } catch (err) {
+        loggers.error(err);
+        return {
+            status: false
+        };
+    }
+}
+
+async function hourExist(time: number, models: allModels, session: Session) { 
+    try {
+        const instance = await models.hour.findOne({
+            where: {
+                time,
+            },
+            session,
+        });
+        return {
+            status: instance? instance?.__existsInDatabase : false,
+            instance: instance
+        };
+    } catch (err) {
+        loggers.error(err);
+        return {
+            status: false
+        };
+    }
+}
+ */
 
 function createMeasurementX(m: MeasurementInput) {
     return async (session: Session, models: allModels): Promise<boolean> => {
         
         try {
-            const {year, month, day, time} = dateTransformer(m.date);
-            await models.userMeasurement.createOne(
+            const { year, month, day, time } = dateTransformer(m.date);
+            const { uid, source, value, name } = m;
+
+            const Date = {
+                propertiesMergeConfig: {
+                    nodes: true,
+                    relationship: true,
+                },
+                properties: [
                     {
-                        type: m.source,
-                        User: {
-                            propertiesMergeConfig: {
-                                nodes: true,
-                                relationship: true,
-                                
-                            },
-                            properties: [{
-                                uid: m.uid,
-                            }]
-                        },
-                        MeasurementValue: {
-                            propertiesMergeConfig: {
-                                nodes: true,
-                                relationship: true,
-                            },
-                            properties: [
-                                {
-                                    subtype: m.data?.subtype,
-                                    value: m.data.value,
-                                    Date: {
-                                        propertiesMergeConfig: {
-                                            nodes: true,
-                                            relationship: true,
-                                        },
-                                        properties: [
-                                            {
-                                                year: year,
-                                                month: month,
-                                                day: day,                                                
-                                                id: `${year}-${month}-${day}`,                                    
-                                            }
-                                        ],
-                                    },
-                                    Hour: {
-                                        propertiesMergeConfig: {
-                                            nodes: true,
-                                            relationship: true,
-                                        },
-                                        properties: [
-                                            {
-                                                time: time,                                 
-                                            }
-                                        ],
-                                    }
-                                }
-                            ]
-                        },
-                        Source: {
-                            propertiesMergeConfig: {
-                                nodes: true,
-                                relationship: true,
-                                
-                            },
-                            properties: [
-                                {
-                                    type: m.source
-                                }
-                            ]
-                        }                  
-                    },
-                    { session, merge: true }
-                );
+                        year: year,
+                        month: month,
+                        day: day,                                                
+                        id: `${year}-${month}-${day}`,                                    
+                    }
+                ],
+            };
+
+            const Hour = {
+                propertiesMergeConfig: {
+                    nodes: true,
+                    relationship: true,
+                },
+                properties: [
+                    {
+                        time: time,                                 
+                    }
+                ],
+            };
+
+            const User = {
+                propertiesMergeConfig: {
+                    nodes: true,
+                    relationship: true,
+                    
+                },
+                properties: [{
+                    uid: uid,
+                }]
+            };
+
+            const Measurement = {
+                propertiesMergeConfig: {
+                    nodes: false,
+                    relationship: false,
+                },
+                properties: [
+                    {
+                        value: value,
+                        Date: Date,
+                        Hour: Hour,
+                        User: User,
+                    }
+                ]
+            };
+
+            const Source = {
+                propertiesMergeConfig: {
+                    nodes: true,
+                    relationship: true,
+                    
+                },
+                properties: [
+                    {
+                        name: source
+                    }
+                ]
+            };
+
+            await models.measurementType.createOne(
+                {
+                    name,
+                    Measurement: Measurement,
+                    Source: Source,             
+                },
+                { session, merge: true }
+            );
             return true;        
             
         } catch (err) {
