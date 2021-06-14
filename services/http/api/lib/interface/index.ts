@@ -2,6 +2,7 @@ import * as loggers from '../logging'
 import { Session } from 'neo4j-driver';
 import { allModels } from 'lib/models/initializers';
 
+
 function userExistsX(id: string) {
     return async (session: Session, models: allModels): Promise<boolean> => {
         try {
@@ -201,35 +202,8 @@ function createMeasurementX(m: MeasurementInput) {
     return async (session: Session, models: allModels): Promise<boolean> => {
         
         try {
-            const { year, month, day, time } = dateTransformer(m.date);
+            const { year, month, day, hour, time } = dateTransformer(m.date);
             const { uid, source, value, name } = m;
-
-            const Date = {
-                propertiesMergeConfig: {
-                    nodes: true,
-                    relationship: true,
-                },
-                properties: [
-                    {
-                        year: year,
-                        month: month,
-                        day: day,                                                
-                        id: `${year}-${month}-${day}`,                                    
-                    }
-                ],
-            };
-
-            const Hour = {
-                propertiesMergeConfig: {
-                    nodes: true,
-                    relationship: true,
-                },
-                properties: [
-                    {
-                        time: time,                                 
-                    }
-                ],
-            };
 
             const User = {
                 propertiesMergeConfig: {
@@ -250,8 +224,52 @@ function createMeasurementX(m: MeasurementInput) {
                 properties: [
                     {
                         value: value,
-                        Date: Date,
-                        Hour: Hour,
+                        // Date: Date,
+                        Hour: {
+                            propertiesMergeConfig: {
+                                nodes: true,
+                                relationship: true,
+                            },
+                            properties: [
+                                { hour }
+                            ],
+                        },
+                        Day: {
+                            propertiesMergeConfig: {
+                                nodes: true,
+                                relationship: true,
+                            },
+                            properties: [
+                                { day }
+                            ],
+                        },
+                        Month: {
+                            propertiesMergeConfig: {
+                                nodes: true,
+                                relationship: true,
+                            },
+                            properties: [
+                                { month }
+                            ],
+                        },
+                        Year: {
+                            propertiesMergeConfig: {
+                                nodes: true,
+                                relationship: true,
+                            },
+                            properties: [
+                                { year }
+                            ],
+                        },
+                        Timestamp: {
+                            propertiesMergeConfig: {
+                                nodes: true,
+                                relationship: false,
+                            },
+                            properties: [
+                                { time }
+                            ],
+                        },
                         User: User,
                     }
                 ]
@@ -297,13 +315,14 @@ function dateTransformer(input: number) {
     const month = date.getMonth();
     const day = date.getDate();
     // const time = new Time(date.getHours(), date.getMinutes(), date.getSeconds(), date.getMilliseconds() * 1000000, date.getTimezoneOffset() *60)
-    
-    const time = 3600 * date.getHours() + 60 * date.getMinutes() + date.getSeconds();
+    const time = date.getTime();
+    const hour = date.getHours(); // 3600 * date.getHours() + 60 * date.getMinutes() + date.getSeconds();
 
     return {
         year, 
         month,
         day, 
+        hour,
         time
     }
 }
