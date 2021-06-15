@@ -1,0 +1,195 @@
+openapi: 3.0.0
+info:
+  title: Bipolar Bridges Data Services Interface
+  version: '0.2'
+  license:
+    name: MIT
+  description: Provides endpoints for general-purpose data import and acquisition within the BB infrastructure.
+  contact:
+    name: Rowan Lindsay
+    email: rowdl22@students.cs.ubc.ca
+servers: []
+paths:
+  /client:
+    post:
+      summary: Create a Client Reference. This tracks the unique user-identifier in the external management system (e.g. firebase).
+      tags: []
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+                schema:
+                  description: 'Creation message'
+                  type: object
+                  properties:
+                    message:
+                      type: string
+                      minLength: 1
+                  required:
+                    - message
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                description: 'Error Cause'
+                type: object
+                properties:
+                  message:
+                    type: string
+                    minLength: 1
+                required:
+                  - message
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                description: 'Error Cause'
+                type: object
+                properties:
+                  message:
+                    type: string
+                    minLength: 1
+                required:
+                  - message
+      operationId: post-client
+      requestBody:
+        content:
+          application/json:
+            schema:
+              description: ''
+              type: object
+              properties:
+                id:
+                  type: string
+                  minLength: 1
+              required:
+                - id
+            examples: {}
+      security:
+        - import-key: []
+    get: 
+      summary: Get information about a specific client
+      tags: []
+      responses:
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+                schema:
+                  description: 'Message'
+                  type: object
+                  properties:
+                    message:
+                      type: string
+                      minLength: 1
+                  required:
+                    - message
+        '200':
+          description: Good
+          content:
+            application/json:
+                schema:
+                  description: 'Client info'
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                      minLength: 1
+                  required:
+                    - id
+  /measurement:
+    post:
+      summary: Record Measurement. Allows for client specification of value type and asserts type-correctness on the server side.
+      tags: []
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+                schema:
+                  description: 'Creation message'
+                  type: object
+                  properties:
+                    message:
+                      type: string
+                      minLength: 1
+                  required:
+                    - message
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                description: 'Error Cause'
+                type: object
+                properties:
+                  message:
+                    type: string
+                    minLength: 1
+                required:
+                  - message
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                description: 'Error Cause'
+                type: object
+                properties:
+                  message:
+                    type: string
+                    minLength: 1
+                required:
+                  - message
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                description: 'Error Cause'
+                type: object
+                properties:
+                  message:
+                    type: string
+                    minLength: 1
+                required:
+                  - message
+      operationId: post-measurement
+      security:
+        - import-key: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              description: 'Measurement Request Contents'
+              type: object
+              properties:
+                clientID:
+                  type: string
+                  minLength: 1
+                data:
+                  type: object
+                  required:
+                    - date
+                    - value
+                    - dataType
+                  properties:
+                    date:
+                      type: number
+                    value:
+                      type: number
+                    dataType:
+                      type: string
+              required:
+                - clientID
+                - data
+components:
+  schemas: {}
+  securitySchemes:
+    import-key:
+      name: Authorization
+      type: apiKey
+      in: header

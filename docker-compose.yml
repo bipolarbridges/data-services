@@ -1,0 +1,34 @@
+version: '3'
+
+services:
+  db:
+    build: services/db
+    ports:
+      - 7687:7687
+    volumes:
+      - store:/data
+  db_shell:
+    depends_on:
+      - db
+    build: services/db_shell
+    tty: true
+    stdin_open: true
+    command: bash -c "connect"
+  api:
+    depends_on:
+      - db
+    build: services/http/api
+    ports:
+      - 8888:8888
+    command: "yarn start"
+  mock_auth_server:
+    build: services/http/api/tests/mocks/auth_server
+    ports:
+      - 4000:4000
+    command: "yarn start"
+networks:
+  default:
+    external:
+      name: bb_default
+volumes:
+  store:

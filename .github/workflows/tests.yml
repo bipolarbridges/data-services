@@ -1,0 +1,45 @@
+name: tests
+on: push
+jobs:
+  api:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+      - name: Create network
+        run: docker network create bb_default
+      - name: Create auth config
+        working-directory: services/http/api/lib/auth
+        run: cp ci-config.json docker-config.json
+      - name: Build service images
+        run: docker-compose build
+      - name: Start database container
+        run: docker-compose up -d db
+      - name: Await database
+        run: sleep 15
+      - name: Show database logs
+        run: docker-compose logs db
+      - name: Load test fixtures
+        run: docker-compose run --rm db_shell execute test_data
+      - name: Start auth server
+        run: docker-compose up -d mock_auth_server
+      - name: Await auth server
+        run: sleep 5
+      - name: Show auth server logs
+        run: docker-compose logs mock_auth_server
+      - name: Start server
+        run: docker-compose up -d api
+      - name: Await server
+        run: sleep 5
+      - name: Show server logs
+        run: docker-compose logs api
+      - name: Install testing dependencies
+        working-directory: services/http/api
+        run: yarn
+      - name: Run tests
+        working-directory: services/http/api
+        run: yarn test
+        timeout-minutes: 1
+      - name: Show complete server logs
+        if: always()
+        run: docker-compose logs api

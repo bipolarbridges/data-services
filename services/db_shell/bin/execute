@@ -1,0 +1,17 @@
+#!/bin/bash
+
+_run_exec_ () {
+    echo "Running queries..."
+    file="queries/$1.cypher"
+    echo "Using file: $file"
+    cat $file | connect
+    echo "Done."
+}
+
+q_file=$1
+if [[ -z "$q_file" ]]; then
+    echo "No query file specified"
+    exit 1
+else
+    _run_exec_ "$q_file"
+fi
