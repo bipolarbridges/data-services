@@ -4,6 +4,9 @@
   "description": "Services for Bipolar Bridges Project",
   "main": "main.js",
   "scripts": {
+    "build:api": "cd services/http/api && yarn build",
+    "build:mock:auth": "cd services/http/api && yarn build:mock:auth",
+    "lint": "cd services/http/api && yarn lint",
     "build": "docker-compose build",
     "build:shell": "docker-compose build db_shell",
     "api:start": "docker-compose up api",
@@ -19,7 +22,8 @@
     "db:reset": "docker-compose run --rm db_shell execute delete_all",
     "db:reset:deep": "docker-compose down && docker volume rm bb_data_services_store",
     "db:reset:test": "yarn db:reset && yarn db:load:test",
-    "test:api": "yarn db:reset:test && cd services/http/api && yarn test"
+    "test:api": "yarn db:reset:test && cd services/http/api && yarn test",
+    "all": "yarn install && cd services/http/api && yarn all"
   },
   "repository": {
     "type": "git",

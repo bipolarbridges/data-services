@@ -1,20 +1,20 @@
-require('dotenv').config()
+import dotenv from 'dotenv';
+dotenv.config();
 
-const express = require('express')
-const cors = require('cors')
-const bodyParser = require('body-parser')
-const database = require('./lib/db')
-const api = require('./lib/interface')
-const { accept } = require('./lib/requests')
-const { handle } = require('./lib/errors')
-const { auth } = require('./lib/auth');
-const logs = require('./lib/logging');
+import express from 'express';
+import cors from 'cors';
+import {database, Database} from './lib/db';
+import api from './lib/interface';
+import accept from './lib/requests';
+import { handle } from './lib/errors';
+import { auth } from './lib/auth';
+//import logs from './lib/logging';
 
 
 const app = express()
-const db = database()
+const db: Database = database()
 
-app.use(bodyParser.json())
+app.use(express.json())
 app.use(cors())
 app.use(accept())
 app.use(auth(db))
