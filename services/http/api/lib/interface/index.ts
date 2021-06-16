@@ -1,8 +1,9 @@
 import * as loggers from '../logging';
 import { Session } from 'neo4j-driver-core';
 import { allModels } from 'lib/models/initializers';
+import { DatabaseProcedure } from 'lib/db';
 
-function userExistsX(id: string) {
+function userExistsX(id: string): DatabaseProcedure<boolean> {
     return async (session: Session, models: allModels): Promise<boolean> => {
         try {
             const user = await models.user.findOne({
@@ -21,7 +22,7 @@ function userExistsX(id: string) {
     }
 }
 
-function createUserX(id: string) {
+function createUserX(id: string): DatabaseProcedure<null> {
     return async (session: Session, models: allModels): Promise<null> => {
         try {
             await models.user.createOne(
@@ -72,7 +73,7 @@ export type CreateMeasurementArgs = {
     value: number
 }
 
-function createMeasurementX(m: CreateMeasurementArgs) {
+function createMeasurementX(m: CreateMeasurementArgs): DatabaseProcedure<boolean> {
     return async (session: Session, models: allModels): Promise<boolean> => {
         const date = transformDate(m.date);
         try {

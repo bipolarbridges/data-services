@@ -5,9 +5,10 @@ import { BinaryLike, createHash } from 'crypto';
 import axios, { AxiosInstance, AxiosRequestConfig }  from 'axios';
 import {InternalError} from '../errors';
 import path from 'path';
-//import {Database} from '../db';
 import { Request } from 'express';
 import { Session } from 'neo4j-driver-core';
+import { allModels } from 'lib/models/initializers';
+import { DatabaseProcedure } from 'lib/db';
 
 const __dirname = path.resolve();
 
@@ -62,19 +63,11 @@ async function getRemoteId(token: BinaryLike) {
     }
 }
 
-export interface AuthMethod {
-    (req: Request, auth: BinaryLike): DatabaseCallback
-}
-
-export interface DatabaseCallback {
-    (db: Session): DatabaseResponse
-}
-
-export type DatabaseResponse = Promise<boolean | null>
-
+export type AuthResult = DatabaseProcedure<boolean>;
+export type AuthMethod = (req: Request, auth: BinaryLike) => AuthResult;
 
 export const authMethods: AuthMethod[] = [
-    (req: Request, auth: BinaryLike) => async (db: Session): Promise<boolean | null> => {
+    (req: Request, auth: BinaryLike) => async (db: Session, models: allModels) => {
         // KEY AUTHENTICATION
         const results = await db.run(
             "MATCH (i:Identity{type: 'key', check: $check}) " +
@@ -88,7 +81,7 @@ export const authMethods: AuthMethod[] = [
             });
         return results.records.length > 0;
     },
-    (req: Request, auth: BinaryLike) => async (db: Session): Promise<boolean | null> => {
+    (req: Request, auth: BinaryLike) => async (db: Session) => {
         const id = await getRemoteId(auth);
         if (!id) {
             return false;
