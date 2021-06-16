@@ -1,4 +1,4 @@
-import * as loggers from '../logging'
+import * as loggers from '../logging';
 import { Session } from 'neo4j-driver';
 import { allModels } from 'lib/models/initializers';
 
@@ -20,17 +20,6 @@ function userExistsX(id: string) {
             return false;
         }
     }
-}
-
-/**
- * @depreciated 
- */
-function userExists(id: string) {
-    return async (session: Session): Promise<boolean> => {
-        const exist = await session.run(
-            "MATCH (u:User{uid: $uid}) RETURN u;", { uid: id });
-        return exist.records.length > 0;
-    };
 }
 
 function createUserX(id: string) {
@@ -66,49 +55,8 @@ function createUserX(id: string) {
     }
 }
 
-/**
- * @depreciated 
- */
-function createUser(id:string) {
-    return async (session: Session): Promise<null> => {
-        await session.run("CREATE (:User{uid: $uid});", { uid: id });
-        await session.run("MATCH (u:User{uid: $uid}) " +
-            "CREATE (r:Resource{path: $clientPath}) " +
-            "CREATE (u)-[:Can{method: 'GET'}]->(r);",
-            {
-                uid: id,
-                clientPath: `/client/${id}`
-            });
-        return null;
-    };
-}
-
-export type typeOldInput = {
-    date: number,
-    uid: string,
-    type: string,
-    value: number
-};
-/**
- * @depreciated 
- */
-function createMeasurement(m: typeOldInput) {
-    return async (session: Session): Promise<boolean> => {
-        // decoding the timestamp per the format of this post:
-        // https://stackoverflow.com/a/847196
-        const date = dateTransformer(m.date);
-        const user = await session.run(
-            "MATCH (u:User{uid:$uid}) "                                                     +
-            "MERGE (m:Measurement{type: $type, value: $value}) "                            +
-            "MERGE (d) -[:Includes]-> (m) "                                                 +
-            "MERGE (u) -[:Recorded]-> (m) "                                                 +
-            "RETURN u;", 
-            {...m, time: date.time, day: date.day, month: date.month, year: date.year })
-        return user.records.length > 0
-    };
-}
-
-export type MeasurementInput = {
+// named with format VerbModelArgs
+export type CreateMeasurementArgs = {
     uid: string,
     value: number,
     name: string,
@@ -116,98 +64,11 @@ export type MeasurementInput = {
     date: number,
 }
 
-async function measurementExist(uid: string, type: string, value: number, timestamp:number, session: Session) {
-    
-}
-
-/* 
-async function measurementExist(uid: string, type: string, models: allModels, session: Session) {
-    try {
-        const instance = await models.MeasurementType.findOne({
-            where: {
-                uid,
-                type,
-            },
-            session,
-        });
-        return {
-            status: instance? instance?.__existsInDatabase : false,
-            instance: (instance as measurement.MeasurementTypeInstance)
-        };
-    } catch (err) {
-        loggers.error(err);
-        return {
-            status: false
-        };
-    }
-}
-
-async function valueExist(value: number, models: allModels, session: Session) {
-    try {
-        const instance = await models.measurementValue.findOne({
-            where: {
-                value,
-            },
-            session,
-        });
-        return {
-            status: instance? instance?.__existsInDatabase : false,
-            instance: instance as measurement.MeasurementInstance
-        };
-    } catch (err) {
-        loggers.error(err);
-        return {
-            status: false
-        };
-    }
-}
-
-async function dateExist(id: string, models: allModels, session: Session) {
-    try {
-        const instance = await models.date.findOne({
-            where: {
-                id,
-            },
-            session,
-        });
-        return {
-            status: instance? instance?.__existsInDatabase : false,
-            instance: instance as date.DateInstance
-        };
-    } catch (err) {
-        loggers.error(err);
-        return {
-            status: false
-        };
-    }
-}
-
-async function hourExist(time: number, models: allModels, session: Session) { 
-    try {
-        const instance = await models.hour.findOne({
-            where: {
-                time,
-            },
-            session,
-        });
-        return {
-            status: instance? instance?.__existsInDatabase : false,
-            instance: instance
-        };
-    } catch (err) {
-        loggers.error(err);
-        return {
-            status: false
-        };
-    }
-}
- */
-
-function createMeasurementX(m: MeasurementInput) {
+function createMeasurementX(m: CreateMeasurementArgs) {
     return async (session: Session, models: allModels): Promise<boolean> => {
         
         try {
-            const { year, month, day, hour, time } = dateTransformer(m.date);
+            const { year, month, day, hour, time } = transformDate(m.date);
             const { uid, source, value, name } = m;
 
             const User = {
@@ -311,15 +172,17 @@ function createMeasurementX(m: MeasurementInput) {
     }
 }
 
-
-function dateTransformer(input: number) {
-    // decoding the timestamp per the format of this post:
-    // https://stackoverflow.com/a/847196
+// Takes in a second number input, converts it to milliseconds 
+// and returns
+// - the year 
+// - the month (0-11)
+// - the day of the month (1-31)
+// - the time in milliseconds
+function transformDate(input: number) {
     const date = new Date(input * 1000);
     const year = date.getFullYear();
     const month = date.getMonth();
     const day = date.getDate();
-    // const time = new Time(date.getHours(), date.getMinutes(), date.getSeconds(), date.getMilliseconds() * 1000000, date.getTimezoneOffset() *60)
     const time = date.getTime();
     const hour = date.getHours(); // 3600 * date.getHours() + 60 * date.getMinutes() + date.getSeconds();
 
@@ -333,10 +196,7 @@ function dateTransformer(input: number) {
 }
 
 export default {
-    userExists,
     userExistsX,
-    createUser,
     createUserX,
-    createMeasurement,
-    createMeasurementX,
+    createMeasurementX,    
 }

@@ -3,8 +3,8 @@ dotenv.config();
 
 import express from 'express';
 import cors from 'cors';
-import {database, Database} from './lib/db';
-import api, { MeasurementInput } from './lib/interface';
+import { database, Database } from './lib/db';
+import api, { CreateMeasurementArgs } from './lib/interface';
 import accept from './lib/requests';
 import { handle } from './lib/errors';
 import { auth } from './lib/auth';
@@ -71,47 +71,43 @@ const measurementRouter = express.Router();
 
 measurementRouter.route('/')
     .post(async (req, res) => {
-        const { clientID, data } : Partial<measurementBody> = req.body;
-        
+        const { clientID, data }: Partial<measurementBody> = req.body;
+        const { name, value, date, source } = data;
         if (!data) {
             res.status(400).send({
                 message: "Missing data object"
             })
+        } else if (!clientID || !date || !value || !name || !source) {
+            res.status(400).send({
+                message: "Missing data fields"
+            })
+        } else if (isNaN(data.date)) {
+            res.status(400).send({
+                message: "date must be a number"
+            })
         } else {
-            const { name, value, date, source } = data;
-            if (!clientID
-                || !date || !source || !value ||!name) {
-                res.status(400).send({
-                    message: "Missing data fields"
+            const me: CreateMeasurementArgs = {
+                date,
+                uid: clientID,
+                source,
+                name,
+                value,
+            }
+            if (!(await db.exec(api.userExistsX(me.uid)))) {
+                res.status(404).send({
+                    message: "Specified client does not exist"
                 })
-            } else if (isNaN(date)) {
+            } else if (!(await db.exec(api.createMeasurementX(me)))) {
                 res.status(400).send({
-                    message: "date must be a number"
+                    message: "measurement could not be created"
                 })
             } else {
-                const me: MeasurementInput = {
-                    date,            
-                    uid: clientID,
-                    source,
-                    name,
-                    value,                
-                }
-                if (!(await db.exec(api.userExistsX(me.uid)))) {
-                    res.status(404).send({
-                        message: "Specified client does not exist"
-                    })
-                } else if (!(await db.exec(api.createMeasurementX(me)))) {
-                    res.status(400).send({
-                        message: "measurement could not be created"
-                    })
-                } else {
-                    res.status(201).send({
-                        message: "Created"
-                    })
-                }
+                res.status(201).send({
+                    message: "Created"
+                })
             }
-
         }
+
     })
 
 app.use('/measurement', measurementRouter);
