@@ -5,7 +5,7 @@ import * as resource from './resource';
 import * as identity from './identity';
 import * as date from './date';
 import * as source from './source';
-import * as hour from './hour';
+import * as time from './time';
 
 export {
     user,
@@ -14,5 +14,5 @@ export {
     identity,
     date,
     source,
-    hour
+    time
 }

@@ -1,33 +1,40 @@
 import { ModelRelatedNodesI, NeogmaInstance, NeogmaModel } from "neogma";
-import { DateInstance, DateModel } from "./date";
-import { HourInstance, HourModel } from "./hour";
+// import { DateInstance, DateModel } from "./date";
+import { DayInstance, DayModel, HourInstance, HourModel, MonthInstance, MonthModel, TimestampInstance, TimestampModel, YearInstance, YearModel } from "./time";
+import { SourceInstance, SourceModel } from "./source";
 import { UserInstance, UserModel } from "./user";
 
-export type UserMeasurementProperties = {
-    type: string,
+export type MeasurementTypeProperties = {
+    name: string,
 }
 
-export type UserMeasurementRelatedNodesI = {
-    MeasurementValue: ModelRelatedNodesI<MeasurementValueModel, MeasurementValueInstance>,
-    User: ModelRelatedNodesI<UserModel, UserInstance>;
+export type MeasurementTypeRelatedNodesI = {
+    Measurement: ModelRelatedNodesI<MeasurementModel, MeasurementInstance>,
+    Source: ModelRelatedNodesI<SourceModel, SourceInstance>;
 };
 
-export type UserMeasurementInstance = NeogmaInstance<UserMeasurementProperties, UserMeasurementRelatedNodesI>;
+export type MeasurementTypeInstance = NeogmaInstance<MeasurementTypeProperties, MeasurementTypeRelatedNodesI>;
 
-export type UserMeasurementModel = NeogmaModel<UserMeasurementProperties, UserMeasurementRelatedNodesI>;
+export type MeasurementTypeModel = NeogmaModel<MeasurementTypeProperties, MeasurementTypeRelatedNodesI>;
 
 // ----------------------------------------------------------------------------------------------------------
 
-export type ValueProperties = {
-    value: number
+export type MeasurementProperties = {
+    value: number,
 }
 
-export type ValueRelatedNodeI = {
-    Date: ModelRelatedNodesI<DateModel, DateInstance>;
+export type MeasurementRelatedNodeI = {
+    User: ModelRelatedNodesI<UserModel, UserInstance>,
+    // Date: ModelRelatedNodesI<DateModel, DateInstance>;
     Hour: ModelRelatedNodesI<HourModel, HourInstance>;
+    Day: ModelRelatedNodesI<DayModel, DayInstance>;
+    Month: ModelRelatedNodesI<MonthModel, MonthInstance>;
+    Year: ModelRelatedNodesI<YearModel, YearInstance>;
+    Timestamp: ModelRelatedNodesI<TimestampModel, TimestampInstance>;
+
 }
 
 
-export type MeasurementValueModel = NeogmaModel<ValueProperties, ValueRelatedNodeI>;
+export type MeasurementModel = NeogmaModel<MeasurementProperties, MeasurementRelatedNodeI>;
 
-export type MeasurementValueInstance = NeogmaInstance<ValueProperties, ValueRelatedNodeI>;
+export type MeasurementInstance = NeogmaInstance<MeasurementProperties, MeasurementRelatedNodeI>;

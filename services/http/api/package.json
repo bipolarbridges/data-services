@@ -7,7 +7,7 @@
     "build:mock:auth": "cd tests/mocks/auth_server && yarn build",
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
-    "test": "jest tests",
+    "test": "jest tests --testPathPattern=/dist/tests/*",
     "start": "node ./dist/main.js",
     "start:lazy": "ts-node main.ts",
     "start:dev:lazy": "nodemon",

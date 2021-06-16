@@ -1,12 +1,12 @@
 import { ModelRelatedNodesI, NeogmaInstance, NeogmaModel } from "neogma";
-import { UserMeasurementInstance, UserMeasurementModel } from "./measurement";
+import { MeasurementTypeInstance, MeasurementTypeModel } from "./measurement";
 
 export type SourceProperties = {
-    type: string
+    name: string
 }
 
 export type SourceRelatedNodeI = {
-    UserMeasurement: ModelRelatedNodesI<UserMeasurementModel, UserMeasurementInstance>
+    MeasurementType: ModelRelatedNodesI<MeasurementTypeModel, MeasurementTypeInstance>
 }
 
 export type SourceInstance = NeogmaInstance<SourceProperties, SourceRelatedNodeI>;
