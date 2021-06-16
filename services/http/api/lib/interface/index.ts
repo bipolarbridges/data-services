@@ -115,6 +115,11 @@ export type MeasurementInput = {
     source: string,
     date: number,
 }
+
+async function measurementExist(uid: string, type: string, value: number, timestamp:number, session: Session) {
+    
+}
+
 /* 
 async function measurementExist(uid: string, type: string, models: allModels, session: Session) {
     try {

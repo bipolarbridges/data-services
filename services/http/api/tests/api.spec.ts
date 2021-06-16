@@ -256,6 +256,7 @@ describe("Paths", () => {
                 expect(res.status).toEqual(403)
             })
         })
+
         const invalidData = [
             // Missing fields
             {
@@ -337,6 +338,7 @@ describe("Paths", () => {
                     expect(res.status).toEqual(400)
                 })))
         })
+
         it("Should respond properly upon success", async () => {
             await ax.post("/measurement", validExampleData, {
                 headers: {
@@ -351,6 +353,7 @@ describe("Paths", () => {
                 fail()
             })
         })
+        
         it("Should reject if client does not exist", async () => {
             await ax.post("/measurement", {
                 clientID: "doesnotexist@email.com",
