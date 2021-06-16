@@ -1,5 +1,5 @@
-import * as loggers from '../logging'
-import { Session } from 'neo4j-driver'
+import * as loggers from '../logging';
+import { Session } from 'neo4j-driver-core';
 import { allModels } from 'lib/models/initializers';
 
 function userExistsX(id: string) {
@@ -64,14 +64,15 @@ function createUserX(id: string) {
     }
 }
 
-export type MeasurementInput = {
+// named with format VerbModelArgs
+export type CreateMeasurementArgs = {
     date: number,
     uid: string,
     type: string,
     value: number
 }
 
-function createMeasurementX(m: MeasurementInput) {
+function createMeasurementX(m: CreateMeasurementArgs) {
     return async (session: Session, models: allModels): Promise<boolean> => {
         const date = transformDate(m.date);
         try {

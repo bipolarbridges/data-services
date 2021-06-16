@@ -14,7 +14,9 @@
     "api:mock": "cd services/http/api && yarn mock",
     "api:start:dev": "cd services/http/api && yarn start",
     "api:start:test": "yarn db:reset && yarn db:start && sleep 15 && yarn db:load:test && yarn api:start:dev",
+    "api:start:lazy": "yarn db:start && yarn mock:start && cd services/http/api && yarn start:lazy",
     "db:start": "docker-compose up -d db",
+    "mock:start": "docker-compose up -d mock_auth_server",
     "stop": "docker-compose down",
     "db:status": "docker-compose logs -f db",
     "db:shell": "docker-compose run --rm db_shell connect",
@@ -23,7 +25,7 @@
     "db:reset": "docker-compose run --rm db_shell execute delete_all",
     "db:reset:deep": "docker-compose down && docker volume rm bb_data_services_store",
     "db:reset:test": "yarn db:reset && yarn db:load:test",
-    "test:api": "yarn db:reset:test && cd services/http/api && yarn test",
+    "test:api": "yarn db:reset:test && cd services/http/api && yarn build && yarn test",
     "all": "yarn install && cd services/http/api && yarn all"
   },
   "repository": {
