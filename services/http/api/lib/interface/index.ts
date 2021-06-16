@@ -21,17 +21,6 @@ function userExistsX(id: string) {
     }
 }
 
-/**
- * @depreciated 
- */
-function userExists(id: string) {
-    return async (session: Session): Promise<boolean> => {
-        const exist = await session.run(
-            "MATCH (u:User{uid: $uid}) RETURN u;", { uid: id });
-        return exist.records.length > 0;
-    };
-}
-
 function createUserX(id: string) {
     return async (session: Session, models: allModels): Promise<null> => {
         try {
@@ -75,23 +64,6 @@ function createUserX(id: string) {
     }
 }
 
-/**
- * @depreciated 
- */
-function createUser(id:string) {
-    return async (session: Session): Promise<null> => {
-        await session.run("CREATE (:User{uid: $uid});", { uid: id });
-        await session.run("MATCH (u:User{uid: $uid}) " +
-            "CREATE (r:Resource{path: $clientPath}) " +
-            "CREATE (u)-[:Can{method: 'GET'}]->(r);",
-            {
-                uid: id,
-                clientPath: `/client/${id}`
-            });
-        return null;
-    };
-}
-
 export type MeasurementInput = {
     date: number,
     uid: string,
@@ -99,28 +71,9 @@ export type MeasurementInput = {
     value: number
 }
 
-/**
- * @depreciated 
- */
-function createMeasurement(m: MeasurementInput) {
-    return async (session: Session): Promise<boolean> => {
-        // decoding the timestamp per the format of this post:
-        // https://stackoverflow.com/a/847196
-        const date = dateTransformer(m.date);
-        const user = await session.run(
-            "MATCH (u:User{uid:$uid}) "                                                     +
-            "MERGE (m:Measurement{type: $type, value: $value}) "                            +
-            "MERGE (d) -[:Includes]-> (m) "                                                 +
-            "MERGE (u) -[:Recorded]-> (m) "                                                 +
-            "RETURN u;", 
-            {...m, time: date.time, day: date.day, month: date.month, year: date.year })
-        return user.records.length > 0
-    };
-}
-
 function createMeasurementX(m: MeasurementInput) {
     return async (session: Session, models: allModels): Promise<boolean> => {
-        const date = dateTransformer(m.date);
+        const date = transformDate(m.date);
         try {
             const user = await models.user.findOne({
                 where: {
@@ -163,22 +116,6 @@ function createMeasurementX(m: MeasurementInput) {
                     },
                     { session, merge: true }
                 );
-                /* await models.date.createOne(
-                    {
-                        day: date.day, 
-                        month: date.month, 
-                        year: date.year,
-                        id: `${date.year}-${date.month}-${date.day}`
-                }, {session});
-
-                createdMeasurement.relateTo({
-                    alias: 'Date',
-                    where: {day: date.day, month: date.month, year: date.month},
-                    properties: {
-                        time: date.time
-                    },
-                    session,
-                }); */
 
                 user.relateTo({
                     alias: 'Measurement',
@@ -201,7 +138,13 @@ function createMeasurementX(m: MeasurementInput) {
     }
 }
 
-function dateTransformer(input: number) {
+// Takes in a second number input, converts it to milliseconds 
+// and returns
+// - the year 
+// - the month (0-11)
+// - the day of the month (1-31)
+// - the time in milliseconds
+function transformDate(input: number) {
     const date = new Date(input * 1000);
     const year = date.getFullYear();
     const month = date.getMonth();
@@ -217,11 +160,7 @@ function dateTransformer(input: number) {
 }
 
 export default {
-    userExists,
     userExistsX,
-    createUser,
     createUserX,
-    createMeasurement,
-    createMeasurementX,
-    
+    createMeasurementX,    
 }

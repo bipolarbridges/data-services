@@ -7,7 +7,7 @@ import {InternalError} from '../errors';
 import path from 'path';
 //import {Database} from '../db';
 import { Request } from 'express';
-import { Session } from 'neo4j-driver'
+import { Session } from 'neo4j-driver';
 
 const __dirname = path.resolve();
 
