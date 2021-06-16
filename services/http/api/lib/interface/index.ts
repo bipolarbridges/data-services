@@ -7,6 +7,7 @@ import { MeasurementProperties, MeasurementTypeProperties } from 'lib/models/mea
 import { UserProperties } from 'lib/models/user';
 import { SourceProperties } from 'lib/models/source';
 import * as loggers from '../logging';
+import { DatabaseProcedure } from 'lib/db';
 
 function userExists(id: string) {
   return async (session: Session, models: AllModels): Promise<boolean> => {
@@ -220,7 +221,7 @@ function transformDate(input: number) {
   };
 }
 
-function createMeasurement(m: CreateMeasurementArgs) {
+function createMeasurement(m: CreateMeasurementArgs): DatabaseProcedure<boolean> {
   return async (session: Session, models: AllModels): Promise<boolean> => {
     try {
       const {

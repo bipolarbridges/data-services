@@ -2,10 +2,13 @@ import { readFileSync } from 'fs';
 import path, { join } from 'path';
 import { BinaryLike, createHash } from 'crypto';
 import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
+
 import { Request } from 'express';
-import { Session } from 'neo4j-driver';
+import { Session } from 'neo4j-driver-core';
+import { DatabaseProcedure } from 'lib/db';
+import { info } from 'console';
+import { AllModels } from 'lib/models';
 import { InternalError } from '../errors';
-import { info } from '../logging';
 
 /* eslint-disable @typescript-eslint/naming-convention */
 const __dirname = path.resolve();
@@ -59,20 +62,13 @@ async function getRemoteId(token: BinaryLike) {
   }
 }
 
-export interface AuthMethod {
-  (req: Request, auth: BinaryLike): DatabaseCallback
-}
-
-export interface DatabaseCallback {
-  (db: Session): DatabaseResponse
-}
-
-export type DatabaseResponse = Promise<boolean | null>;
+export type AuthResult = DatabaseProcedure<boolean>;
+export type AuthMethod = (req: Request, auth: BinaryLike) => AuthResult;
 
 export const authMethods: AuthMethod[] = [
-  (req: Request, auth: BinaryLike) => async (db: Session): Promise<boolean | null> => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  (req: Request, auth: BinaryLike) => async (db: Session, models: AllModels) => {
     // KEY AUTHENTICATION
-    info(`Path: ${req.path}`);
     const results = await db.run(
       "MATCH (i:Identity{type: 'key', check: $check}) "
             + 'MATCH (r:Resource{path: $path}) '
@@ -86,7 +82,7 @@ export const authMethods: AuthMethod[] = [
     );
     return results.records.length > 0;
   },
-  (req: Request, auth: BinaryLike) => async (db: Session): Promise<boolean | null> => {
+  (req: Request, auth: BinaryLike) => async (db: Session) => {
     const id = await getRemoteId(auth);
     if (!id) {
       return false;
