@@ -10,21 +10,7 @@
         "strictBindCallApply": true,
         "moduleResolution": "node",
         "baseUrl": ".",
-        "paths": {
-            "db/*": ["lib/db/index.ts"],
-            "errors/*": ["/lib/errors/index.ts"],
-            "interface/*": ["/lib/interface/index.ts"],
-            "logging/*": ["/lib/logging/index.ts"],
-            "requests/*": ["/lib/requests/index.ts"],
-            "models/*": ["/lib/models/index.ts"],
-            "client/*": ["/lib/models/client.ts"],
-            "measurement/*": ["/lib/models/measurement.ts"],
-            "resource/*": ["/lib/models/resource.ts"],
-            "*": [
-              "*",
-              "node_modules/*"
-            ]
-        }
+        "skipLibCheck": true
     },
     "exclude": [
         "./tests",
