@@ -203,14 +203,14 @@ export function initSourceModel(db: Neogma, userMeasurementModel: measurement.Us
         {
             label: 'Source',
             schema: {
-                type: {
+                name: {
                     type: 'string',
                     required: true
                 },
                 
             },
             relationships: {
-                UserMeasurement: {
+                MeasurementType: {
                     model: userMeasurementModel,
                     direction: 'out',
                     name: 'Includes',
