@@ -5,7 +5,8 @@ import {
     resource,
     identity,
     source,
-    time
+    time,
+    allModels
 } from '../models';
 
 
@@ -270,21 +271,6 @@ export function initSourceModel(db: Neogma, MeasurementTypeModel: measurement.Me
         db);
 }
 
-export type allModels = {
-    // date: date.DateModel,
-    identity: identity.IdentityModel,
-    measurementType: measurement.MeasurementTypeModel,
-    resource: resource.ResourceModel,
-    user: user.UserModel,
-    source: source.SourceModel,
-    hour: time.HourModel,
-    day: time.DayModel,
-    month: time.MonthModel,
-    year: time.YearModel,
-    timestamp: time.TimestampModel,
-    measurementValue: measurement.MeasurementModel
-}
-
 export function initAllModels(db: Neogma): allModels {
     const resource = initResourceModel(db);
     const identity = initIdentityModel(db, resource);
@@ -319,7 +305,6 @@ export function initAllModels(db: Neogma): allModels {
         });
 
     return {
-        // date,
         source,
         resource,
         measurementType, 

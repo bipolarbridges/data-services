@@ -1,6 +1,6 @@
 import * as loggers from '../logging';
 import { Session } from 'neo4j-driver';
-import { allModels } from 'lib/models/initializers';
+import { allModels } from 'lib/models';
 
 
 function userExists(id: string) {
