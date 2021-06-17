@@ -4,7 +4,6 @@ import {
     measurement,
     resource,
     identity,
-    date,
     source,
     time
 } from '../models';
@@ -29,7 +28,7 @@ export function initIdentityModel(db: Neogma, resourceModel: resource.ResourceMo
                 },
             },
             relationships: {
-                Resource: {
+                resource: {
                     model: resourceModel,
                     direction: 'out',
                     name: 'Can',
@@ -61,34 +60,6 @@ export function initResourceModel(db: Neogma): resource.ResourceModel {
                 }
             },
             primaryKeyField: 'path'
-        },
-        db
-    )
-}
-
-export function initDateModel(db: Neogma): date.DateModel {
-    return ModelFactory<date.DateProperties, date.DateRelatedNode>(
-        {
-            label: 'Date',
-            primaryKeyField: 'id',
-            schema: {
-                id: {
-                    type: 'string',
-                    required: true
-                },
-                day: {
-                    type: 'number',
-                    required: true
-                },
-                month: {
-                    type: 'number',
-                    required: true
-                },
-                year: {
-                    type: 'number',
-                    required: true
-                },
-            },
         },
         db
     )
@@ -187,27 +158,27 @@ export function initMeasurementModel(db: Neogma,
                 },
             },
             relationships: {
-                Hour: {
+                hour: {
                     model: hourModel,
                     direction: 'out',
                     name: 'RecordedAt'
                 },
-                Day: {
+                day: {
                     model: dayModel,
                     direction: 'out',
                     name: 'RecordedOn',
                 },
-                Month: {
+                month: {
                     model: monthModel,
                     direction: 'out',
                     name: 'RecordedOn'
                 },
-                Year: {
+                year: {
                     model: yearModel,
                     direction: 'out',
                     name: 'RecordedOn',
                 },
-                Timestamp: {
+                timestamp: {
                     model: timestampModel,
                     direction: 'out',
                     name: 'RecordedAt'
@@ -229,7 +200,7 @@ export function initMeasurementTypeModel(db: Neogma, valueModel: measurement.Mea
                 },
             },
             relationships: {
-                Measurement: {
+                measurement: {
                     model: valueModel,
                     direction: 'out',
                     name: 'Includes',
@@ -252,12 +223,12 @@ export function initUserModel(db: Neogma, measurementModel: measurement.Measurem
                 },
             },
             relationships: {
-                MeasurementType: {
+                measurementType: {
                     model: measurementModel,
                     direction: 'out',
                     name: 'Recorded',
                 },
-                Resource: {
+                resource: {
                     model: resourceModel,
                     direction: 'out',
                     name: 'Can',
@@ -288,7 +259,7 @@ export function initSourceModel(db: Neogma, MeasurementTypeModel: measurement.Me
                 },
             },
             relationships: {
-                MeasurementType: {
+                measurementType: {
                     model: MeasurementTypeModel,
                     direction: 'out',
                     name: 'Includes',
@@ -332,7 +303,7 @@ export function initAllModels(db: Neogma): allModels {
     
     measurementType.addRelationships(
         {
-            Source: {
+            source: {
                 model: source,
                 direction: 'in',
                 name: 'Includes',
@@ -340,7 +311,7 @@ export function initAllModels(db: Neogma): allModels {
         });
     measurementValue.addRelationships(
         {
-            User: {
+            user: {
                 model: user,
                 direction: 'in',
                 name: 'Recorded',

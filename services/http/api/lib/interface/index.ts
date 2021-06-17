@@ -3,7 +3,7 @@ import { Session } from 'neo4j-driver';
 import { allModels } from 'lib/models/initializers';
 
 
-function userExistsX(id: string) {
+function userExists(id: string) {
     return async (session: Session, models: allModels): Promise<boolean> => {
         try {
             const user = await models.user.findOne({
@@ -22,13 +22,13 @@ function userExistsX(id: string) {
     }
 }
 
-function createUserX(id: string) {
+function createUser(id: string) {
     return async (session: Session, models: allModels): Promise<null> => {
         try {
             await models.user.createOne(
                 {
                     uid: id,
-                    Resource: {
+                    resource: {
                         propertiesMergeConfig: {
                             nodes: true,
                             relationship: true,
@@ -64,7 +64,7 @@ export type CreateMeasurementArgs = {
     date: number,
 }
 
-function createMeasurementX(m: CreateMeasurementArgs) {
+function createMeasurement(m: CreateMeasurementArgs) {
     return async (session: Session, models: allModels): Promise<boolean> => {
         
         try {
@@ -157,8 +157,8 @@ function createMeasurementX(m: CreateMeasurementArgs) {
             await models.measurementType.createOne(
                 {
                     name,
-                    Measurement: Measurement,
-                    Source: Source,             
+                    measurement: Measurement,
+                    source: Source,             
                 },
                 { session, merge: true }
             );
@@ -196,7 +196,7 @@ function transformDate(input: number) {
 }
 
 export default {
-    userExistsX,
-    createUserX,
-    createMeasurementX,    
+    userExists,
+    createUser,
+    createMeasurement,    
 }

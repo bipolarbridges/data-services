@@ -35,13 +35,13 @@ clientRouter.route('/')
             })
         } else {
             const id = data['id']
-            const exists = await db.exec(api.userExistsX(id))
+            const exists = await db.exec(api.userExists(id))
             if (exists) {
                 res.status(403).send({
                     message: "Already exists"
                 })
             } else {
-                await db.exec(api.createUserX(id))
+                await db.exec(api.createUser(id))
                 res.status(201).send({
                     message: "Created"
                 })
@@ -94,11 +94,11 @@ measurementRouter.route('/')
                     name,
                     value,
                 }
-                if (!(await db.exec(api.userExistsX(me.uid)))) {
+                if (!(await db.exec(api.userExists(me.uid)))) {
                     res.status(404).send({
                         message: "Specified client does not exist"
                     })
-                } else if (!(await db.exec(api.createMeasurementX(me)))) {
+                } else if (!(await db.exec(api.createMeasurement(me)))) {
                     res.status(400).send({
                         message: "measurement could not be created"
                     })

@@ -6,7 +6,7 @@ export type ResourceProperties = {
 }
 
 export type ResourceRelatedNode = {
-    User: ModelRelatedNodesI<UserModel, UserInstance>
+    user: ModelRelatedNodesI<UserModel, UserInstance>
 }
 
 export type ResourceInstance = NeogmaInstance<ResourceProperties, ResourceRelatedNode>;
