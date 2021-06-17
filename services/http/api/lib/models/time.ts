@@ -22,7 +22,7 @@ export type TimestampProperties = {
 }
 
 export type TimestampRelatedNodeI = {
-    measurement: ModelRelatedNodesI<MeasurementModel, MeasurementInstance>
+    Measurement: ModelRelatedNodesI<MeasurementModel, MeasurementInstance>
 }
 
 export type TimestampInstance = NeogmaInstance<TimestampProperties, TimestampRelatedNodeI>;
@@ -36,7 +36,7 @@ export type DayProperties = {
 }
 
 export type DayRelatedNodeI = {
-    measurement: ModelRelatedNodesI<MeasurementModel, MeasurementInstance>
+    Measurement: ModelRelatedNodesI<MeasurementModel, MeasurementInstance>
 }
 
 export type DayInstance = NeogmaInstance<DayProperties, DayRelatedNodeI>;
@@ -50,7 +50,8 @@ export type MonthProperties = {
 }
 
 export type MonthRelatedNodeI = {
-    measurement: ModelRelatedNodesI<MeasurementModel, MeasurementInstance>
+    Measurement: ModelRelatedNodesI<MeasurementModel, MeasurementInstance>;
+    Day: ModelRelatedNodesI<DayModel, DayInstance>;
 }
 
 export type MonthInstance = NeogmaInstance<MonthProperties, MonthRelatedNodeI>;
@@ -64,7 +65,7 @@ export type YearProperties = {
 }
 
 export type YearRelatedNodeI = {
-    measurement: ModelRelatedNodesI<MeasurementModel, MeasurementInstance>
+    Measurement: ModelRelatedNodesI<MeasurementModel, MeasurementInstance>
 }
 
 export type YearInstance = NeogmaInstance<YearProperties, YearRelatedNodeI>;

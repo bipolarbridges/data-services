@@ -8,7 +8,7 @@ export type IdentityProperties = {
 }
 
 export type IdentityRelatedNode = {
-    resource: ModelRelatedNodesI<ResourceModel, ResourceInstance>
+    Resource: ModelRelatedNodesI<ResourceModel, ResourceInstance>
 }
 
 export type IdentityInstance = NeogmaInstance<IdentityProperties, IdentityRelatedNode>

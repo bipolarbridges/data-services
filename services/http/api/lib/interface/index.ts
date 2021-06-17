@@ -28,7 +28,7 @@ function createUser(id: string) {
             await models.user.createOne(
                 {
                     uid: id,
-                    resource: {
+                    Resource: {
                         propertiesMergeConfig: {
                             nodes: true,
                             relationship: true,
@@ -115,7 +115,18 @@ function createMeasurement(m: CreateMeasurementArgs) {
                                 relationship: true,
                             },
                             properties: [
-                                { month }
+                                { 
+                                    month,
+                                    Day: {
+                                        propertiesMergeConfig: {
+                                            nodes: true,
+                                            relationship: false,
+                                        },
+                                        properties: [
+                                            { day }
+                                        ],
+                                    }
+                                }
                             ],
                         },
                         Year: {
@@ -157,8 +168,8 @@ function createMeasurement(m: CreateMeasurementArgs) {
             await models.measurementType.createOne(
                 {
                     name,
-                    measurement: Measurement,
-                    source: Source,             
+                    Measurement: Measurement,
+                    Source: Source,             
                 },
                 { session, merge: true }
             );

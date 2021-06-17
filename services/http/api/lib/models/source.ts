@@ -6,7 +6,7 @@ export type SourceProperties = {
 }
 
 export type SourceRelatedNodeI = {
-    measurementType: ModelRelatedNodesI<MeasurementTypeModel, MeasurementTypeInstance>
+    MeasurementType: ModelRelatedNodesI<MeasurementTypeModel, MeasurementTypeInstance>
 }
 
 export type SourceInstance = NeogmaInstance<SourceProperties, SourceRelatedNodeI>;

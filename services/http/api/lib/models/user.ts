@@ -8,8 +8,8 @@ export type UserProperties = {
 }
 
 export type UserRelatedNode = {
-    measurementType: ModelRelatedNodesI<MeasurementTypeModel, MeasurementTypeInstance>,
-    resource: ModelRelatedNodesI<ResourceModel, ResourceInstance>
+    MeasurementType: ModelRelatedNodesI<MeasurementTypeModel, MeasurementTypeInstance>,
+    Resource: ModelRelatedNodesI<ResourceModel, ResourceInstance>
 }
 
 export type UserInstance = NeogmaInstance<UserProperties, UserRelatedNode>;
