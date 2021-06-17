@@ -310,14 +310,6 @@ export function initAllModels(db: Neogma): allModels {
                 name: 'Recorded',
             }
         });
-     measurementValue.addRelationships(
-        {
-            User: {
-                model: user,
-                direction: 'out',
-                name: 'RecordedBy',
-            }
-        });
 
     return {
         source,
