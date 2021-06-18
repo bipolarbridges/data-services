@@ -4158,7 +4158,7 @@ neo4j-driver@^4.3.0, neo4j-driver@^4.3.1:
     neo4j-driver-core "^4.3.1"
     rxjs "^6.6.3"
 
-neogma@^1.8.4:
+neogma@^1.9.1:
   version "1.9.1"
   resolved "https://registry.yarnpkg.com/neogma/-/neogma-1.9.1.tgz#bb64d3761a3782fd6106dafb045148657d9a696a"
   integrity sha512-esF+lQlZpZ4+QDdaOgg3JotvEKAysllXwm8X1nleHQdcOInisAJU87nko0ZFu83yn6XWVp7cg3TYisVPkz+6AA==
