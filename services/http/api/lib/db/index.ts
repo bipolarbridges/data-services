@@ -1,9 +1,11 @@
 import { InternalError } from '../errors';
 import { Neogma } from 'neogma';
 import { debug } from '../logging'
-import { allModels, initAllModels } from '../models/initializers';
+import { initAllModels } from '../models/initializers';
 import { Parameters } from 'neo4j-driver/types/query-runner';
-import { Result, Session, TransactionConfig, Driver } from 'neo4j-driver-core';
+import { Driver, Result, Session } from 'neo4j-driver';
+import { TransactionConfig } from 'neo4j-driver-core';
+import { allModels } from 'lib/models';
 
 class DatabaseError extends InternalError {
     constructor(error: string) {
@@ -73,3 +75,4 @@ export function database(): Database {
     db.init();
     return db
 }
+

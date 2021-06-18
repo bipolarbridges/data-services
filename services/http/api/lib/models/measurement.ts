@@ -1,18 +1,38 @@
 import { ModelRelatedNodesI, NeogmaInstance, NeogmaModel } from "neogma";
-import { UserModel, UserInstance } from "./user";
-import { DateInstance, DateModel } from "./date";
+// import { DateInstance, DateModel } from "./date";
+import { DayInstance, DayModel, HourInstance, HourModel, MonthInstance, MonthModel, TimestampInstance, TimestampModel, YearInstance, YearModel } from "./time";
+import { SourceInstance, SourceModel } from "./source";
+import { UserInstance, UserModel } from "./user";
+
+export type MeasurementTypeProperties = {
+    name: string,
+}
+
+export type MeasurementTypeRelatedNodesI = {
+    Measurement: ModelRelatedNodesI<MeasurementModel, MeasurementInstance>,
+    Source: ModelRelatedNodesI<SourceModel, SourceInstance>;
+};
+
+export type MeasurementTypeInstance = NeogmaInstance<MeasurementTypeProperties, MeasurementTypeRelatedNodesI>;
+
+export type MeasurementTypeModel = NeogmaModel<MeasurementTypeProperties, MeasurementTypeRelatedNodesI>;
+
+// ----------------------------------------------------------------------------------------------------------
 
 export type MeasurementProperties = {
-    type: string,
-    value: number
+    value: number,
 }
 
-export type MeasurementRelatedNode = {
+export type MeasurementRelatedNodeI = {
     User: ModelRelatedNodesI<UserModel, UserInstance>,
-    Date: ModelRelatedNodesI<DateModel, DateInstance>
+    Hour: ModelRelatedNodesI<HourModel, HourInstance>;
+    Day: ModelRelatedNodesI<DayModel, DayInstance>;
+    Month: ModelRelatedNodesI<MonthModel, MonthInstance>;
+    Year: ModelRelatedNodesI<YearModel, YearInstance>;
+    Timestamp: ModelRelatedNodesI<TimestampModel, TimestampInstance>;
 }
 
-export type MeasurementInstance = NeogmaInstance<MeasurementProperties, MeasurementRelatedNode>;
 
-export type MeasurementModel = NeogmaModel<MeasurementProperties, MeasurementRelatedNode>;
+export type MeasurementModel = NeogmaModel<MeasurementProperties, MeasurementRelatedNodeI>;
 
+export type MeasurementInstance = NeogmaInstance<MeasurementProperties, MeasurementRelatedNodeI>;

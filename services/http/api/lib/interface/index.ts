@@ -1,9 +1,10 @@
 import * as loggers from '../logging';
-import { Session } from 'neo4j-driver-core';
-import { allModels } from 'lib/models/initializers';
 import { DatabaseProcedure } from 'lib/db';
+import { Session } from 'neo4j-driver';
+import { allModels } from 'lib/models';
 
-function userExistsX(id: string): DatabaseProcedure<boolean> {
+
+function userExists(id: string): DatabaseProcedure<boolean> {
     return async (session: Session, models: allModels): Promise<boolean> => {
         try {
             const user = await models.user.findOne({
@@ -22,7 +23,7 @@ function userExistsX(id: string): DatabaseProcedure<boolean> {
     }
 }
 
-function createUserX(id: string): DatabaseProcedure<null> {
+function createUser(id: string): DatabaseProcedure<boolean>{
     return async (session: Session, models: allModels): Promise<null> => {
         try {
             await models.user.createOne(
@@ -34,25 +35,15 @@ function createUserX(id: string): DatabaseProcedure<null> {
                             relationship: true,
                             
                         },
-                        where: [
+                        properties: [
                             {
-                                params: {
-                                    path: `/client/${id}`,
-                                },
-                                relationshipProperties: {
-                                    method: 'GET'
-                                },
+                                path: `/client/${id}`,
+                                method: 'GET'
                             },
                         ],
-                        properties: [{
-                            path: `/client/${id}`,
-                            method: 'GET',
-                            
-                        }],
-                    },
-                    
+                    },                
                 },
-                {session}
+                {merge: true, session}
             ); 
             
             return null;
@@ -67,74 +58,127 @@ function createUserX(id: string): DatabaseProcedure<null> {
 
 // named with format VerbModelArgs
 export type CreateMeasurementArgs = {
-    date: number,
     uid: string,
-    type: string,
-    value: number
+    value: number,
+    name: string,
+    source: string,
+    date: number,
 }
 
-function createMeasurementX(m: CreateMeasurementArgs): DatabaseProcedure<boolean> {
+function createMeasurement(m: CreateMeasurementArgs) {
     return async (session: Session, models: allModels): Promise<boolean> => {
-        const date = transformDate(m.date);
+        
         try {
-            const user = await models.user.findOne({
-                where: {
-                    uid: m.uid,
-                },
-                session,
-            });
-            if (user?.__existsInDatabase) {
-                await models.measurement.createOne(
-                    {
-                        type: m.type,
-                        value: m.value,  
-                        Date: {
-                            
+            const { year, month, day, hour, time } = transformDate(m.date);
+            const { uid, source, value, name } = m;
 
+            const User = {
+                propertiesMergeConfig: {
+                    nodes: true,
+                    relationship: true,
+                    
+                },
+                properties: [{
+                    uid: uid,
+                }]
+            };
+
+            const Measurement = {
+                propertiesMergeConfig: {
+                    nodes: false,
+                    relationship: false,
+                },
+                properties: [
+                    {
+                        value: value,
+                        // Date: Date,
+                        Hour: {
                             propertiesMergeConfig: {
                                 nodes: true,
                                 relationship: true,
-                                
                             },
-                            where: [
-                                {
-                                    params: {
-                                        id: `${date.year}-${date.month}-${date.day}`,
-                                    },
-                                    relationshipProperties: {
-                                        time: date.time
-                                    },
-                                },
-                            ],
                             properties: [
-                                {
-                                    ...date,
-                                    id: `${date.year}-${date.month}-${date.day}`,                                    
+                                { hour }
+                            ],
+                        },
+                        Day: {
+                            propertiesMergeConfig: {
+                                nodes: true,
+                                relationship: true,
+                            },
+                            properties: [
+                                { day }
+                            ],
+                        },
+                        Month: {
+                            propertiesMergeConfig: {
+                                nodes: true,
+                                relationship: true,
+                            },
+                            properties: [
+                                { 
+                                    month,
+                                    Day: {
+                                        propertiesMergeConfig: {
+                                            nodes: true,
+                                            relationship: false,
+                                        },
+                                        properties: [
+                                            { day }
+                                        ],
+                                    }
                                 }
                             ],
+                        },
+                        Year: {
+                            propertiesMergeConfig: {
+                                nodes: true,
+                                relationship: true,
+                            },
+                            properties: [
+                                { year }
+                            ],
+                        },
+                        Timestamp: {
+                            propertiesMergeConfig: {
+                                nodes: true,
+                                relationship: false,
+                            },
+                            properties: [
+                                { time }
+                            ],
+                        },
+                        User: User,
+                    }
+                ]
+            };
 
-                        },  
-                        
-                    },
-                    { session, merge: true }
-                );
+            const Source = {
+                propertiesMergeConfig: {
+                    nodes: true,
+                    relationship: true,
+                    
+                },
+                properties: [
+                    {
+                        name: source
+                    }
+                ]
+            };
 
-                user.relateTo({
-                    alias: 'Measurement',
-                    where: {
-                        type: m.type,
-                        value: m.value,
-                        
-                    },
-                    session,
-                });
-                return true;
-            } else {
-                return false;
-            }          
+            await models.measurementType.createOne(
+                {
+                    name,
+                    Measurement: Measurement,
+                    Source: Source,             
+                },
+                { session, merge: true }
+            );
+            return true;        
             
         } catch (err) {
             loggers.error(err);
+            loggers.error(err?.data?.errors)
             return false;
         }
     }
@@ -151,18 +195,20 @@ function transformDate(input: number) {
     const year = date.getFullYear();
     const month = date.getMonth();
     const day = date.getDate();
-    const time = 3600 * date.getHours() + 60 * date.getMinutes() + date.getSeconds();
+    const time = date.getTime();
+    const hour = date.getHours(); // 3600 * date.getHours() + 60 * date.getMinutes() + date.getSeconds();
 
     return {
         year, 
         month,
         day, 
+        hour,
         time
     }
 }
 
 export default {
-    userExistsX,
-    createUserX,
-    createMeasurementX,    
+    userExists,
+    createUser,
+    createMeasurement,    
 }

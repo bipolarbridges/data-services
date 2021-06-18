@@ -1,5 +1,5 @@
 import { ModelRelatedNodesI, NeogmaInstance, NeogmaModel } from "neogma";
-import { MeasurementModel, MeasurementInstance } from "./measurement";
+import { MeasurementTypeInstance, MeasurementTypeModel } from "./measurement";
 import { ResourceInstance, ResourceModel } from "./resource";
 
 export type UserProperties = {
@@ -8,7 +8,7 @@ export type UserProperties = {
 }
 
 export type UserRelatedNode = {
-    Measurement: ModelRelatedNodesI<MeasurementModel, MeasurementInstance>,
+    MeasurementType: ModelRelatedNodesI<MeasurementTypeModel, MeasurementTypeInstance>,
     Resource: ModelRelatedNodesI<ResourceModel, ResourceInstance>
 }
 

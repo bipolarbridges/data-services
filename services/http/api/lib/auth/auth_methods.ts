@@ -7,7 +7,7 @@ import {InternalError} from '../errors';
 import path from 'path';
 import { Request } from 'express';
 import { Session } from 'neo4j-driver-core';
-import { allModels } from 'lib/models/initializers';
+import { allModels } from 'lib/models';
 import { DatabaseProcedure } from 'lib/db';
 
 const __dirname = path.resolve();
@@ -69,6 +69,7 @@ export type AuthMethod = (req: Request, auth: BinaryLike) => AuthResult;
 export const authMethods: AuthMethod[] = [
     (req: Request, auth: BinaryLike) => async (db: Session, models: allModels) => {
         // KEY AUTHENTICATION
+        info(`Path: ${req.path}`)
         const results = await db.run(
             "MATCH (i:Identity{type: 'key', check: $check}) " +
             "MATCH (r:Resource{path: $path}) " +
