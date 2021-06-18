@@ -7,12 +7,12 @@ export type MeasurementProperties = {
     value: number
 }
 
-export type MeasurementRelatedNode = {
+export type MeasurementRelatedNodes = {
     User: ModelRelatedNodesI<UserModel, UserInstance>,
     Date: ModelRelatedNodesI<DateModel, DateInstance>
 }
 
-export type MeasurementInstance = NeogmaInstance<MeasurementProperties, MeasurementRelatedNode>;
+export type MeasurementInstance = NeogmaInstance<MeasurementProperties, MeasurementRelatedNodes>;
 
-export type MeasurementModel = NeogmaModel<MeasurementProperties, MeasurementRelatedNode>;
+export type MeasurementModel = NeogmaModel<MeasurementProperties, MeasurementRelatedNodes>;
 

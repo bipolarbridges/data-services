@@ -8,7 +8,7 @@ import {
 } from '../models';
 
 export function initDateModel(db: Neogma): date.DateModel {
-    return ModelFactory<date.DateProperties, date.DateRelatedNode>(
+    return ModelFactory<date.DateProperties, date.DateRelatedNodes>(
         {
             label: 'Date',
             primaryKeyField: 'id',
@@ -37,7 +37,7 @@ export function initDateModel(db: Neogma): date.DateModel {
 }
 
 export function initIdentityModel(db: Neogma, resourceModel: resource.ResourceModel): identity.IdentityModel {
-    return ModelFactory<identity.IdentityProperties, identity.IdentityRelatedNode>(
+    return ModelFactory<identity.IdentityProperties, identity.IdentityRelatedNodes>(
         {
             label: 'Identity',
             schema: {
@@ -77,7 +77,7 @@ export function initIdentityModel(db: Neogma, resourceModel: resource.ResourceMo
 }
 
 export function initMeasurementModel(db: Neogma, dateModel: date.DateModel): measurement.MeasurementModel {
-    return ModelFactory<measurement.MeasurementProperties, measurement.MeasurementRelatedNode>(
+    return ModelFactory<measurement.MeasurementProperties, measurement.MeasurementRelatedNodes>(
         {
             label: 'Measurement',
             schema: {
@@ -112,7 +112,7 @@ export function initMeasurementModel(db: Neogma, dateModel: date.DateModel): mea
 }
 
 export function initResourceModel(db: Neogma): resource.ResourceModel {
-    return ModelFactory<resource.ResourceProperties, resource.ResourceRelatedNode>(
+    return ModelFactory<resource.ResourceProperties, resource.ResourceRelatedNodes>(
         {
             label: 'Resource',
             schema: {
@@ -127,7 +127,7 @@ export function initResourceModel(db: Neogma): resource.ResourceModel {
 }
 
 export function initUserModel(db: Neogma, measurementModel: measurement.MeasurementModel, resourceModel: resource.ResourceModel): user.UserModel {
-    return ModelFactory<user.UserProperties, user.UserRelatedNode>(
+    return ModelFactory<user.UserProperties, user.UserRelatedNodes>(
         {
             label: 'User',
             schema: {

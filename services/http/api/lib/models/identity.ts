@@ -7,10 +7,10 @@ export type IdentityProperties = {
     check: string
 }
 
-export type IdentityRelatedNode = {
+export type IdentityRelatedNodes = {
     Resource: ModelRelatedNodesI<ResourceModel, ResourceInstance>
 }
 
-export type IdentityInstance = NeogmaInstance<IdentityProperties, IdentityRelatedNode>
+export type IdentityInstance = NeogmaInstance<IdentityProperties, IdentityRelatedNodes>
 
-export type IdentityModel = NeogmaModel<IdentityProperties, IdentityRelatedNode>;
+export type IdentityModel = NeogmaModel<IdentityProperties, IdentityRelatedNodes>;

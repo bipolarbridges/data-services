@@ -30,8 +30,7 @@ function createUserX(id: string) {
                     Resource: {
                         propertiesMergeConfig: {
                             nodes: true,
-                            relationship: true,
-                            
+                            relationship: true,                        
                         },
                         where: [
                             {
@@ -43,11 +42,6 @@ function createUserX(id: string) {
                                 },
                             },
                         ],
-                        properties: [{
-                            path: `/client/${id}`,
-                            method: 'GET',
-                            
-                        }],
                     },
                     
                 },
@@ -88,12 +82,9 @@ function createMeasurementX(m: CreateMeasurementArgs) {
                         type: m.type,
                         value: m.value,  
                         Date: {
-                            
-
                             propertiesMergeConfig: {
                                 nodes: true,
                                 relationship: true,
-                                
                             },
                             where: [
                                 {
@@ -105,13 +96,6 @@ function createMeasurementX(m: CreateMeasurementArgs) {
                                     },
                                 },
                             ],
-                            properties: [
-                                {
-                                    ...date,
-                                    id: `${date.year}-${date.month}-${date.day}`,                                    
-                                }
-                            ],
-
                         },  
                         
                     },
@@ -123,7 +107,6 @@ function createMeasurementX(m: CreateMeasurementArgs) {
                     where: {
                         type: m.type,
                         value: m.value,
-                        
                     },
                     session,
                 });
@@ -150,7 +133,7 @@ function transformDate(input: number) {
     const year = date.getFullYear();
     const month = date.getMonth();
     const day = date.getDate();
-    const time = 3600 * date.getHours() + 60 * date.getMinutes() + date.getSeconds();
+    const time = date.getTime();
 
     return {
         year, 

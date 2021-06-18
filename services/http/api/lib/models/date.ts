@@ -8,10 +8,10 @@ export type DateProperties = {
     id: string
 }
 
-export type DateRelatedNode = {
+export type DateRelatedNodes = {
     Measurement: ModelRelatedNodesI<MeasurementModel, MeasurementInstance>;
 }
 
-export type DateInstance = NeogmaInstance<DateProperties, DateRelatedNode>;
+export type DateInstance = NeogmaInstance<DateProperties, DateRelatedNodes>;
 
-export type DateModel = NeogmaModel<DateProperties, DateRelatedNode>;
+export type DateModel = NeogmaModel<DateProperties, DateRelatedNodes>;
