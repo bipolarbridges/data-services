@@ -189,7 +189,7 @@ export function initAllModels(db: Neogma): allModels {
         User: {
             model: user,
             direction: 'in',
-            name: 'Recorded By',
+            name: 'RecordedBy',
         }
     });
     return {
