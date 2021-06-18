@@ -12,7 +12,7 @@ function userExists(id: string) {
                 },
                 session,
             });
-            const exist = user? user?.__existsInDatabase : false;
+            const exist = user ? user?.__existsInDatabase : false;
             loggers.info(`User exists: ${exist}`);
             return exist;
         } catch (err) {
@@ -32,7 +32,6 @@ function createUser(id: string) {
                         propertiesMergeConfig: {
                             nodes: true,
                             relationship: true,
-                            
                         },
                         properties: [
                             {
@@ -50,8 +49,8 @@ function createUser(id: string) {
             loggers.error(err);
             return null;
         }
-        
-            
+
+
     }
 }
 
@@ -198,7 +197,7 @@ function transformDate(input: number) {
     const hour = date.getHours(); // 3600 * date.getHours() + 60 * date.getMinutes() + date.getSeconds();
 
     return {
-        year, 
+        year,
         month,
         day, 
         hour,
