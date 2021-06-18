@@ -11,7 +11,7 @@ function userExistsX(id: string) {
                 },
                 session,
             });
-            const exist = user? user?.__existsInDatabase : false;
+            const exist = user ? user?.__existsInDatabase : false;
             loggers.info(`User exists: ${exist}`);
             return exist;
         } catch (err) {
@@ -30,31 +30,27 @@ function createUserX(id: string) {
                     Resource: {
                         propertiesMergeConfig: {
                             nodes: true,
-                            relationship: true,                        
+                            relationship: true,
                         },
-                        where: [
+                        properties: [
                             {
-                                params: {
-                                    path: `/client/${id}`,
-                                },
-                                relationshipProperties: {
-                                    method: 'GET'
-                                },
+                                path: `/client/${id}`,
+                                method: 'GET'
                             },
                         ],
                     },
-                    
+
                 },
-                {session}
-            ); 
-            
+                { session }
+            );
+
             return null;
         } catch (err) {
             loggers.error(err);
             return null;
         }
-        
-            
+
+
     }
 }
 
@@ -70,51 +66,37 @@ function createMeasurementX(m: CreateMeasurementArgs) {
     return async (session: Session, models: allModels): Promise<boolean> => {
         const date = transformDate(m.date);
         try {
-            const user = await models.user.findOne({
-                where: {
-                    uid: m.uid,
+            await models.measurement.createOne(
+                {
+                    type: m.type,
+                    value: m.value,
+                    User: {
+                        propertiesMergeConfig: {
+                            nodes: true,
+                            relationship: true,
+                        },
+                        properties: [{
+                            uid: m.uid,
+                        }],
+                    },
+                    Date: {
+                        propertiesMergeConfig: {
+                            nodes: true,
+                            relationship: true,
+                        },
+                        properties: [{
+                            id: `${date.year}-${date.month}-${date.day}`,
+                            time: date.time,
+                            day: date.day,
+                            month: date.month,
+                            year: date.year,
+                        }],
+                    },
                 },
-                session,
-            });
-            if (user?.__existsInDatabase) {
-                await models.measurement.createOne(
-                    {
-                        type: m.type,
-                        value: m.value,  
-                        Date: {
-                            propertiesMergeConfig: {
-                                nodes: true,
-                                relationship: true,
-                            },
-                            where: [
-                                {
-                                    params: {
-                                        id: `${date.year}-${date.month}-${date.day}`,
-                                    },
-                                    relationshipProperties: {
-                                        time: date.time
-                                    },
-                                },
-                            ],
-                        },  
-                        
-                    },
-                    { session, merge: true }
-                );
+                { session, merge: true }
+            );
+            return true;
 
-                user.relateTo({
-                    alias: 'Measurement',
-                    where: {
-                        type: m.type,
-                        value: m.value,
-                    },
-                    session,
-                });
-                return true;
-            } else {
-                return false;
-            }          
-            
         } catch (err) {
             loggers.error(err);
             return false;
@@ -136,9 +118,9 @@ function transformDate(input: number) {
     const time = date.getTime();
 
     return {
-        year, 
+        year,
         month,
-        day, 
+        day,
         time
     }
 }
@@ -146,5 +128,5 @@ function transformDate(input: number) {
 export default {
     userExistsX,
     createUserX,
-    createMeasurementX,    
+    createMeasurementX,
 }
