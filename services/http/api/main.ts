@@ -34,18 +34,25 @@ clientRouter.route('/')
                 message: "Missing id field"
             })
         } else {
-            const id = data['id']
-            const exists = await db.exec(api.userExists(id))
-            if (exists) {
-                res.status(403).send({
-                    message: "Already exists"
-                })
-            } else {
-                await db.exec(api.createUser(id))
-                res.status(201).send({
-                    message: "Created"
+            const id = data['id'];
+            try {
+                const exists = await db.exec(api.userExists(id))
+                if (exists) {
+                    res.status(403).send({
+                        message: "Already exists"
+                    })
+                } else {
+                    await db.exec(api.createUser(id))
+                    res.status(201).send({
+                        message: "Created"
+                    })
+                }
+            } catch (err) {
+                res.status(404).send({
+                    message: err
                 })
             }
+            
         }
     });
 

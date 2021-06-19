@@ -16,6 +16,7 @@
     "api:start:test": "yarn db:reset && yarn db:start && sleep 15 && yarn db:load:test && yarn api:start:dev",
     "api:start:lazy": "cd services/http/api && yarn start:dev:lazy",
     "api:start:all:lazy": "yarn db:start && yarn mock:start && yarn api:start:lazy",
+    "api:load:test": "cd services/http/api && yarn load:test",
     "db:start": "docker-compose up -d db",
     "mock:start": "docker-compose up -d mock_auth_server",
     "stop": "docker-compose down",
@@ -25,18 +26,7 @@
     "db:load:test": "docker-compose run --rm db_shell execute test_data",
     "db:reset": "docker-compose run --rm db_shell execute delete_all",
     "db:reset:deep": "docker-compose down && docker volume rm bb_data_services_store",
-    "db:reset:test": "yarn db:reset && yarn db:load:test",
-    "test:api": "yarn db:reset:test && cd services/http/api && yarn build && yarn test",
-    "all": "yarn install && cd services/http/api && yarn all"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/bipolarbridges/data-services.git"
-  },
-  "author": "bipolarbridges",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/bipolarbridges/data-services/issues"
+    "db:reset:test": "yarn db:reset && yarn db:load:test"
   },
   "homepage": "https://github.com/bipolarbridges/data-services#readme"
 }
