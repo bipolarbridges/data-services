@@ -289,10 +289,10 @@ export function initAllModels(db: Neogma): allModels {
     const year = initYearModel(db);
     const timestamp = initTimestampModel(db);
 
-    const measurementValue = initMeasurementModel(db, hour, day, month, year, timestamp);
-    const measurementType = initMeasurementTypeModel(db, measurementValue);
+    const measurement = initMeasurementModel(db, hour, day, month, year, timestamp);
+    const measurementType = initMeasurementTypeModel(db, measurement);
     const source = initSourceModel(db, measurementType);
-    const user = initUserModel(db, measurementValue, resource);
+    const user = initUserModel(db, measurement, resource);
 
     measurementType.addRelationships(
         {
@@ -301,15 +301,28 @@ export function initAllModels(db: Neogma): allModels {
                 direction: 'in',
                 name: 'Includes',
             }
-        });
-    measurementValue.addRelationships(
+        }
+    );
+
+    measurement.addRelationships(
         {
             User: {
                 model: user,
                 direction: 'in',
                 name: 'Recorded',
             }
-        });
+        }
+    );
+    
+    measurement.addRelationships(
+        {
+            MeasurementType: {
+                model: measurementType,
+                direction: 'in',
+                name: 'Includes',
+            }
+        }
+    );
 
     return {
         source,
@@ -317,7 +330,7 @@ export function initAllModels(db: Neogma): allModels {
         measurementType,
         identity,
         user,
-        measurementValue,
+        measurement,
         hour,
         day,
         month,
