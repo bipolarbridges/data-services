@@ -6,8 +6,8 @@ import {
 import { MeasurementProperties, MeasurementTypeProperties } from 'lib/models/measurement';
 import { UserProperties } from 'lib/models/user';
 import { SourceProperties } from 'lib/models/source';
-import * as loggers from '../logging';
 import { DatabaseProcedure } from 'lib/db';
+import * as loggers from '../logging';
 
 function userExists(id: string) {
   return async (session: Session, models: AllModels): Promise<boolean> => {

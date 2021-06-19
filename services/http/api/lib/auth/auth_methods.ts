@@ -6,9 +6,11 @@ import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
 import { Request } from 'express';
 import { Session } from 'neo4j-driver-core';
 import { DatabaseProcedure } from 'lib/db';
-import { info } from 'console';
+import { IdentityInstance } from 'lib/models/identity';
+import { UserInstance } from 'lib/models/user';
+import { InternalError } from 'lib/errors';
 import { AllModels } from 'lib/models';
-import { InternalError } from '../errors';
+import { info } from 'lib/logging';
 
 /* eslint-disable @typescript-eslint/naming-convention */
 const __dirname = path.resolve();
@@ -66,39 +68,61 @@ export type AuthResult = DatabaseProcedure<boolean>;
 export type AuthMethod = (req: Request, auth: BinaryLike) => AuthResult;
 
 export const authMethods: AuthMethod[] = [
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  // KEY AUTHENTICATION
   (req: Request, auth: BinaryLike) => async (db: Session, models: AllModels) => {
-    // KEY AUTHENTICATION
-    const results = await db.run(
-      "MATCH (i:Identity{type: 'key', check: $check}) "
-            + 'MATCH (r:Resource{path: $path}) '
-            + 'MATCH (i)-[c:Can{method: $method}]->(r)'
-            + 'RETURN i,r,c;',
-      {
+    const ident: IdentityInstance = await models.identity.findOne({
+      where: {
+        type: 'key',
         check: basicHash(auth),
-        path: req.path,
-        method: req.method,
       },
-    );
-    return results.records.length > 0;
+      session: db,
+    });
+    if (ident) {
+      const perms = await ident.findRelationships({
+        alias: 'Resource',
+        where: {
+          target: {
+            path: req.path,
+          },
+          relationship: {
+            method: req.method,
+          },
+        },
+        session: db,
+        limit: 1,
+      });
+      return perms.length === 1;
+    }
+    return false;
   },
-  (req: Request, auth: BinaryLike) => async (db: Session) => {
+  // USER AUTHENTICATION
+  (req: Request, auth: BinaryLike) => async (db: Session, models: AllModels):Promise<boolean> => {
     const id = await getRemoteId(auth);
     if (!id) {
       return false;
     }
-    info('Authenticated: ', id);
-    const results = await db.run(
-      'MATCH (u:User{uid: $uid}) '
-                + 'MATCH (r:Resource{path: $path}) '
-                + 'MATCH (u)-[c:Can{method: $method}]->(r)'
-                + 'RETURN u,r,c;',
-      {
+    const user: UserInstance = await models.user.findOne({
+      where: {
         uid: id,
-        path: req.path,
-        method: req.method,
       },
-    );
-    return results.records.length > 0;
+      session: db,
+    });
+    if (!user) {
+      return false;
+    }
+    const perms = await user.findRelationships({
+      alias: 'Resource',
+      where: {
+        target: {
+          path: req.path,
+        },
+        relationship: {
+          method: req.method,
+        },
+      },
+      session: db,
+      limit: 1,
+    });
+    return perms.length === 1;
   },
 ];
