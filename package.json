@@ -31,5 +31,14 @@
     "test:api": "yarn api:load:test && cd services/http/api && yarn build && yarn test",
     "all": "yarn install && cd services/http/api && yarn all"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bipolarbridges/data-services.git"
+  },
+  "author": "bipolarbridges",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/bipolarbridges/data-services/issues"
+  },
   "homepage": "https://github.com/bipolarbridges/data-services#readme"
 }
