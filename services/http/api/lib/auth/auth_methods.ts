@@ -96,7 +96,7 @@ export const authMethods: AuthMethod[] = [
     return false;
   },
   // USER AUTHENTICATION
-  (req: Request, auth: BinaryLike) => async (db: Session, models: AllModels):Promise<boolean> => {
+  (req: Request, auth: BinaryLike) => async (db: Session, models: AllModels) => {
     const id = await getRemoteId(auth);
     if (!id) {
       return false;
