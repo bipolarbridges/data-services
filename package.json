@@ -16,6 +16,7 @@
     "api:start:test": "yarn db:reset && yarn db:start && sleep 15 && yarn db:load:test && yarn api:start:dev",
     "api:start:lazy": "cd services/http/api && yarn start:dev:lazy",
     "api:start:all:lazy": "yarn db:start && yarn mock:start && yarn api:start:lazy",
+    "api:load:test": "cd services/http/api && yarn load:test",
     "db:start": "docker compose up -d db",
     "mock:start": "docker compose up -d mock_auth_server",
     "stop": "docker compose down",
