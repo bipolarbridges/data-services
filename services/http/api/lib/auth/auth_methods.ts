@@ -69,63 +69,63 @@ export type AuthResult = DatabaseProcedure<boolean>;
 export type AuthMethod = (req: Request, auth: BinaryLike) => AuthResult;
 
 export const authMethods: AuthMethod[] = [
-	// KEY AUTHENTICATION
+    // KEY AUTHENTICATION
     (req: Request, auth: BinaryLike) => async (db: Session, models: allModels) => {
-	const ident: IdentityInstance = await models.identity.findOne({
-		where: {
-			type: 'key',
-			check: basicHash(auth)
-		},
-		session: db
-	});
-	if (ident) {
-		const perms = await ident.findRelationships({
-			alias: "Resource",
-			where: {
-				target: {
-					path: req.path,
-				},
-				relationship: {
-					method: req.method
-				}
-			},
-			session: db,
-			limit: 1
-		});
-		return perms.length == 1;
-	} else {
-		return false;
-	}
+    const ident: IdentityInstance = await models.identity.findOne({
+        where: {
+            type: 'key',
+            check: basicHash(auth)
+        },
+        session: db
+    });
+    if (ident) {
+        const perms = await ident.findRelationships({
+            alias: "Resource",
+            where: {
+                target: {
+                    path: req.path,
+                },
+                relationship: {
+                    method: req.method
+                }
+            },
+            session: db,
+            limit: 1
+        });
+        return perms.length == 1;
+    } else {
+        return false;
+    }
     },
-    	// USER AUTHENTICATION
+        // USER AUTHENTICATION
     (req: Request, auth: BinaryLike) => async (db: Session, models: allModels) => {
         const id = await getRemoteId(auth);
         if (!id) {
             return false;
         } else {
-		const user: UserInstance = await models.user.findOne({
-			where: {
-				uid: id,
-			},
-			session: db
-		});
-		if (!user) {
-			return;
-		}
-		const perms = await user.findRelationships({
-			alias: "Resource",
-			where: {
-				target: {
-					path: req.path,
-				},
-				relationship: {
-					method: req.method
-				}
-			},
-			session: db,
-			limit: 1
-		});
-		return perms.length == 1;
+        const user: UserInstance = await models.user.findOne({
+            where: {
+                uid: id,
+            },
+            session: db
+        });
+        if (!user) {
+            return;
+        }
+        const perms = await user.findRelationships({
+            alias: "Resource",
+            where: {
+                target: {
+                    path: req.path,
+                },
+                relationship: {
+                    method: req.method
+                }
+            },
+            session: db,
+            limit: 1
+        });
+        return perms.length == 1;
         }
     }
 ];
