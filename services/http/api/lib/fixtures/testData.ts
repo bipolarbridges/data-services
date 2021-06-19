@@ -1,5 +1,5 @@
 import { Database, database } from '../db';
-import { allModels, resource } from '../models';
+import { AllModels, resource } from '../models';
 import api from '../interface';
 import { error, info } from '../logging';
 import { Session } from 'neo4j-driver';
@@ -34,7 +34,7 @@ type resource = {
 function createIdentity(db: Database) {
     const paths: resource[]= [{ path: '/client', method: 'POST' }, {path: '/measurement', method: 'POST'}];
 
-    const creator = async (session: Session, models: allModels): Promise<boolean> => {
+    const creator = async (session: Session, models: AllModels): Promise<boolean> => {
         try {
             await models.identity.createOne(
                 {
