@@ -1,6 +1,10 @@
 import * as loggers from '../logging';
 import { Session } from 'neo4j-driver';
 import { allModels } from 'lib/models';
+import { DayProperties, HourProperties, TimestampProperties, YearProperties } from 'lib/models/time';
+import { MeasurementProperties, MeasurementTypeProperties } from 'lib/models/measurement';
+import { UserProperties } from 'lib/models/user';
+import { SourceProperties } from 'lib/models/source';
 
 
 function userExists(id: string) {
@@ -39,11 +43,11 @@ function createUser(id: string) {
                                 method: 'GET'
                             },
                         ],
-                    },                
+                    },
                 },
-                {merge: true, session}
-            ); 
-            
+                { merge: true, session }
+            );
+
             return null;
         } catch (err) {
             loggers.error(err);
@@ -63,9 +67,136 @@ export type CreateMeasurementArgs = {
     date: number,
 }
 
+type mergeConfig = {
+    nodes: boolean, 
+    relationship: boolean,
+};
+
+type mergeProperties = {
+    Hour: {
+        propertiesMergeConfig: mergeConfig,
+        properties: HourProperties[]
+    },
+    Day: dayMergeProperties,
+    Month: monthMergeProperties,
+    Year: {
+        propertiesMergeConfig: mergeConfig,
+        properties: YearProperties[]
+    },
+    Timestamp: {
+        propertiesMergeConfig: mergeConfig,
+        properties: TimestampProperties[]
+    },
+    User?: userMergeProperties,
+    MeasurementType?: {
+        propertiesMergeConfig: mergeConfig,
+        properties: combinedTypeSource[]
+    }
+}
+
+type userMergeProperties = {
+    propertiesMergeConfig: mergeConfig,
+    properties: UserProperties[]
+};
+
+type measurementTypeMergeProperties = {
+    propertiesMergeConfig: mergeConfig,
+    properties: combinedTypeSource[],
+}
+
+type dayMergeProperties = {
+    propertiesMergeConfig: mergeConfig,
+    properties: DayProperties[]
+};
+
+
+type monthMergeProperties = {
+    propertiesMergeConfig: mergeConfig,
+    properties: {
+        month: number,
+        Day?: dayMergeProperties
+    }[]
+}
+
+type sourceMergeProperties = {
+    propertiesMergeConfig: mergeConfig,
+    properties: SourceProperties[],
+};
+
+type combinedTypeSource = MeasurementTypeProperties & { Source: sourceMergeProperties };
+
+export type mergedMeasurement = MeasurementProperties & mergeProperties;
+
+
+export function makeMeasurementProperties(value: number, hour: number, day: number, month: number,
+    year: number, time: number, User?: userMergeProperties, MeasurementType?: measurementTypeMergeProperties): mergedMeasurement {
+    return {
+        value,
+        Hour: {
+            propertiesMergeConfig: {
+                nodes: true,
+                relationship: false,
+            },
+            properties: [
+                { hour }
+            ],
+        },
+        Day: {
+            propertiesMergeConfig: {
+                nodes: true,
+                relationship: false,
+            },
+            properties: [
+                { day }
+            ],
+        },
+        Month: {
+            propertiesMergeConfig: {
+                nodes: true,
+                relationship: false,
+            },
+            properties: [
+                {
+                    month,
+                    Day: {
+                        propertiesMergeConfig: {
+                            nodes: true,
+                            relationship: true,
+                        },
+                        properties: [
+                            { day }
+                        ],
+                    }
+                }
+            ],
+        },
+        Year: {
+            propertiesMergeConfig: {
+                nodes: true,
+                relationship: true,
+            },
+            properties: [
+                { year }
+            ],
+        },
+        Timestamp: {
+            propertiesMergeConfig: {
+                nodes: true,
+                relationship: false,
+            },
+            properties: [
+                { time }
+            ],
+        },
+        User,
+        MeasurementType,
+
+    }
+}
+
 function createMeasurement(m: CreateMeasurementArgs) {
     return async (session: Session, models: allModels): Promise<boolean> => {
-        
+
         try {
             const { year, month, day, hour, time } = transformDate(m.date);
             const { uid, source, value, name } = m;
@@ -74,7 +205,7 @@ function createMeasurement(m: CreateMeasurementArgs) {
                 propertiesMergeConfig: {
                     nodes: true,
                     relationship: true,
-                    
+
                 },
                 properties: [{
                     uid: uid,
@@ -86,76 +217,14 @@ function createMeasurement(m: CreateMeasurementArgs) {
                     nodes: false,
                     relationship: false,
                 },
-                properties: [
-                    {
-                        value: value,
-                        // Date: Date,
-                        Hour: {
-                            propertiesMergeConfig: {
-                                nodes: true,
-                                relationship: true,
-                            },
-                            properties: [
-                                { hour }
-                            ],
-                        },
-                        Day: {
-                            propertiesMergeConfig: {
-                                nodes: true,
-                                relationship: true,
-                            },
-                            properties: [
-                                { day }
-                            ],
-                        },
-                        Month: {
-                            propertiesMergeConfig: {
-                                nodes: true,
-                                relationship: true,
-                            },
-                            properties: [
-                                { 
-                                    month,
-                                    Day: {
-                                        propertiesMergeConfig: {
-                                            nodes: true,
-                                            relationship: false,
-                                        },
-                                        properties: [
-                                            { day }
-                                        ],
-                                    }
-                                }
-                            ],
-                        },
-                        Year: {
-                            propertiesMergeConfig: {
-                                nodes: true,
-                                relationship: true,
-                            },
-                            properties: [
-                                { year }
-                            ],
-                        },
-                        Timestamp: {
-                            propertiesMergeConfig: {
-                                nodes: true,
-                                relationship: false,
-                            },
-                            properties: [
-                                { time }
-                            ],
-                        },
-                        User: User,
-                    }
-                ]
+                properties: [makeMeasurementProperties(value, hour, day, month, year, time, User)]
             };
 
             const Source = {
                 propertiesMergeConfig: {
                     nodes: true,
                     relationship: true,
-                    
+
                 },
                 properties: [
                     {
@@ -168,12 +237,12 @@ function createMeasurement(m: CreateMeasurementArgs) {
                 {
                     name,
                     Measurement: Measurement,
-                    Source: Source,             
+                    Source: Source,
                 },
                 { session, merge: true }
             );
-            return true;        
-            
+            return true;
+
         } catch (err) {
             loggers.error(err);
             loggers.error(err?.data?.errors)
@@ -199,7 +268,7 @@ function transformDate(input: number) {
     return {
         year,
         month,
-        day, 
+        day,
         hour,
         time
     }
@@ -208,5 +277,5 @@ function transformDate(input: number) {
 export default {
     userExists,
     createUser,
-    createMeasurement,    
+    createMeasurement,
 }
