@@ -5,10 +5,10 @@ export type SourceProperties = {
     name: string
 }
 
-export type SourceRelatedNodeI = {
+export type SourceRelatedNodes = {
     MeasurementType: ModelRelatedNodesI<MeasurementTypeModel, MeasurementTypeInstance>
 }
 
-export type SourceInstance = NeogmaInstance<SourceProperties, SourceRelatedNodeI>;
+export type SourceInstance = NeogmaInstance<SourceProperties, SourceRelatedNodes>;
 
-export type SourceModel = NeogmaModel<SourceProperties, SourceRelatedNodeI>;
+export type SourceModel = NeogmaModel<SourceProperties, SourceRelatedNodes>;

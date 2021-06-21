@@ -11,7 +11,7 @@ import {
 
 
 export function initIdentityModel(db: Neogma, resourceModel: resource.ResourceModel): identity.IdentityModel {
-    return ModelFactory<identity.IdentityProperties, identity.IdentityRelatedNode>(
+    return ModelFactory<identity.IdentityProperties, identity.IdentityRelatedNodes>(
         {
             label: 'Identity',
             schema: {
@@ -51,7 +51,7 @@ export function initIdentityModel(db: Neogma, resourceModel: resource.ResourceMo
 }
 
 export function initResourceModel(db: Neogma): resource.ResourceModel {
-    return ModelFactory<resource.ResourceProperties, resource.ResourceRelatedNode>(
+    return ModelFactory<resource.ResourceProperties, resource.ResourceRelatedNodes>(
         {
             label: 'Resource',
             schema: {
@@ -67,7 +67,7 @@ export function initResourceModel(db: Neogma): resource.ResourceModel {
 }
 
 export function initHourModel(db: Neogma): time.HourModel {
-    return ModelFactory<time.HourProperties, time.HourRelatedNodeI>(
+    return ModelFactory<time.HourProperties, time.HourRelatedNodes>(
         {
             label: 'Hour',
             primaryKeyField: 'hour',
@@ -83,7 +83,7 @@ export function initHourModel(db: Neogma): time.HourModel {
 }
 
 export function initTimestampModel(db: Neogma): time.TimestampModel {
-    return ModelFactory<time.TimestampProperties, time.TimestampRelatedNodeI>(
+    return ModelFactory<time.TimestampProperties, time.TimestampRelatedNodes>(
         {
             label: 'Timestamp',
             primaryKeyField: 'time',
@@ -99,7 +99,7 @@ export function initTimestampModel(db: Neogma): time.TimestampModel {
 }
 
 export function initDayModel(db: Neogma): time.DayModel {
-    return ModelFactory<time.DayProperties, time.DayRelatedNodeI>(
+    return ModelFactory<time.DayProperties, time.DayRelatedNodes>(
         {
             label: 'Day',
             primaryKeyField: 'day',
@@ -115,7 +115,7 @@ export function initDayModel(db: Neogma): time.DayModel {
 }
 
 export function initMonthModel(db: Neogma, dayModel: time.DayModel): time.MonthModel {
-    return ModelFactory<time.MonthProperties, time.MonthRelatedNodeI>(
+    return ModelFactory<time.MonthProperties, time.MonthRelatedNodes>(
         {
             label: 'Month',
             primaryKeyField: 'month',
@@ -138,7 +138,7 @@ export function initMonthModel(db: Neogma, dayModel: time.DayModel): time.MonthM
 }
 
 export function initYearModel(db: Neogma): time.YearModel {
-    return ModelFactory<time.YearProperties, time.YearRelatedNodeI>(
+    return ModelFactory<time.YearProperties, time.YearRelatedNodes>(
         {
             label: 'Year',
             primaryKeyField: 'year',
@@ -156,7 +156,7 @@ export function initYearModel(db: Neogma): time.YearModel {
 export function initMeasurementModel(db: Neogma,
     hourModel: time.HourModel, dayModel: time.DayModel, monthModel: time.MonthModel,
     yearModel: time.YearModel, timestampModel: time.TimestampModel): measurement.MeasurementModel {
-    return ModelFactory<measurement.MeasurementProperties, measurement.MeasurementRelatedNodeI>(
+    return ModelFactory<measurement.MeasurementProperties, measurement.MeasurementRelatedNodes>(
         {
             label: 'Measurement',
             schema: {
@@ -221,7 +221,7 @@ export function initMeasurementTypeModel(db: Neogma, valueModel: measurement.Mea
 }
 
 export function initUserModel(db: Neogma, measurementModel: measurement.MeasurementModel, resourceModel: resource.ResourceModel): user.UserModel {
-    return ModelFactory<user.UserProperties, user.UserRelatedNode>(
+    return ModelFactory<user.UserProperties, user.UserRelatedNodes>(
         {
             label: 'User',
             schema: {
@@ -231,7 +231,7 @@ export function initUserModel(db: Neogma, measurementModel: measurement.Measurem
                 },
             },
             relationships: {
-                MeasurementType: {
+                Measurement: {
                     model: measurementModel,
                     direction: 'out',
                     name: 'Recorded',
@@ -257,7 +257,7 @@ export function initUserModel(db: Neogma, measurementModel: measurement.Measurem
 }
 
 export function initSourceModel(db: Neogma, MeasurementTypeModel: measurement.MeasurementTypeModel): source.SourceModel {
-    return ModelFactory<source.SourceProperties, source.SourceRelatedNodeI>(
+    return ModelFactory<source.SourceProperties, source.SourceRelatedNodes>(
         {
             label: 'Source',
             schema: {
@@ -289,10 +289,10 @@ export function initAllModels(db: Neogma): allModels {
     const year = initYearModel(db);
     const timestamp = initTimestampModel(db);
 
-    const measurementValue = initMeasurementModel(db, hour, day, month, year, timestamp);
-    const measurementType = initMeasurementTypeModel(db, measurementValue);
+    const measurement = initMeasurementModel(db, hour, day, month, year, timestamp);
+    const measurementType = initMeasurementTypeModel(db, measurement);
     const source = initSourceModel(db, measurementType);
-    const user = initUserModel(db, measurementValue, resource);
+    const user = initUserModel(db, measurement, resource);
 
     measurementType.addRelationships(
         {
@@ -301,15 +301,28 @@ export function initAllModels(db: Neogma): allModels {
                 direction: 'in',
                 name: 'Includes',
             }
-        });
-    measurementValue.addRelationships(
+        }
+    );
+
+    measurement.addRelationships(
         {
             User: {
                 model: user,
                 direction: 'in',
                 name: 'Recorded',
             }
-        });
+        }
+    );
+    
+    measurement.addRelationships(
+        {
+            MeasurementType: {
+                model: measurementType,
+                direction: 'in',
+                name: 'Includes',
+            }
+        }
+    );
 
     return {
         source,
@@ -317,7 +330,7 @@ export function initAllModels(db: Neogma): allModels {
         measurementType,
         identity,
         user,
-        measurementValue,
+        measurement,
         hour,
         day,
         month,

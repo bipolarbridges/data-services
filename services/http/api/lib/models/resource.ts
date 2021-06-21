@@ -5,11 +5,11 @@ export type ResourceProperties = {
     path: string
 }
 
-export type ResourceRelatedNode = {
-    User: ModelRelatedNodesI<UserModel, UserInstance>
+export type ResourceRelatedNodes = {
+    User: ModelRelatedNodesI<UserModel, UserInstance>;
 }
 
-export type ResourceInstance = NeogmaInstance<ResourceProperties, ResourceRelatedNode>;
+export type ResourceInstance = NeogmaInstance<ResourceProperties, ResourceRelatedNodes>;
 
-export type ResourceModel = NeogmaModel<ResourceProperties,ResourceRelatedNode>;
+export type ResourceModel = NeogmaModel<ResourceProperties,ResourceRelatedNodes>;
 
