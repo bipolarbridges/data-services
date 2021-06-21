@@ -278,5 +278,5 @@ function transformDate(input: number) {
 export default {
     userExists,
     createUser,
-    createMeasurement,    
+    createMeasurement,
 }
