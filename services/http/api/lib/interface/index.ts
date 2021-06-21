@@ -21,7 +21,7 @@ function userExists(id: string) {
     }
 }
 
-function createUserX(id: string) {
+function createUser(id: string) {
     return async (session: Session, models: allModels): Promise<null> => {
         try {
             await models.user.createOne(
@@ -127,6 +127,6 @@ function transformDate(input: number) {
 
 export default {
     userExists,
-    createUserX,
+    createUser,
     createMeasurement,
 }

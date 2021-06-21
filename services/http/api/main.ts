@@ -33,7 +33,7 @@ app.post('/client', async (req, res) => {
                 message: "Already exists"
             })
         } else {
-            await db.exec(api.createUserX(id))
+            await db.exec(api.createUser(id))
             res.status(201).send({
                 message: "Created"
             })
