@@ -19,7 +19,7 @@ type allModels = {
     month: time.MonthModel,
     year: time.YearModel,
     timestamp: time.TimestampModel,
-    measurementValue: measurement.MeasurementModel
+    measurement: measurement.MeasurementModel
 }
 
 export {
