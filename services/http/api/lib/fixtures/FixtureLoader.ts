@@ -1,5 +1,5 @@
 import { Database, database, DatabaseProcedure } from '../db';
-import { error, info } from '../logging';
+import { info } from '../logging';
 
 export type Fixture = DatabaseProcedure<void>;
 
@@ -11,7 +11,7 @@ export default class FixtureLoader {
             this.db = database();
     }
 
-    async load(fix: Fixture) {
+    async load(fix: Fixture): Promise<void> {
         info('Clearing out old data...');
         await this.db.run('MATCH (n) DETACH DELETE n;');
         info('Done clearing data.');
