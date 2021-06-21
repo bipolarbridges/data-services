@@ -77,7 +77,7 @@ export const authMethods: AuthMethod[] = [
       },
       session: db,
     });
-    if (ident) {
+    if (ident && ident.__existsInDatabase) {
       const perms = await ident.findRelationships({
         alias: 'Resource',
         where: {

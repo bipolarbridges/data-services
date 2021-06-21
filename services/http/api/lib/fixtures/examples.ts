@@ -1,6 +1,6 @@
-import { Database, database } from '../db';
+// import { Database, database } from '../db';
 import { allModels } from '../models';
-import { error, info } from '../logging';
+import { error } from '../logging';
 import { Session } from 'neo4j-driver';
 import dotenv from 'dotenv';
 import { makeMeasurementProperties, mergedMeasurement } from '../interface';
