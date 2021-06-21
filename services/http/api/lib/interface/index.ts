@@ -2,7 +2,7 @@ import * as loggers from '../logging';
 import { Session } from 'neo4j-driver-core';
 import { allModels } from 'lib/models/initializers';
 
-function userExistsX(id: string) {
+function userExists(id: string) {
     return async (session: Session, models: allModels): Promise<boolean> => {
         try {
             const user = await models.user.findOne({
@@ -62,7 +62,7 @@ export type CreateMeasurementArgs = {
     value: number
 }
 
-function createMeasurementX(m: CreateMeasurementArgs) {
+function createMeasurement(m: CreateMeasurementArgs) {
     return async (session: Session, models: allModels): Promise<boolean> => {
         const date = transformDate(m.date);
         try {
@@ -126,7 +126,7 @@ function transformDate(input: number) {
 }
 
 export default {
-    userExistsX,
+    userExists,
     createUserX,
-    createMeasurementX,
+    createMeasurement,
 }
