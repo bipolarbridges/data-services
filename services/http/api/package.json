@@ -15,7 +15,7 @@
     "mock:auth": "cd tests/mocks/auth_server && yarn start",
     "start:dev": "concurrently --kill-others 'yarn start:lazy' 'yarn mock:auth'",
     "all": "yarn install && cd tests/mocks/auth_server && yarn install",
-    "load:test": "ts-node ./lib/fixtures/testData.ts",
+    "load:test": "ts-node tests/testData.ts",
     "load:examples": "ts-node ./lib/fixtures/examples.ts"
   },
   "author": "bipolarbridges",
