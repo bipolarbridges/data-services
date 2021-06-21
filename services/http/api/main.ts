@@ -52,7 +52,6 @@ clientRouter.route('/')
                     message: err
                 })
             }
-            
         }
     });
 
