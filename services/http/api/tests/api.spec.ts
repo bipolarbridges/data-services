@@ -238,7 +238,7 @@ describe("Paths", () => {
                 value: 0.2,
                 source: 'measurement'
             }
-        }
+        };
         it("Should reject if a bad key is provided", async () => {
             await ax.post("/measurement", validExampleData, {
                 headers: {
@@ -339,20 +339,74 @@ describe("Paths", () => {
                 })))
         })
 
-        it("Should respond properly upon success", async () => {
-            await ax.post("/measurement", validExampleData, {
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": "apikey1"
-                }
-            }).then(async (res) => {
-                spec("POST", "/measurement").match(res)
-                expect(res.status).toEqual(201)
-            }).catch((err) => {
-                console.log(err.response.data)
-                fail()
-            })
-        })
+        describe('201 /measurement', () => {
+
+            it('Should respond properly with the first ever piece of measurement', async () => {
+                await ax.post("/measurement", validExampleData, {
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": "apikey1"
+                    }
+                }).then(async (res) => {
+                    spec("POST", "/measurement").match(res)
+                    expect(res.status).toEqual(201)
+                }).catch((err) => {
+                    console.log(err.response.data)
+                    fail()
+                });
+            });
+            
+            it('Should accept measurement with similar but with different name', async () => {
+                const similar = {
+                    clientID: validExampleData.clientID,
+                    data: {
+                        date:  ((new Date().getTime()) / 1000) + 100,
+                        name: 'mindfulness',
+                        value: validExampleData.data.value,
+                        source: validExampleData.data.source,
+                    }
+                };
+
+                await ax.post("/measurement", similar, {
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": "apikey1"
+                    }
+                }).then(async (res) => {
+                    spec("POST", "/measurement").match(res)
+                    expect(res.status).toEqual(201)
+                }).catch((err) => {
+                    console.log(err.response.data)
+                    fail()
+                });
+            });
+
+            it('Should accept measurement with different source but same value', async () => {
+                const similar = {
+                    clientID: validExampleData.clientID,
+                    data: {
+                        date:  ((new Date().getTime()) / 1000) + 200,
+                        name: 'cognition',
+                        value: validExampleData.data.value,
+                        source: 'qolSurvey',
+                    }
+                };
+                await ax.post("/measurement", similar, {
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": "apikey1"
+                    }
+                }).then(async (res) => {
+                    spec("POST", "/measurement").match(res)
+                    expect(res.status).toEqual(201)
+                }).catch((err) => {
+                    console.log(err.response.data)
+                    fail()
+                });
+            });
+
+        });
+        
         
         it("Should reject if client does not exist", async () => {
             await ax.post("/measurement", {
