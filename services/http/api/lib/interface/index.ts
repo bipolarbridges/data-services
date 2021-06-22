@@ -33,18 +33,6 @@ function createUser(id: string): DatabaseProcedure<boolean>{
             await models.user.createOne(
                 {
                     uid: id,
-                    Resource: {
-                        propertiesMergeConfig: {
-                            nodes: true,
-                            relationship: true,
-                        },
-                        properties: [
-                            {
-                                path: `/client/${id}`,
-                                method: 'GET'
-                            },
-                        ],
-                    },
                 },
                 { merge: true, session }
             );

@@ -9,8 +9,9 @@ import { Request } from 'express';
 import { Session } from 'neo4j-driver-core';
 import { allModels } from 'lib/models';
 import { DatabaseProcedure } from 'lib/db';
-import { IdentityInstance } from 'lib/models/identity';
-import { UserInstance } from 'lib/models/user';
+import { ApiKeyInstance } from 'lib/models/auth/apiKey';
+import { UserIdentityInstance } from 'lib/models/auth/userIdentity';
+import { findOne } from 'lib/util/misc';
 
 const __dirname = path.resolve();
 
@@ -65,67 +66,138 @@ async function getRemoteId(token: BinaryLike) {
     }
 }
 
+
+async function matchClientCreatorRole(db: Session, key: ApiKeyInstance): Promise<boolean> {
+	const matches = await key.findRelationships({
+		alias: 'ClientCreatorRole',
+		where: {
+			target: {},
+			relationship: {
+				name: 'Has'
+			}
+		},
+        session: db,
+		limit: 1
+	});
+	return matches.length >= 1;
+}
+
+async function matchDataExporterRole(db: Session, models: allModels, key: ApiKeyInstance, source: string)
+: Promise<boolean> {
+	const matches = await key.findRelationships({
+		alias: 'DataExporterRole',
+        session: db,
+	});
+	return findOne(matches, async (m) => {
+		const sources = await m.target.findRelationships({
+			alias: 'Source',
+			where: {
+				target: {
+					name: source
+				},
+				relationship: {
+					name: 'For'
+				}
+			},
+			session: db,
+			limit: 1
+		});
+		return sources.length == 1;
+	}) != null;
+}
+
+async function matchClientReaderRole(db: Session, models: allModels,
+					user: UserIdentityInstance, clientId: string): Promise<boolean> {
+	const matches = await user.findRelationships({
+		alias: 'ClientReaderRole',
+		where: {
+			target: {},
+			relationship: {
+				name: 'Has'
+			}
+		},
+		session: db
+	});
+	return findOne(matches, async(m) => {
+		const clients = await m.target.findRelationships({
+			alias: 'User',
+			where: {
+				target: {
+					uid: clientId,
+				},
+				relationship: {
+					name: 'For'
+				}
+			},
+			session: db,
+			limit: 1,
+		});
+		return clients.length == 1;
+	}) != null;
+}
+
+
 export type AuthResult = DatabaseProcedure<boolean>;
 export type AuthMethod = (req: Request, auth: BinaryLike) => AuthResult;
+
 
 export const authMethods: AuthMethod[] = [
     // KEY AUTHENTICATION
     (req: Request, auth: BinaryLike) => async (db: Session, models: allModels) => {
-    const ident: IdentityInstance = await models.identity.findOne({
-        where: {
-            type: 'key',
-            check: basicHash(auth)
-        },
-        session: db
-    });
-    if (ident && ident.__existsInDatabase) {
-        const perms = await ident.findRelationships({
-            alias: "Resource",
-            where: {
-                target: {
-                    path: req.path,
-                },
-                relationship: {
-                    method: req.method
-                }
-            },
-            session: db,
-            limit: 1
-        });
-        return perms.length == 1;
-    } else {
-        return false;
-    }
+		const key: ApiKeyInstance = await models.auth.apiKey.findOne({
+			where: {
+				hash: basicHash(auth),
+			},
+			session: db
+		});
+		if (!(key?.__existsInDatabase)) {
+			return false;
+		}
+		switch (req.method) {
+			case 'POST':
+				switch (req.path) {
+					case '/client':
+						return await matchClientCreatorRole(db, key);
+					case '/measurement':
+						return await matchDataExporterRole(db, models,
+										key, req.body['source']);
+					break;
+					default:
+						return false;
+				}
+			break;
+			default:
+				return false;
+		}
     },
         // USER AUTHENTICATION
     (req: Request, auth: BinaryLike) => async (db: Session, models: allModels) => {
         const id = await getRemoteId(auth);
         if (!id) {
             return false;
-        } else {
-        const user: UserInstance = await models.user.findOne({
+        }
+        const user: UserIdentityInstance = await models.auth.userIdentity.findOne({
             where: {
                 uid: id,
             },
             session: db
         });
         if (!user) {
-            return;
+            return false;
         }
-        const perms = await user.findRelationships({
-            alias: "Resource",
-            where: {
-                target: {
-                    path: req.path,
-                },
-                relationship: {
-                    method: req.method
-                }
-            },
-            session: db,
-            limit: 1
-        });
-        return perms.length == 1;
-        }
+		switch (req.method) {
+			case 'GET':
+				switch (req.baseUrl) {
+					case '/client':
+						return matchClientReaderRole(db, models,
+									user, req.params.clientId);
+					break;
+					default:
+						return false;
+				}	
+			break;
+			default:
+				return false;
+		}			
     }
 ];
