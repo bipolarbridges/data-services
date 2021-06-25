@@ -236,7 +236,7 @@ describe("Paths", () => {
                 date: 1610997441,
                 name: 'sentiment',
                 value: 0.2,
-                source: 'measurement'
+                source: 'firebase'
             }
         }
         it("Should reject if a bad key is provided", async () => {
@@ -265,7 +265,7 @@ describe("Paths", () => {
                     date: 1610997441,
                     name: 'sentiment',
                     value: 0.8,
-                    source: 'measurement'
+                    source: 'firebase'
 
                 }
             },
@@ -279,7 +279,7 @@ describe("Paths", () => {
                     // data: ...
                     name: 'sentiment',
                     value: 0.8,
-                    source: 'measurement'
+                    source: 'firebase'
                 }
             },
             {
@@ -288,7 +288,7 @@ describe("Paths", () => {
                     date: 1610997441,
                     // name: ...
                     value: 1.3,
-                    source: 'measurement'
+                    source: 'firebase'
                 }
             },
             {
@@ -297,7 +297,7 @@ describe("Paths", () => {
                     date: 1610997441,
                     name: 'sentiment',
                     // value: ...,
-                    source: 'measurement'
+                    source: 'firebase'
                 }
             },
             {

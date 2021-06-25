@@ -56,6 +56,19 @@ new FixtureLoader().load(async (session: Session, models: allModels) => {
 		uid: id,
 	}, { session });
 
+	await models.auth.roles.clientReaderRole.createOne({
+		name: `read:Client:${id}`,
+		User: {
+			propertiesMergeConfig: {
+				nodes: true,
+				relationship: true,
+			},
+			properties: [{
+				uid: id
+			}]
+		}
+	});
+
 })
 .then(() => {
 	process.exit(0);

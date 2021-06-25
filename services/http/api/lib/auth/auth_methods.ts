@@ -1,6 +1,6 @@
 import { readFileSync } from 'fs';
 import { join } from 'path';
-import { info } from '../logging';
+import { info, debug } from '../logging';
 import { BinaryLike, createHash } from 'crypto';
 import axios, { AxiosInstance, AxiosRequestConfig }  from 'axios';
 import {InternalError} from '../errors';
@@ -11,7 +11,7 @@ import { allModels } from 'lib/models';
 import { DatabaseProcedure } from 'lib/db';
 import { ApiKeyInstance } from 'lib/models/auth/apiKey';
 import { UserIdentityInstance } from 'lib/models/auth/userIdentity';
-import { findOne } from 'lib/util/misc';
+import { findOne } from '../util/misc';
 
 const __dirname = path.resolve();
 
@@ -70,15 +70,10 @@ async function getRemoteId(token: BinaryLike) {
 async function matchClientCreatorRole(db: Session, key: ApiKeyInstance): Promise<boolean> {
 	const matches = await key.findRelationships({
 		alias: 'ClientCreatorRole',
-		where: {
-			target: {},
-			relationship: {
-				name: 'Has'
-			}
-		},
         session: db,
 		limit: 1
 	});
+	debug("Client creator matches: ", matches);
 	return matches.length >= 1;
 }
 
@@ -95,9 +90,7 @@ async function matchDataExporterRole(db: Session, models: allModels, key: ApiKey
 				target: {
 					name: source
 				},
-				relationship: {
-					name: 'For'
-				}
+				relationship: {},
 			},
 			session: db,
 			limit: 1
@@ -125,9 +118,7 @@ async function matchClientReaderRole(db: Session, models: allModels,
 				target: {
 					uid: clientId,
 				},
-				relationship: {
-					name: 'For'
-				}
+				relationship: {}
 			},
 			session: db,
 			limit: 1,
@@ -185,6 +176,7 @@ export const authMethods: AuthMethod[] = [
         if (!user) {
             return false;
         }
+		debug("Base url: ", req.baseUrl);
 		switch (req.method) {
 			case 'GET':
 				switch (req.baseUrl) {
