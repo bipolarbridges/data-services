@@ -16,7 +16,9 @@
     "start:dev": "concurrently --kill-others 'yarn start:lazy' 'yarn mock:auth'",
     "all": "yarn install && cd tests/mocks/auth_server && yarn install",
     "load:test": "ts-node tests/testData.ts",
-    "load:examples": "ts-node ./lib/fixtures/example.ts"
+    "load:examples": "ts-node ./lib/fixtures/example.ts",
+    "reload:test": "yarn build && yarn load:test && yarn test",
+    "test:dev": "nodemon --config tests/nodemon.json"
   },
   "author": "bipolarbridges",
   "license": "MIT",

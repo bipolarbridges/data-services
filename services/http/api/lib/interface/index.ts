@@ -33,29 +33,38 @@ function createUser(id: string): DatabaseProcedure<boolean>{
             await models.user.createOne(
                 {
                     uid: id,
-                    Resource: {
-                        propertiesMergeConfig: {
-                            nodes: true,
-                            relationship: true,
-                        },
-                        properties: [
-                            {
-                                path: `/client/${id}`,
-                                method: 'GET'
-                            },
-                        ],
-                    },
                 },
-                { merge: true, session }
-            );
-
+                { merge: true, session });
+            const readerName = `read:Client:${id}`;
+            await models.auth.roles.clientReaderRole.createOne({
+                name: readerName,
+                User: {
+                    propertiesMergeConfig: {
+                        nodes: true,
+                        relationship: true,
+                    },
+                    properties: [{
+                        uid: id
+                    }]
+                }
+            }, { merge: true, session });
+            await models.auth.userIdentity.createOne({
+                uid: id, // in this case, user id is the client id
+                ClientReaderRole: {
+                    propertiesMergeConfig: {
+                        nodes: true,
+                        relationship: true,
+                    },
+                    properties: [{
+                            name: readerName
+                    }]
+                }
+            }, { merge: true, session });
             return null;
         } catch (err) {
             loggers.error(err);
             return null;
         }
-
-
     }
 }
 

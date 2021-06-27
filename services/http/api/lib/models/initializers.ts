@@ -2,68 +2,132 @@ import { ModelFactory, Neogma } from "neogma";
 import {
     user,
     measurement,
-    resource,
-    identity,
     source,
     time,
+	auth,
     allModels
 } from '../models';
 
-
-export function initIdentityModel(db: Neogma, resourceModel: resource.ResourceModel): identity.IdentityModel {
-    return ModelFactory<identity.IdentityProperties, identity.IdentityRelatedNodes>(
-        {
-            label: 'Identity',
-            schema: {
-                type: {
-                    type: 'string',
-                    required: true
-                },
-                name: {
-                    type: 'string',
-                    required: true
-                },
-                check: {
-                    type: 'string',
-                    required: true
-                },
-            },
-            relationships: {
-                Resource: {
-                    model: resourceModel,
-                    direction: 'out',
-                    name: 'Can',
-                    properties: {
-                        method: {
-                            property: 'method',
-                            schema: {
-                                type: 'string'
-                            }
-                        }
-                    }
-
-                }
-            },
-            primaryKeyField: 'name'
-        },
-        db
-    )
+export function initUserIdentityModel(db: Neogma,
+		clientReaderRoleModel: auth.roles.clientReaderRole.ClientReaderRoleModel)
+:auth.userIdentity.UserIdentityModel {
+		return ModelFactory<auth.userIdentity.UserIdentityProperties, auth.userIdentity.UserIdentityRelatedNodes>({
+				label: 'UserIdentity',
+				schema: {
+					uid: {
+						type: 'string',
+						required: true
+					}
+				},
+				primaryKeyField: 'uid',
+				relationships: {
+					ClientReaderRole: {
+						model: clientReaderRoleModel,
+						direction: 'out',
+						name: 'Has'
+					},
+				}
+		}, db);
 }
 
-export function initResourceModel(db: Neogma): resource.ResourceModel {
-    return ModelFactory<resource.ResourceProperties, resource.ResourceRelatedNodes>(
-        {
-            label: 'Resource',
-            schema: {
-                path: {
-                    type: 'string',
-                    required: true
-                }
-            },
-            primaryKeyField: 'path'
-        },
-        db
-    )
+export function initApiKeyModel(db: Neogma,
+		dataExporterRoleModel: auth.roles.dataExporterRole.DataExporterRoleModel,
+		clientCreatorRoleModel: auth.roles.clientReaderRole.ClientReaderRoleModel)
+:auth.apiKey.ApiKeyModel {
+	return ModelFactory<auth.apiKey.ApiKeyProperties, auth.apiKey.ApiKeyRelatedNodes>({
+		label: 'ApiKey',
+		schema: {
+			name: {
+				type: 'string',
+				required: true
+			},
+			hash: {
+				type: 'string',
+				required: true
+			}
+		},
+		primaryKeyField: 'name',
+		relationships: {
+			DataExporterRole: {
+				model: dataExporterRoleModel,
+				direction: 'out',
+				name: 'Has'
+			},
+			ClientCreatorRole: {
+				model: clientCreatorRoleModel,
+				direction: 'out',
+				name: 'Has'
+			}
+		}
+	}, db);
+}
+
+export function initClientCreatorRoleModel(db: Neogma,
+		userModel: user.UserModel)
+: auth.roles.clientCreatorRole.ClientCreatorRoleModel {
+	return ModelFactory<auth.roles.clientCreatorRole.ClientCreatorRoleProperties,
+				auth.roles.clientCreatorRole.ClientCreatorRoleRelatedNodes>({
+			label: 'ClientCreatorRole',
+			schema: {
+				name: {
+					type: 'string',
+					required: true,
+				}
+			},
+			primaryKeyField: 'name',
+			relationships: {
+				User: {
+					model: userModel,
+					direction: 'out',
+					name: 'Created'
+				}
+			}
+	}, db);
+}
+
+export function initClientReaderRoleModel(db: Neogma,
+		userModel: user.UserModel)
+: auth.roles.clientReaderRole.ClientReaderRoleModel {
+	return ModelFactory<auth.roles.clientReaderRole.ClientReaderRoleProperties,
+				auth.roles.clientReaderRole.ClientReaderRoleRelatedNodes>({
+			label: 'ClientReaderRole',
+			schema: {
+				name: {
+					type: 'string',
+					required: true,
+				}
+			},
+			primaryKeyField: 'name',
+			relationships: {
+				User: {
+					model: userModel,
+					direction: 'out',
+					name: 'For'
+				}
+			}
+	}, db);
+}
+
+export function initDataExportRoleModel(db: Neogma,
+		sourceModel: source.SourceModel): auth.roles.dataExporterRole.DataExporterRoleModel {
+	return ModelFactory<auth.roles.dataExporterRole.DataExporterRoleProperties,
+				auth.roles.dataExporterRole.DataExporterRoleRelatedNodes>({
+		label: 'DataExporterRole',
+		schema: {
+			name: {
+				type: 'string',
+				required: true,
+			}
+		},
+		primaryKeyField: 'name',
+		relationships: {
+			Source: {
+				model: sourceModel,
+				direction: 'out',
+				name: 'For'
+			}
+		}
+	}, db);
 }
 
 export function initHourModel(db: Neogma): time.HourModel {
@@ -220,7 +284,7 @@ export function initMeasurementTypeModel(db: Neogma, valueModel: measurement.Mea
     );
 }
 
-export function initUserModel(db: Neogma, measurementModel: measurement.MeasurementModel, resourceModel: resource.ResourceModel): user.UserModel {
+export function initUserModel(db: Neogma, measurementModel: measurement.MeasurementModel): user.UserModel {
     return ModelFactory<user.UserProperties, user.UserRelatedNodes>(
         {
             label: 'User',
@@ -236,19 +300,6 @@ export function initUserModel(db: Neogma, measurementModel: measurement.Measurem
                     direction: 'out',
                     name: 'Recorded',
                 },
-                Resource: {
-                    model: resourceModel,
-                    direction: 'out',
-                    name: 'Can',
-                    properties: {
-                        method: {
-                            property: 'method',
-                            schema: {
-                                type: 'string'
-                            }
-                        }
-                    }
-                }
             },
             primaryKeyField: 'uid',
         },
@@ -279,8 +330,6 @@ export function initSourceModel(db: Neogma, MeasurementTypeModel: measurement.Me
 }
 
 export function initAllModels(db: Neogma): allModels {
-    const resource = initResourceModel(db);
-    const identity = initIdentityModel(db, resource);
 
     // const date = initDateModel(db);
     const hour = initHourModel(db);
@@ -292,7 +341,19 @@ export function initAllModels(db: Neogma): allModels {
     const measurement = initMeasurementModel(db, hour, day, month, year, timestamp);
     const measurementType = initMeasurementTypeModel(db, measurement);
     const source = initSourceModel(db, measurementType);
-    const user = initUserModel(db, measurement, resource);
+    const user = initUserModel(db, measurement);
+
+	const roles: auth.roles.allRolesModels = {
+		clientReaderRole: initClientReaderRoleModel(db, user),
+		clientCreatorRole: initClientCreatorRoleModel(db, user),
+		dataExporterRole: initDataExportRoleModel(db, source),	
+	}
+
+	const auth: auth.allAuthModels = {
+		apiKey: initApiKeyModel(db, roles.dataExporterRole, roles.clientCreatorRole),
+		userIdentity: initUserIdentityModel(db, roles.clientReaderRole),
+		roles,
+	}
 
     measurementType.addRelationships(
         {
@@ -326,15 +387,14 @@ export function initAllModels(db: Neogma): allModels {
 
     return {
         source,
-        resource,
         measurementType,
-        identity,
         user,
         measurement,
         hour,
         day,
         month,
         year,
-        timestamp
+        timestamp,
+		auth
     }
 }

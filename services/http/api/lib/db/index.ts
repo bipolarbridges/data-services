@@ -1,6 +1,6 @@
 import { InternalError } from '../errors';
 import { Neogma } from 'neogma';
-import { debug } from '../logging'
+import { debug, error } from '../logging'
 import { initAllModels } from '../models/initializers';
 import { Parameters } from 'neo4j-driver/types/query-runner';
 import { Driver, Result, Session } from 'neo4j-driver';
@@ -51,6 +51,7 @@ export class Database {
             return ret
         } catch (e) {
             if (e instanceof InternalError) {
+		error(`Internal Error: ${e}`)
                 throw e;
             } else {
                 throw new DatabaseError(e);

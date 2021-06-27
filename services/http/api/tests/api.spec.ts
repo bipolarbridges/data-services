@@ -5,7 +5,7 @@ import axios, {AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse} fro
 import { fail } from 'assert';
 
 const ax = axios.create({
-	baseURL: "http://127.0.0.1:8888"
+    baseURL: "http://127.0.0.1:8888"
 });
 
 jestOpenAPI(resolve(process.cwd(), "reference/bb-api.v0.yaml"));
@@ -133,6 +133,27 @@ describe("Paths", () => {
                         fail()
                     })
                 })
+            it("Should reject if a key does not have client creator privilege",
+                async () => {
+                    await ax.post("/client", {
+                        id: "client1@email.com"
+                    },
+                    {
+                        headers: {
+                            "Content-Type": "application/json",
+                            "Authorization": "apikey2"
+                        }
+                    }).then(async (res) => {
+                        fail("Should have rejected")
+                    }).catch((err) => {
+                        if (!err['response']) {
+                            fail()
+                        }
+                        const res = err['response']
+                        spec("POST", "/measurement").match(res)
+                        expect(res.status).toEqual(403)
+                    })
+                });
             });
         describe("GET", () => {
             it("Should reject if no authorization provided", async () => {
@@ -156,11 +177,11 @@ describe("Paths", () => {
                         }
                     })
                     .then(async (res) => {
-                        fail("Should have rejected");
+                        fail("Should have rejected.");
                     })
                     .catch((err) => {
                         if (!err['response']) {
-                            fail();
+                            fail(err);
                         }
                         const res = err['response']
                         spec("GET", "/client").match(res)
@@ -236,14 +257,14 @@ describe("Paths", () => {
                 date: 1610997441,
                 name: 'sentiment',
                 value: 0.2,
-                source: 'measurement'
+                source: 'firebase'
             }
         }
-        it("Should reject if a bad key is provided", async () => {
+        it("Should reject if a nonexistent key is provided", async () => {
             await ax.post("/measurement", validExampleData, {
                 headers: {
                     "Content-Type": "application/json",
-                    "Authorization": "apikey2"
+                    "Authorization": "apikey3"
                 }
             }).then(async (res) => {
                 fail("Should have rejected")
@@ -256,7 +277,6 @@ describe("Paths", () => {
                 expect(res.status).toEqual(403)
             })
         })
-
         const invalidData = [
             // Missing fields
             {
@@ -265,7 +285,7 @@ describe("Paths", () => {
                     date: 1610997441,
                     name: 'sentiment',
                     value: 0.8,
-                    source: 'measurement'
+                    source: 'firebase'
 
                 }
             },
@@ -279,7 +299,7 @@ describe("Paths", () => {
                     // data: ...
                     name: 'sentiment',
                     value: 0.8,
-                    source: 'measurement'
+                    source: 'firebase'
                 }
             },
             {
@@ -288,7 +308,7 @@ describe("Paths", () => {
                     date: 1610997441,
                     // name: ...
                     value: 1.3,
-                    source: 'measurement'
+                    source: 'firebase'
                 }
             },
             {
@@ -297,7 +317,7 @@ describe("Paths", () => {
                     date: 1610997441,
                     name: 'sentiment',
                     // value: ...,
-                    source: 'measurement'
+                    source: 'firebase'
                 }
             },
             {
@@ -319,26 +339,25 @@ describe("Paths", () => {
                 }
             }
         ]
-        it("Should reject if data fields are missing or have wrong type", 
-            async () => {
-            await Promise.all(invalidData.map((dat) =>
-                ax.post("/measurement", dat, {
+        invalidData.forEach((d, i: number) => {
+            it(`Should reject if data fields are missing or have wrong type (${i})`, async () => {
+                await ax.post("/measurement", d, {
                     headers: {
                         "Content-Type": "application/json",
                         "Authorization": "apikey1"
                     }
-                }).then(async (res) => {
-                    fail(`Should have rejected (${JSON.stringify(dat)})`)
-                }).catch((err) => {
+                    }).then(async (res) => {
+                    fail(`Should have rejected (${JSON.stringify(d)})`)
+                    }).catch((err) => {
                     if (!err['response']) {
                         fail(`Error: ${err}`)
                     }
                     const res = err['response']
                     spec("POST", "/measurement").match(res)
                     expect(res.status).toEqual(400)
-                })))
-        })
-
+                    })
+            });
+        });
         it("Should respond properly upon success", async () => {
             await ax.post("/measurement", validExampleData, {
                 headers: {
@@ -352,7 +371,7 @@ describe("Paths", () => {
                 console.log(err.response.data)
                 fail()
             })
-        })
+        });
         
         it("Should reject if client does not exist", async () => {
             await ax.post("/measurement", {
@@ -375,5 +394,47 @@ describe("Paths", () => {
                 expect(res.status).toEqual(404)
             })
         })
+        it("Should reject if the provided key does not have permission" +
+            " for the given source", async () => {
+                const body = {
+                clientID: "client0@email.com",
+                    data: {
+                        date: 1610997441,
+                        name: 'sentiment',
+                        value: 0.2,
+                        source: 'not-an-authorized-source'
+                    }
+                }
+                await ax.post("/measurement", body, {
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": "apikey1"
+                    }
+                }).then(async (res) => {
+                    fail("Should have rejected")
+                }).catch((err) => {
+                    if (!err['response']) {
+                        console.log(err);
+                        fail()
+                    }
+                    const res = err['response']
+                    spec("POST", "/measurement").match(res)
+                    expect(res.status).toEqual(403)
+                });
+            });
+        it("Should work if the provided key has only exporter permission", async () => {
+            await ax.post("/measurement", validExampleData, {
+                    headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": "apikey2"
+                    }
+            }).then(async (res) => {
+                    spec("POST", "/measurement").match(res)
+                    expect(res.status).toEqual(201)
+            }).catch((err) => {
+                    console.log(err.response.data)
+                    fail()
+            })
+        });
     })
 });
