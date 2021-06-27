@@ -10,7 +10,7 @@ import { Session } from 'neo4j-driver-core';
 import { allModels } from 'lib/models';
 import { DatabaseProcedure } from 'lib/db';
 import { ApiKeyInstance } from 'lib/models/auth/apiKey';
-import { UserIdentityInstance } from 'lib/models/auth/userIdentity';
+import { ServiceUserInstance } from 'lib/models/auth/serviceUser';
 import { findOne } from '../util/misc';
 
 const __dirname = path.resolve();
@@ -66,14 +66,14 @@ async function getRemoteId(token: BinaryLike) {
     }
 }
 
-async function matchClientCreatorRole(db: Session, key: ApiKeyInstance): Promise<boolean> {
-	debug("Finding client creator role");
+async function matchAppUserCreatorRole(db: Session, key: ApiKeyInstance): Promise<boolean> {
+	debug("Finding appUser creator role");
 	const matches = await key.findRelationships({
-		alias: 'ClientCreatorRole',
+		alias: 'AppUserCreatorRole',
         session: db,
 		limit: 1
 	});
-	debug("Client creator matches: ", matches);
+	debug("AppUser creator matches: ", matches);
 	return matches.length >= 1;
 }
 
@@ -99,30 +99,30 @@ async function matchDataExporterRole(db: Session, models: allModels, key: ApiKey
 	}) != null;
 }
 
-async function matchClientReaderRole(db: Session, models: allModels,
-					user: UserIdentityInstance, clientId: string): Promise<boolean> {
-	const matches = await user.findRelationships({
-		alias: 'ClientReaderRole',
+async function matchAppUserReaderRole(db: Session, models: allModels,
+					appUser: ServiceUserInstance, appUserId: string): Promise<boolean> {
+	const matches = await appUser.findRelationships({
+		alias: 'AppUserReaderRole',
 		where: {
 			target: {},
 			relationship: {}
 		},
 		session: db
 	});
-	debug(`Client ID: ${clientId}`);
+	debug(`AppUser ID: ${appUserId}`);
 	return await findOne(matches, async(m) => {
-		const clients = await m.target.findRelationships({
-			alias: 'User',
+		const appUsers = await m.target.findRelationships({
+			alias: 'AppUser',
 			where: {
 				target: {
-					uid: clientId,
+					uid: appUserId,
 				},
 				relationship: {}
 			},
 			session: db,
 			limit: 1,
 		});
-		return clients.length == 1;
+		return appUsers.length == 1;
 	}) != null;
 }
 
@@ -149,8 +149,8 @@ export const authMethods: AuthMethod[] = [
 		switch (req.method) {
 			case 'POST':
 				switch (req.baseUrl) {
-					case '/client':
-						return await matchClientCreatorRole(db, key);
+					case '/appUser':
+						return await matchAppUserCreatorRole(db, key);
 					case '/measurement':
 						if (!req.body['data'] || !req.body['data']['source']) {
 							return false;
@@ -172,7 +172,7 @@ export const authMethods: AuthMethod[] = [
         if (!id) {
             return false;
         }
-        const user: UserIdentityInstance = await models.auth.userIdentity.findOne({
+        const user: ServiceUserInstance = await models.auth.serviceUser.findOne({
             where: {
                 uid: id,
             },
@@ -181,15 +181,15 @@ export const authMethods: AuthMethod[] = [
         if (!user) {
             return false;
         }
-	info(`Authenticated as user identity with id '${id}'`);
+	info(`Authenticated as user with id '${id}'`);
 		debug(`Base url: ${req.baseUrl}`);
 		switch (req.method) {
 			case 'GET':
 				debug(req.params);
 				switch (req.baseUrl) {
-					case '/client':
-						return await matchClientReaderRole(db, models,
-									user, req.params.clientId);
+					case '/appUser':
+						return await matchAppUserReaderRole(db, models,
+									user, req.params.appUserId);
 					break;
 					default:
 						return false;

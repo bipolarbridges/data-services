@@ -1,16 +1,16 @@
 import * as roles from './roles';
-import * as userIdentity from './userIdentity';
+import * as serviceUser from './serviceUser';
 import * as apiKey from './apiKey';
 
 type allAuthModels = {
-	userIdentity: userIdentity.UserIdentityModel,
+	serviceUser: serviceUser.ServiceUserModel,
 	apiKey: apiKey.ApiKeyModel,
 	roles: roles.allRolesModels,
 }
 
 export {
 	roles,
-	userIdentity,
+	serviceUser,
 	apiKey,
 	allAuthModels
 };

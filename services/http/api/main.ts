@@ -24,13 +24,13 @@ app.get('/', (req, res) => {
 });
 
 
-const clientRouter = express.Router();
+const appUserRouter = express.Router();
 
-const clientInfoRoute = clientRouter.route('/:clientId');
+const appUserInfoRoute = appUserRouter.route('/:appUserId');
 
-clientRouter.use(authenticate);
+appUserRouter.use(authenticate);
 
-clientRouter.route('/')
+appUserRouter.route('/')
     .post(async (req, res) => {
         const data = req.body
         if (!data['id']) {
@@ -40,13 +40,13 @@ clientRouter.route('/')
         } else {
             const id = data['id'];
             try {
-                const exists = await db.exec(api.userExists(id));
+                const exists = await db.exec(api.appUserExists(id));
                 if (exists) {
                     res.status(403).send({
                         message: "Already exists"
                     })
                 } else {
-                    await db.exec(api.createUser(id))
+                    await db.exec(api.createAppUser(id))
                     res.status(201).send({
                         message: "Created"
                     })
@@ -59,19 +59,19 @@ clientRouter.route('/')
         }
     });
 
-clientInfoRoute.get(authenticate);
+appUserInfoRoute.get(authenticate);
 
-clientInfoRoute.get(async (req, res) => {
+appUserInfoRoute.get(async (req, res) => {
         res.status(200).send({
-            id: req.params.clientId
+            id: req.params.appUserId
         });
     });
 
-app.use('/client', clientRouter);
+app.use('/appUser', appUserRouter);
 
 // MEASUREMENT ADD
 interface measurementBody {
-    clientID: string,
+    appUserID: string,
     data: {
         name: string,
         value: number,
@@ -83,7 +83,7 @@ interface measurementBody {
 type RequestWithParams = Request & { _params: measurementBody };
 
 const measurementParamFilter = async (req: RequestWithParams, res: Response, next: NextFunction) => {
-    const { clientID, data }: Partial<measurementBody> = req.body;
+    const { appUserID, data }: Partial<measurementBody> = req.body;
     if (!data) {
             res.status(400).send({
                 message: "Missing data object"
@@ -91,7 +91,7 @@ const measurementParamFilter = async (req: RequestWithParams, res: Response, nex
             return;
     }
     const { name, value, date, source } = data;
-    if (!clientID || !date || !value || !name || !source) {
+    if (!appUserID || !date || !value || !name || !source) {
             res.status(400).send({
                     message: "Missing data fields"
             });
@@ -103,7 +103,7 @@ const measurementParamFilter = async (req: RequestWithParams, res: Response, nex
             })
             return;
     }
-    req._params = { clientID, data };
+    req._params = { appUserID, data };
     next();
 }
 
@@ -114,18 +114,18 @@ measurementRouter.use(authenticate);
 measurementRouter.route('/')
     .post(async (req: RequestWithParams, res) => {
         debug(req._params);
-        const { clientID, data } = req._params;
+        const { appUserID, data } = req._params;
         const { name, value, date, source } = data;
         const me: CreateMeasurementArgs = {
             date,
-            uid: clientID,
+            uid: appUserID,
             source,
             name,
             value,
         }
-        if (!(await db.exec(api.userExists(me.uid)))) {
+        if (!(await db.exec(api.appUserExists(me.uid)))) {
             res.status(404).send({
-                message: "Specified client does not exist"
+                message: "Specified appUser does not exist"
             })
         } else if (!(await db.exec(api.createMeasurement(me)))) {
             res.status(400).send({

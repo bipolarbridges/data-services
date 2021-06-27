@@ -1,6 +1,6 @@
 import { ModelFactory, Neogma } from "neogma";
 import {
-    user,
+    appUser,
     measurement,
     source,
     time,
@@ -8,11 +8,11 @@ import {
     allModels
 } from '../models';
 
-export function initUserIdentityModel(db: Neogma,
-		clientReaderRoleModel: auth.roles.clientReaderRole.ClientReaderRoleModel)
-:auth.userIdentity.UserIdentityModel {
-		return ModelFactory<auth.userIdentity.UserIdentityProperties, auth.userIdentity.UserIdentityRelatedNodes>({
-				label: 'UserIdentity',
+export function initServiceUserModel(db: Neogma,
+		appUserReaderRoleModel: auth.roles.appUserReaderRole.AppUserReaderRoleModel)
+:auth.serviceUser.ServiceUserModel {
+		return ModelFactory<auth.serviceUser.ServiceUserProperties, auth.serviceUser.ServiceUserRelatedNodes>({
+				label: 'ServiceUser',
 				schema: {
 					uid: {
 						type: 'string',
@@ -21,8 +21,8 @@ export function initUserIdentityModel(db: Neogma,
 				},
 				primaryKeyField: 'uid',
 				relationships: {
-					ClientReaderRole: {
-						model: clientReaderRoleModel,
+					AppUserReaderRole: {
+						model: appUserReaderRoleModel,
 						direction: 'out',
 						name: 'Has'
 					},
@@ -32,7 +32,7 @@ export function initUserIdentityModel(db: Neogma,
 
 export function initApiKeyModel(db: Neogma,
 		dataExporterRoleModel: auth.roles.dataExporterRole.DataExporterRoleModel,
-		clientCreatorRoleModel: auth.roles.clientReaderRole.ClientReaderRoleModel)
+		appUserCreatorRoleModel: auth.roles.appUserReaderRole.AppUserReaderRoleModel)
 :auth.apiKey.ApiKeyModel {
 	return ModelFactory<auth.apiKey.ApiKeyProperties, auth.apiKey.ApiKeyRelatedNodes>({
 		label: 'ApiKey',
@@ -53,8 +53,8 @@ export function initApiKeyModel(db: Neogma,
 				direction: 'out',
 				name: 'Has'
 			},
-			ClientCreatorRole: {
-				model: clientCreatorRoleModel,
+			AppUserCreatorRole: {
+				model: appUserCreatorRoleModel,
 				direction: 'out',
 				name: 'Has'
 			}
@@ -62,12 +62,12 @@ export function initApiKeyModel(db: Neogma,
 	}, db);
 }
 
-export function initClientCreatorRoleModel(db: Neogma,
-		userModel: user.UserModel)
-: auth.roles.clientCreatorRole.ClientCreatorRoleModel {
-	return ModelFactory<auth.roles.clientCreatorRole.ClientCreatorRoleProperties,
-				auth.roles.clientCreatorRole.ClientCreatorRoleRelatedNodes>({
-			label: 'ClientCreatorRole',
+export function initAppUserCreatorRoleModel(db: Neogma,
+		appUserModel: appUser.AppUserModel)
+: auth.roles.appUserCreatorRole.AppUserCreatorRoleModel {
+	return ModelFactory<auth.roles.appUserCreatorRole.AppUserCreatorRoleProperties,
+				auth.roles.appUserCreatorRole.AppUserCreatorRoleRelatedNodes>({
+			label: 'AppUserCreatorRole',
 			schema: {
 				name: {
 					type: 'string',
@@ -76,8 +76,8 @@ export function initClientCreatorRoleModel(db: Neogma,
 			},
 			primaryKeyField: 'name',
 			relationships: {
-				User: {
-					model: userModel,
+				AppUser: {
+					model: appUserModel,
 					direction: 'out',
 					name: 'Created'
 				}
@@ -85,12 +85,12 @@ export function initClientCreatorRoleModel(db: Neogma,
 	}, db);
 }
 
-export function initClientReaderRoleModel(db: Neogma,
-		userModel: user.UserModel)
-: auth.roles.clientReaderRole.ClientReaderRoleModel {
-	return ModelFactory<auth.roles.clientReaderRole.ClientReaderRoleProperties,
-				auth.roles.clientReaderRole.ClientReaderRoleRelatedNodes>({
-			label: 'ClientReaderRole',
+export function initAppUserReaderRoleModel(db: Neogma,
+		appUserModel: appUser.AppUserModel)
+: auth.roles.appUserReaderRole.AppUserReaderRoleModel {
+	return ModelFactory<auth.roles.appUserReaderRole.AppUserReaderRoleProperties,
+				auth.roles.appUserReaderRole.AppUserReaderRoleRelatedNodes>({
+			label: 'AppUserReaderRole',
 			schema: {
 				name: {
 					type: 'string',
@@ -99,8 +99,8 @@ export function initClientReaderRoleModel(db: Neogma,
 			},
 			primaryKeyField: 'name',
 			relationships: {
-				User: {
-					model: userModel,
+				AppUser: {
+					model: appUserModel,
 					direction: 'out',
 					name: 'For'
 				}
@@ -284,10 +284,10 @@ export function initMeasurementTypeModel(db: Neogma, valueModel: measurement.Mea
     );
 }
 
-export function initUserModel(db: Neogma, measurementModel: measurement.MeasurementModel): user.UserModel {
-    return ModelFactory<user.UserProperties, user.UserRelatedNodes>(
+export function initAppUserModel(db: Neogma, measurementModel: measurement.MeasurementModel): appUser.AppUserModel {
+    return ModelFactory<appUser.AppUserProperties, appUser.AppUserRelatedNodes>(
         {
-            label: 'User',
+            label: 'AppUser',
             schema: {
                 uid: {
                     type: 'string',
@@ -341,17 +341,17 @@ export function initAllModels(db: Neogma): allModels {
     const measurement = initMeasurementModel(db, hour, day, month, year, timestamp);
     const measurementType = initMeasurementTypeModel(db, measurement);
     const source = initSourceModel(db, measurementType);
-    const user = initUserModel(db, measurement);
+    const appUser = initAppUserModel(db, measurement);
 
 	const roles: auth.roles.allRolesModels = {
-		clientReaderRole: initClientReaderRoleModel(db, user),
-		clientCreatorRole: initClientCreatorRoleModel(db, user),
+		appUserReaderRole: initAppUserReaderRoleModel(db, appUser),
+		appUserCreatorRole: initAppUserCreatorRoleModel(db, appUser),
 		dataExporterRole: initDataExportRoleModel(db, source),	
 	}
 
 	const auth: auth.allAuthModels = {
-		apiKey: initApiKeyModel(db, roles.dataExporterRole, roles.clientCreatorRole),
-		userIdentity: initUserIdentityModel(db, roles.clientReaderRole),
+		apiKey: initApiKeyModel(db, roles.dataExporterRole, roles.appUserCreatorRole),
+		serviceUser: initServiceUserModel(db, roles.appUserReaderRole),
 		roles,
 	}
 
@@ -367,8 +367,8 @@ export function initAllModels(db: Neogma): allModels {
 
     measurement.addRelationships(
         {
-            User: {
-                model: user,
+            AppUser: {
+                model: appUser,
                 direction: 'in',
                 name: 'Recorded',
             }
@@ -388,7 +388,7 @@ export function initAllModels(db: Neogma): allModels {
     return {
         source,
         measurementType,
-        user,
+        appUser,
         measurement,
         hour,
         day,

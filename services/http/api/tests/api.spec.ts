@@ -57,11 +57,11 @@ function match(method: string, path: string, body: unknown, opts: AxiosRequestCo
 
 
 describe("Paths", () => {
-    describe("/client", () => {
+    describe("/appUser", () => {
         describe("POST", () => {
-            match("POST", "/client",
+            match("POST", "/appUser",
                 {
-                    id: "client1@email.com"
+                    id: "appUser1@email.com"
                 },
                 {
                     headers: {
@@ -70,7 +70,7 @@ describe("Paths", () => {
                     }
                 }, 201,
                 "Normal happy case");
-            match("POST", "/client",
+            match("POST", "/appUser",
                 {},
                 {
                     headers: {
@@ -79,7 +79,7 @@ describe("Paths", () => {
                     }
                 }, 400,
                 "Missing data fields");
-            match("POST", "/client",
+            match("POST", "/appUser",
                 "I'm not JSON",
                 {
                     headers: {
@@ -87,9 +87,9 @@ describe("Paths", () => {
                     }
                 }, 400,
                 "Invalid JSON in body");
-            match("POST", "/client",
+            match("POST", "/appUser",
                 {
-                    id: "client1@email.com"
+                    id: "appUser1@email.com"
                 },
                 {
                     headers: {
@@ -98,20 +98,20 @@ describe("Paths", () => {
                     }
                 }, 403,
                 "Bad key");
-            it("Should disallow creation of clients with the same id", 
+            it("Should disallow creation of appUsers with the same id", 
                 async () => {
-                    await ax.post("/client", {
-                        id: "client2@email.com"
+                    await ax.post("/appUser", {
+                        id: "appUser2@email.com"
                     }, {
                         headers: {
                             "Content-Type": "application/json",
                             "Authorization": "apikey1"
                         }
                     }).then(async (res) => {
-                        spec("POST", "/client").match(res)
+                        spec("POST", "/appUser").match(res)
                         expect(res.status).toEqual(201)
-                        await ax.post("/client", {
-                            id: "client2@email.com"
+                        await ax.post("/appUser", {
+                            id: "appUser2@email.com"
                         }, {
                             headers: {
                                 "Content-Type": "application/json",
@@ -124,7 +124,7 @@ describe("Paths", () => {
                                 fail()
                             }
                             const res = err['response']
-                            spec("POST", "/client").match(res)
+                            spec("POST", "/appUser").match(res)
                             expect(res.status).toEqual(403)
                             expect(res.data['message']).toEqual("Already exists")
                         })
@@ -133,10 +133,10 @@ describe("Paths", () => {
                         fail()
                     })
                 })
-            it("Should reject if a key does not have client creator privilege",
+            it("Should reject if a key does not have appUser creator privilege",
                 async () => {
-                    await ax.post("/client", {
-                        id: "client1@email.com"
+                    await ax.post("/appUser", {
+                        id: "appUser1@email.com"
                     },
                     {
                         headers: {
@@ -157,7 +157,7 @@ describe("Paths", () => {
             });
         describe("GET", () => {
             it("Should reject if no authorization provided", async () => {
-                await ax.get("/client/client0@email.com")
+                await ax.get("/appUser/appUser0@email.com")
                     .then(async (res) => {
                         fail("Should have rejected");
                     })
@@ -166,14 +166,14 @@ describe("Paths", () => {
                             fail();
                         }
                         const res = err['response']
-                        spec("GET", "/client").match(res)
+                        spec("GET", "/appUser").match(res)
                         expect(res.status).toEqual(403)
                     });
             });
             it("Should reject if unauthorized identity provided", async () => {
-                await ax.get("/client/client0@email.com", {
+                await ax.get("/appUser/appUser0@email.com", {
                         headers: {
-                            "Authorization": "client1token"
+                            "Authorization": "appUser1token"
                         }
                     })
                     .then(async (res) => {
@@ -184,19 +184,19 @@ describe("Paths", () => {
                             fail(err);
                         }
                         const res = err['response']
-                        spec("GET", "/client").match(res)
+                        spec("GET", "/appUser").match(res)
                         expect(res.status).toEqual(403)
                     });
             });
-            it("Should allow a client to access own data", async () => {
-                await ax.get("/client/client0@email.com", {
+            it("Should allow a appUser to access own data", async () => {
+                await ax.get("/appUser/appUser0@email.com", {
                         headers: {
-                            // this maps to the client0 id in the auth server
-                            "Authorization": "client0token"
+                            // this maps to the appUser0 id in the auth server
+                            "Authorization": "appUser0token"
                         }
                     })
                     .then(async (res) => {
-                        spec("GET", "/client").match(res)
+                        spec("GET", "/appUser").match(res)
                         expect(res.status).toEqual(200);
                     })
                     .catch((err) => {
@@ -205,8 +205,8 @@ describe("Paths", () => {
                     });
             });
             // TODO should modify the semantics below:
-            it("Should reject if client id does not exist", async () => {
-                await ax.get("/client/client(-1)@email.com")
+            it("Should reject if appUser id does not exist", async () => {
+                await ax.get("/appUser/appUser(-1)@email.com")
                     .then(async (res) => {
                         fail("Should have rejected");
                     })
@@ -215,28 +215,28 @@ describe("Paths", () => {
                             fail();
                         }
                         const res = err['response']
-                        spec("GET", "/client").match(res)
+                        spec("GET", "/appUser").match(res)
                         expect(res.status).toEqual(403);
                     });
             });
-            it("Should allow a new client to access own data", async () => {
-                await ax.post("/client", {
-                    id: "client3@email.com"
+            it("Should allow a new appUser to access own data", async () => {
+                await ax.post("/appUser", {
+                    id: "appUser3@email.com"
                 }, {
                     headers: {
                         "Content-Type": "application/json",
                         "Authorization": "apikey1"
                     }
                 }).then(async (res) => {
-                    spec("POST", "/client").match(res)
+                    spec("POST", "/appUser").match(res)
                     expect(res.status).toEqual(201)
-                    return await ax.get("/client/client3@email.com", {
+                    return await ax.get("/appUser/appUser3@email.com", {
                         headers: {
-                            "Authorization": "client3token"
+                            "Authorization": "appUser3token"
                         }
                     })
                     .then(async (res) => {
-                        spec("GET", "/client").match(res)
+                        spec("GET", "/appUser").match(res)
                         expect(res.status).toEqual(200);
                     })
                     .catch((err) => {
@@ -252,7 +252,7 @@ describe("Paths", () => {
     });
     describe("/measurement", () => {
         const validExampleData = {
-            clientID: "client0@email.com",
+            appUserID: "appUser0@email.com",
             data: {
                 date: 1610997441,
                 name: 'sentiment',
@@ -280,7 +280,7 @@ describe("Paths", () => {
         const invalidData = [
             // Missing fields
             {
-                //clientID: ...
+                //appUserID: ...
                 data: {
                     date: 1610997441,
                     name: 'sentiment',
@@ -290,11 +290,11 @@ describe("Paths", () => {
                 }
             },
             {
-                clientID: "client2@email.com"
+                appUserID: "appUser2@email.com"
                 // data: ...
             },
             {
-                clientID: "client2@email.com",
+                appUserID: "appUser2@email.com",
                 data: {
                     // data: ...
                     name: 'sentiment',
@@ -303,7 +303,7 @@ describe("Paths", () => {
                 }
             },
             {
-                clientID: "client2@email.com",
+                appUserID: "appUser2@email.com",
                 data: {
                     date: 1610997441,
                     // name: ...
@@ -312,7 +312,7 @@ describe("Paths", () => {
                 }
             },
             {
-                clientID: "client2@email.com",
+                appUserID: "appUser2@email.com",
                 data: {
                     date: 1610997441,
                     name: 'sentiment',
@@ -321,7 +321,7 @@ describe("Paths", () => {
                 }
             },
             {
-                clientID: "client2@email.com",
+                appUserID: "appUser2@email.com",
                 data: {
                     date: 1610997433,
                     name: 'sentiment',
@@ -331,7 +331,7 @@ describe("Paths", () => {
             },
             // Bad typing examples
             {
-                clientID: "client0@email.com",
+                appUserID: "appUser0@email.com",
                 data: {
                     date: 'Jun 1st',
                     dataType: 'sentiment',
@@ -373,9 +373,9 @@ describe("Paths", () => {
             })
         });
         
-        it("Should reject if client does not exist", async () => {
+        it("Should reject if appUser does not exist", async () => {
             await ax.post("/measurement", {
-                clientID: "doesnotexist@email.com",
+                appUserID: "doesnotexist@email.com",
                 data: validExampleData.data
             }, {
                 headers: {
@@ -397,7 +397,7 @@ describe("Paths", () => {
         it("Should reject if the provided key does not have permission" +
             " for the given source", async () => {
                 const body = {
-                clientID: "client0@email.com",
+                appUserID: "appUser0@email.com",
                     data: {
                         date: 1610997441,
                         name: 'sentiment',

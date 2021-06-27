@@ -24,21 +24,21 @@ new FixtureLoader().load(async (session: Session, models: allModels) => {
 		}
 	}, { merge: true, session });
 
-	await models.auth.roles.clientCreatorRole.createOne({
-		name: 'firebase-client-creator',
+	await models.auth.roles.appUserCreatorRole.createOne({
+		name: 'firebase-appUser-creator',
 	}, { session });
 
 	await models.auth.apiKey.createOne({
 		name: 'firebase-export-key',
 		// hash of 'apikey1'
 		hash: "d4f79b313f8106f5af108ad96ff516222dbfd5a0ab52f4308e4b1ad1d740de60",
-		ClientCreatorRole: {
+		AppUserCreatorRole: {
 			propertiesMergeConfig: {
 				nodes: true,
 				relationship: true,
 			},
 			properties: [{
-				name: 'firebase-client-creator',	
+				name: 'firebase-appUser-creator',
 			}]
 		},
 		DataExporterRole: {
@@ -67,15 +67,15 @@ new FixtureLoader().load(async (session: Session, models: allModels) => {
 		}
 	}, { merge: true, session });
 
-	const id = 'client0@email.com';
-	await models.user.createOne({
+	const id = 'appUser0@email.com';
+	await models.appUser.createOne({
 		uid: id,
 	}, { session });
 
-	const readerId = `read:Client:${id}`;
-	await models.auth.roles.clientReaderRole.createOne({
+	const readerId = `read:AppUser:${id}`;
+	await models.auth.roles.appUserReaderRole.createOne({
 		name: readerId,
-		User: {
+		AppUser: {
 			propertiesMergeConfig: {
 				nodes: true,
 				relationship: true,
@@ -86,10 +86,10 @@ new FixtureLoader().load(async (session: Session, models: allModels) => {
 		}
 	}, { merge: true, session });
 
-	const uid = id; // system id, may be different from client id
-	await models.auth.userIdentity.createOne({
+	const uid = id; // system id, may be different from appUser id
+	await models.auth.serviceUser.createOne({
 		uid,
-		ClientReaderRole: {
+		AppUserReaderRole: {
 			propertiesMergeConfig: {
 				nodes: true,
 				relationship: true,

@@ -1,13 +1,13 @@
 import { ModelRelatedNodesI, NeogmaInstance, NeogmaModel } from "neogma";
 import {
 		dataExporterRole,
-		clientCreatorRole,
+		appUserCreatorRole,
 } from './roles';
 
 type DataExporterRoleModel = dataExporterRole.DataExporterRoleModel;
 type DataExporterRoleInstance = dataExporterRole.DataExporterRoleInstance;
-type ClientCreatorRoleModel = clientCreatorRole.ClientCreatorRoleModel;
-type ClientCreatorRoleInstance = clientCreatorRole.ClientCreatorRoleInstance;
+type AppUserCreatorRoleModel = appUserCreatorRole.AppUserCreatorRoleModel;
+type AppUserCreatorRoleInstance = appUserCreatorRole.AppUserCreatorRoleInstance;
 
 export type ApiKeyProperties = {
     name: string,
@@ -16,7 +16,7 @@ export type ApiKeyProperties = {
 
 export type ApiKeyRelatedNodes = {
     DataExporterRole: ModelRelatedNodesI<DataExporterRoleModel, DataExporterRoleInstance>
-    ClientCreatorRole: ModelRelatedNodesI<ClientCreatorRoleModel, ClientCreatorRoleInstance>
+    AppUserCreatorRole: ModelRelatedNodesI<AppUserCreatorRoleModel, AppUserCreatorRoleInstance>
 }
 
 export type ApiKeyInstance = NeogmaInstance<ApiKeyProperties, ApiKeyRelatedNodes>

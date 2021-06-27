@@ -10,9 +10,9 @@ info:
     email: rowdl22@students.cs.ubc.ca
 servers: []
 paths:
-  /client:
+  /appUser:
     post:
-      summary: Create a Client Reference. This tracks the unique user-identifier in the external management system (e.g. firebase).
+      summary: Create an App User.
       tags: []
       responses:
         '201':
@@ -54,7 +54,7 @@ paths:
                     minLength: 1
                 required:
                   - message
-      operationId: post-client
+      operationId: post-appUser
       requestBody:
         content:
           application/json:
@@ -71,7 +71,7 @@ paths:
       security:
         - import-key: []
     get: 
-      summary: Get information about a specific client
+      summary: Get information about a specific appUser
       tags: []
       responses:
         '403':
@@ -92,7 +92,7 @@ paths:
           content:
             application/json:
                 schema:
-                  description: 'Client info'
+                  description: 'AppUser info'
                   type: object
                   properties:
                     id:
@@ -102,7 +102,7 @@ paths:
                     - id
   /measurement:
     post:
-      summary: Record Measurement. Allows for client specification of value type and asserts type-correctness on the server side.
+      summary: Record Measurement. Allows for appUser specification of value type and asserts type-correctness on the server side.
       tags: []
       responses:
         '201':
@@ -167,7 +167,7 @@ paths:
               description: 'Measurement Request Contents'
               type: object
               properties:
-                clientID:
+                appUserID:
                   type: string
                   minLength: 1
                 data:
@@ -186,7 +186,7 @@ paths:
                     subtype: 
                       type: string
               required:
-                - clientID
+                - appUserID
                 - data
 components:
   schemas: {}

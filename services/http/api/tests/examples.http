@@ -1,7 +1,0 @@
-POST http://127.0.0.1:8888/client HTTP/1.1
-content-type: application/json
-authorization: apikey1
-
-{
-    "id": "5PLhmSJ8vz86eTzy"
-}

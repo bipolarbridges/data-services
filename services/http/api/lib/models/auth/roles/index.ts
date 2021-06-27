@@ -1,16 +1,16 @@
 import * as dataExporterRole from './dataExporterRole';
-import * as clientCreatorRole from './clientCreatorRole';
-import * as clientReaderRole from './clientReaderRole';
+import * as appUserCreatorRole from './appUserCreatorRole';
+import * as appUserReaderRole from './appUserReaderRole';
 
 type allRolesModels = {
 	dataExporterRole: dataExporterRole.DataExporterRoleModel,
-	clientCreatorRole: clientCreatorRole.ClientCreatorRoleModel,
-	clientReaderRole: clientReaderRole.ClientReaderRoleModel,
+	appUserCreatorRole: appUserCreatorRole.AppUserCreatorRoleModel,
+	appUserReaderRole: appUserReaderRole.AppUserReaderRoleModel,
 };
 
 export {
 	dataExporterRole,
-	clientCreatorRole,
-	clientReaderRole,
+	appUserCreatorRole,
+	appUserReaderRole,
 	allRolesModels
 };

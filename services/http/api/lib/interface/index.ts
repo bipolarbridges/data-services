@@ -4,21 +4,21 @@ import { Session } from 'neo4j-driver';
 import { allModels } from 'lib/models';
 import { DayProperties, HourProperties, TimestampProperties, YearProperties } from 'lib/models/time';
 import { MeasurementProperties, MeasurementTypeProperties } from 'lib/models/measurement';
-import { UserProperties } from 'lib/models/user';
+import { AppUserProperties } from 'lib/models/appUser';
 import { SourceProperties } from 'lib/models/source';
 
 
-function userExists(id: string): DatabaseProcedure<boolean> {
+function appUserExists(id: string): DatabaseProcedure<boolean> {
     return async (session: Session, models: allModels): Promise<boolean> => {
         try {
-            const user = await models.user.findOne({
+            const appUser = await models.appUser.findOne({
                 where: {
                     uid: id,
                 },
                 session,
             });
-            const exist = user ? user?.__existsInDatabase : false;
-            loggers.info(`User exists: ${exist}`);
+            const exist = appUser ? appUser?.__existsInDatabase : false;
+            loggers.info(`AppUser exists: ${exist}`);
             return exist;
         } catch (err) {
             loggers.error(err);
@@ -27,18 +27,18 @@ function userExists(id: string): DatabaseProcedure<boolean> {
     }
 }
 
-function createUser(id: string): DatabaseProcedure<boolean>{
+function createAppUser(id: string): DatabaseProcedure<boolean>{
     return async (session: Session, models: allModels): Promise<null> => {
         try {
-            await models.user.createOne(
+            await models.appUser.createOne(
                 {
                     uid: id,
                 },
                 { merge: true, session });
-            const readerName = `read:Client:${id}`;
-            await models.auth.roles.clientReaderRole.createOne({
+            const readerName = `read:AppUser:${id}`;
+            await models.auth.roles.appUserReaderRole.createOne({
                 name: readerName,
-                User: {
+                AppUser: {
                     propertiesMergeConfig: {
                         nodes: true,
                         relationship: true,
@@ -48,9 +48,9 @@ function createUser(id: string): DatabaseProcedure<boolean>{
                     }]
                 }
             }, { merge: true, session });
-            await models.auth.userIdentity.createOne({
-                uid: id, // in this case, user id is the client id
-                ClientReaderRole: {
+            await models.auth.serviceUser.createOne({
+                uid: id, // in this case, user id is the appUser id
+                AppUserReaderRole: {
                     propertiesMergeConfig: {
                         nodes: true,
                         relationship: true,
@@ -97,16 +97,16 @@ type mergeProperties = {
         propertiesMergeConfig: mergeConfig,
         properties: TimestampProperties[]
     },
-    User?: userMergeProperties,
+    AppUser?: appUserMergeProperties,
     MeasurementType?: {
         propertiesMergeConfig: mergeConfig,
         properties: combinedTypeSource[]
     }
 }
 
-type userMergeProperties = {
+type appUserMergeProperties = {
     propertiesMergeConfig: mergeConfig,
-    properties: UserProperties[]
+    properties: AppUserProperties[]
 };
 
 type measurementTypeMergeProperties = {
@@ -139,7 +139,7 @@ export type mergedMeasurement = MeasurementProperties & mergeProperties;
 
 
 export function makeMeasurementProperties(value: number, hour: number, day: number, month: number,
-    year: number, time: number, User?: userMergeProperties, MeasurementType?: measurementTypeMergeProperties): mergedMeasurement {
+    year: number, time: number, AppUser?: appUserMergeProperties, MeasurementType?: measurementTypeMergeProperties): mergedMeasurement {
     return {
         value,
         Hour: {
@@ -198,7 +198,7 @@ export function makeMeasurementProperties(value: number, hour: number, day: numb
                 { time }
             ],
         },
-        User,
+        AppUser,
         MeasurementType,
 
     }
@@ -211,7 +211,7 @@ function createMeasurement(m: CreateMeasurementArgs) {
             const { year, month, day, hour, time } = transformDate(m.date);
             const { uid, source, value, name } = m;
 
-            const User = {
+            const AppUser = {
                 propertiesMergeConfig: {
                     nodes: true,
                     relationship: true,
@@ -227,7 +227,7 @@ function createMeasurement(m: CreateMeasurementArgs) {
                     nodes: false,
                     relationship: false,
                 },
-                properties: [makeMeasurementProperties(value, hour, day, month, year, time, User)]
+                properties: [makeMeasurementProperties(value, hour, day, month, year, time, AppUser)]
             };
 
             const Source = {
@@ -285,7 +285,7 @@ function transformDate(input: number) {
 }
 
 export default {
-    userExists,
-    createUser,
+    appUserExists,
+    createAppUser,
     createMeasurement,
 }

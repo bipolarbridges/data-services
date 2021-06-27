@@ -12,10 +12,10 @@ type Data = {
     [key:string]: string
 }
 const DATA : Data = {
-    'client0token': 'client0@email.com',
-    'client1token': 'client1@email.com',
-    'client2token': 'client2@email.com',
-    'client3token': 'client3@email.com',
+    'appUser0token': 'appUser0@email.com',
+    'appUser1token': 'appUser1@email.com',
+    'appUser2token': 'appUser2@email.com',
+    'appUser3token': 'appUser3@email.com',
 }
 
 type ValidationBody = {

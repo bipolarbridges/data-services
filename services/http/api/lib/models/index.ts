@@ -1,4 +1,4 @@
-import * as user from './user';
+import * as appUser from './appUser';
 import * as measurement from './measurement';
 import * as source from './source';
 import * as time from './time';
@@ -7,7 +7,7 @@ import * as auth from './auth';
 
 type allModels = {
     measurementType: measurement.MeasurementTypeModel,
-    user: user.UserModel,
+    appUser: appUser.AppUserModel,
     source: source.SourceModel,
     hour: time.HourModel,
     day: time.DayModel,
@@ -19,7 +19,7 @@ type allModels = {
 }
 
 export {
-    user,
+    appUser,
     measurement,
     source,
     time,
