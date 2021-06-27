@@ -5,7 +5,7 @@ import axios, {AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse} fro
 import { fail } from 'assert';
 
 const ax = axios.create({
-	baseURL: "http://127.0.0.1:8888"
+    baseURL: "http://127.0.0.1:8888"
 });
 
 jestOpenAPI(resolve(process.cwd(), "reference/bb-api.v0.yaml"));
@@ -156,11 +156,11 @@ describe("Paths", () => {
                         }
                     })
                     .then(async (res) => {
-                        fail("Should have rejected");
+                        fail("Should have rejected.");
                     })
                     .catch((err) => {
                         if (!err['response']) {
-                            fail();
+                            fail(err);
                         }
                         const res = err['response']
                         spec("GET", "/client").match(res)
@@ -319,26 +319,25 @@ describe("Paths", () => {
                 }
             }
         ]
-        it("Should reject if data fields are missing or have wrong type", 
-            async () => {
-            await Promise.all(invalidData.map((dat) =>
-                ax.post("/measurement", dat, {
+        invalidData.forEach((d, i: number) => {
+            it(`Should reject if data fields are missing or have wrong type (${i})`, async () => {
+                await ax.post("/measurement", d, {
                     headers: {
                         "Content-Type": "application/json",
                         "Authorization": "apikey1"
                     }
-                }).then(async (res) => {
-                    fail(`Should have rejected (${JSON.stringify(dat)})`)
-                }).catch((err) => {
+                    }).then(async (res) => {
+                    fail(`Should have rejected (${JSON.stringify(d)})`)
+                    }).catch((err) => {
                     if (!err['response']) {
                         fail(`Error: ${err}`)
                     }
                     const res = err['response']
                     spec("POST", "/measurement").match(res)
                     expect(res.status).toEqual(400)
-                })))
-        })
-
+                    })
+            });
+        });
         it("Should respond properly upon success", async () => {
             await ax.post("/measurement", validExampleData, {
                 headers: {
