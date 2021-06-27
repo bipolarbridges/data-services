@@ -22,7 +22,7 @@ new FixtureLoader().load(async (session: Session, models: allModels) => {
 			}]
 
 		}
-	}, { session });
+	}, { merge: true, session });
 
 	await models.auth.roles.clientCreatorRole.createOne({
 		name: 'firebase-client-creator',
@@ -49,15 +49,16 @@ new FixtureLoader().load(async (session: Session, models: allModels) => {
 				name: 'firebase-exporter'
 			}]
 		}
-	}, { session });
+	}, { merge: true, session });
 
 	const id = 'client0@email.com';
 	await models.user.createOne({
 		uid: id,
 	}, { session });
 
+	const readerId = `read:Client:${id}`;
 	await models.auth.roles.clientReaderRole.createOne({
-		name: `read:Client:${id}`,
+		name: readerId,
 		User: {
 			propertiesMergeConfig: {
 				nodes: true,
@@ -67,8 +68,21 @@ new FixtureLoader().load(async (session: Session, models: allModels) => {
 				uid: id
 			}]
 		}
-	});
+	}, { merge: true, session });
 
+	const uid = id; // system id, may be different from client id
+	await models.auth.userIdentity.createOne({
+		uid,
+		ClientReaderRole: {
+			propertiesMergeConfig: {
+				nodes: true,
+				relationship: true,
+			},
+			properties: [{
+					name: readerId
+			}]
+		}
+	}, { merge: true, session });
 })
 .then(() => {
 	process.exit(0);
