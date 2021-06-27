@@ -30,6 +30,7 @@ new FixtureLoader().load(async (session: Session, models: allModels) => {
 
 	await models.auth.apiKey.createOne({
 		name: 'firebase-export-key',
+		// hash of 'apikey1'
 		hash: "d4f79b313f8106f5af108ad96ff516222dbfd5a0ab52f4308e4b1ad1d740de60",
 		ClientCreatorRole: {
 			propertiesMergeConfig: {
@@ -40,6 +41,21 @@ new FixtureLoader().load(async (session: Session, models: allModels) => {
 				name: 'firebase-client-creator',	
 			}]
 		},
+		DataExporterRole: {
+			propertiesMergeConfig: {
+				nodes: true,
+				relationship: true,
+			},
+			properties: [{
+				name: 'firebase-exporter'
+			}]
+		}
+	}, { merge: true, session });
+
+	await models.auth.apiKey.createOne({
+		name: 'other-export-key',
+		// hash of 'apikey2'
+		hash: "15fac8fa1c99022568b008b9df07b04b45354ac5ca4740041d904cd3cf2b39e3",
 		DataExporterRole: {
 			propertiesMergeConfig: {
 				nodes: true,
