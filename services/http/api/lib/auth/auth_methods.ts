@@ -66,8 +66,8 @@ async function getRemoteId(token: BinaryLike) {
     }
 }
 
-
 async function matchClientCreatorRole(db: Session, key: ApiKeyInstance): Promise<boolean> {
+	debug("Finding client creator role");
 	const matches = await key.findRelationships({
 		alias: 'ClientCreatorRole',
         session: db,
@@ -83,7 +83,7 @@ async function matchDataExporterRole(db: Session, models: allModels, key: ApiKey
 		alias: 'DataExporterRole',
         session: db,
 	});
-	return findOne(matches, async (m) => {
+	return await findOne(matches, async (m) => {
 		const sources = await m.target.findRelationships({
 			alias: 'Source',
 			where: {
@@ -105,13 +105,12 @@ async function matchClientReaderRole(db: Session, models: allModels,
 		alias: 'ClientReaderRole',
 		where: {
 			target: {},
-			relationship: {
-				name: 'Has'
-			}
+			relationship: {}
 		},
 		session: db
 	});
-	return findOne(matches, async(m) => {
+	debug(`Client ID: ${clientId}`);
+	return await findOne(matches, async(m) => {
 		const clients = await m.target.findRelationships({
 			alias: 'User',
 			where: {
@@ -135,6 +134,7 @@ export type AuthMethod = (req: Request, auth: BinaryLike) => AuthResult;
 export const authMethods: AuthMethod[] = [
     // KEY AUTHENTICATION
     (req: Request, auth: BinaryLike) => async (db: Session, models: allModels) => {
+		debug("Key auth");
 		const key: ApiKeyInstance = await models.auth.apiKey.findOne({
 			where: {
 				hash: basicHash(auth),
@@ -142,17 +142,21 @@ export const authMethods: AuthMethod[] = [
 			session: db
 		});
 		if (!(key?.__existsInDatabase)) {
+			debug("Key DNE");
 			return false;
 		}
+		debug(`method: ${req.method}`);
 		switch (req.method) {
 			case 'POST':
-				switch (req.path) {
+				switch (req.baseUrl) {
 					case '/client':
 						return await matchClientCreatorRole(db, key);
 					case '/measurement':
+						if (!req.body['data'] || !req.body['data']['source']) {
+							return false;
+						}
 						return await matchDataExporterRole(db, models,
-										key, req.body['source']);
-					break;
+										key, req.body['data']['source']);
 					default:
 						return false;
 				}
@@ -163,6 +167,7 @@ export const authMethods: AuthMethod[] = [
     },
         // USER AUTHENTICATION
     (req: Request, auth: BinaryLike) => async (db: Session, models: allModels) => {
+		debug("User auth");
         const id = await getRemoteId(auth);
         if (!id) {
             return false;
@@ -176,12 +181,14 @@ export const authMethods: AuthMethod[] = [
         if (!user) {
             return false;
         }
-		debug("Base url: ", req.baseUrl);
+	info(`Authenticated as user identity with id '${id}'`);
+		debug(`Base url: ${req.baseUrl}`);
 		switch (req.method) {
 			case 'GET':
+				debug(req.params);
 				switch (req.baseUrl) {
 					case '/client':
-						return matchClientReaderRole(db, models,
+						return await matchClientReaderRole(db, models,
 									user, req.params.clientId);
 					break;
 					default:
