@@ -1,7 +1,7 @@
 import dotenv from 'dotenv';
 dotenv.config();
 
-import express from 'express';
+import express, { Application, Request, Response } from 'express';
 import cors from 'cors';
 import { database, Database } from './lib/db';
 import api, { CreateMeasurementArgs } from './lib/interface';
@@ -11,15 +11,14 @@ import { auth } from './lib/auth';
 //import logs from './lib/logging';
 
 
-const app = express()
+const app: Application = express()
 const db: Database = database()
-
-app.use(express.json())
+app.use(express.json)
 app.use(cors())
 app.use(accept())
 app.use(auth(db))
 
-app.post('/client', async (req, res) => {
+app.post('/client', async (req: Request, res: Response) => {
     const data = req.body
     if (!data['id']) {
         res.status(400).send({
@@ -41,13 +40,13 @@ app.post('/client', async (req, res) => {
     }
 });
 
-app.get('/client/:clientId', async (req, res) => {
+app.get('/client/:clientId', async (req: Request, res: Response) => {
     res.status(200).send({
         id: req.params.clientId
     });
 });
 
-app.post('/measurement', async (req, res) => {
+app.post('/measurement', async (req: Request, res: Response) => {
     const data = req.body
     if (!data['clientID'] 
                 || !data['data']
