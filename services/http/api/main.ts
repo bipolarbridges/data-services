@@ -3,7 +3,7 @@ dotenv.config();
 
 import express from 'express';
 import cors from 'cors';
-import {database, Database} from './lib/db';
+import { database, Database } from './lib/db';
 import api, { CreateMeasurementArgs } from './lib/interface';
 import accept from './lib/requests';
 import { handle } from './lib/errors';
