@@ -1,83 +1,80 @@
-import { InternalError } from '../errors';
 import { Neogma } from 'neogma';
-import { debug } from '../logging'
-import { initAllModels } from '../models/initializers';
 import { DatabaseResponse } from 'lib/auth/auth_methods';
 import { Parameters } from 'neo4j-driver/types/query-runner';
 import { Driver, Result, Session } from 'neo4j-driver';
 import { TransactionConfig } from 'neo4j-driver-core';
-import { allModels } from 'lib/models';
+import { AllModels } from 'lib/models';
+import { debug } from '../logging';
+import { initAllModels } from '../models/initializers';
+import { InternalError } from '../errors';
 
 class DatabaseError extends InternalError {
-    constructor(error: string) {
-        super(error);
-    }
+  constructor(error: string) {
+    super(error);
+  }
 }
 
 export class Database {
-    driver: Driver | null;
-    initialized: boolean;
-    neogma: Neogma;
-    models: allModels;
+  driver: Driver | null;
 
-    constructor () {
-        this.driver = null;
-        this.neogma = null;
-        this.initialized = false;
-    }
+  initialized: boolean;
 
-    init (): void {
-        this.neogma = new Neogma(
-            {
-                // use your connection details
-                url: `bolt://${process.env['DB_ADDR']}:7687`,
-                username: 'neo4j',
-                password: 'password',
-            },
-            {
-                logger: debug,
-            },
-        );
-        this.models = initAllModels(this.neogma);
-        this.driver = this.neogma.driver;
-        this.initialized = true;
-    }
+  neogma: Neogma;
 
-    async exec (proc: (session: Session, all: allModels) => DatabaseResponse): Promise<boolean | null> {
-        const session: Session = this.driver.session();
-        try {
-            const ret = await proc(session, this.models);
-            return ret
-        } catch (e) {
-            if (e instanceof InternalError) {
-                throw e;
-            } else {
-                throw new DatabaseError(e);
-            }
-        } finally {
-            await session.close();
-        }
-    }
+  models: AllModels;
 
-    run (query: string, parameters?: Parameters, config?: TransactionConfig): Result {
-        const session: Session = this.driver.session();
-        return session.run(query, parameters, config);
-    }
+  constructor() {
+    this.driver = null;
+    this.neogma = null;
+    this.initialized = false;
+  }
 
-    async stop (): Promise<void> {
-        await this.driver.close();
+  init(): void {
+    this.neogma = new Neogma(
+      {
+        // use your connection details
+        url: `bolt://${process.env.DB_ADDR}:7687`,
+        username: 'neo4j',
+        password: 'password',
+      },
+      {
+        logger: debug,
+      },
+    );
+    this.models = initAllModels(this.neogma);
+    this.driver = this.neogma.driver;
+    this.initialized = true;
+  }
+
+  async exec(proc: (session: Session, all: AllModels) => DatabaseResponse)
+  : Promise<boolean | null> {
+    const session: Session = this.driver.session();
+    try {
+      const ret = await proc(session, this.models);
+      return ret;
+    } catch (e) {
+      if (e instanceof InternalError) {
+        throw e;
+      } else {
+        throw new DatabaseError(e);
+      }
+    } finally {
+      await session.close();
     }
+  }
+
+  run(query: string, parameters?: Parameters, config?: TransactionConfig): Result {
+    const session: Session = this.driver.session();
+    return session.run(query, parameters, config);
+  }
+
+  async stop(): Promise<void> {
+    await this.driver.close();
+  }
 }
 
 export function database(): Database {
-    const db = new Database();
-    db.init();
-    return db
+  const db = new Database();
+  db.init();
+  return db;
 }
-
-/*
-Type 
-'import("/home/kaede/Documents/polarus/data-services/services/http/api/node_modules/neogma/node_modules/neo4j-driver/types/driver").Driver' 
-is not assignable to type 
-'import("/home/kaede/Documents/polarus/data-services/services/http/api/node_modules/neo4j-driver/types/driver").Driver'.
-*/
