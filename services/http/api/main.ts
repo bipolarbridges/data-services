@@ -1,6 +1,6 @@
 import dotenv from 'dotenv';
 
-import express from 'express';
+import express, { Application, Request, Response } from 'express';
 import cors from 'cors';
 import { database, Database } from './lib/db';
 import api, { CreateMeasurementArgs } from './lib/interface';
@@ -9,20 +9,19 @@ import { handle } from './lib/errors';
 import auth from './lib/auth';
 dotenv.config();
 
-const app = express();
+const app: Application = express();
 const db: Database = database();
-
-app.use(express.json());
+app.use(express.json);
 app.use(cors());
 app.use(accept());
 
-app.get('/', (req, res) => res.status(200).end());
+app.get('/', (req: Request, res: Response) => res.status(200).end());
 
 app.use(auth(db));
 
 const clientRouter = express.Router();
 clientRouter.route('/')
-  .post(async (req, res) => {
+  .post(async (req: Request, res: Response) => {
     const data = req.body;
     if (!data.id) {
       res.status(400).send({
@@ -51,7 +50,7 @@ clientRouter.route('/')
   });
 
 clientRouter.route('/:clientId')
-  .get(async (req, res) => {
+  .get(async (req: Request, res: Response) => {
     res.status(200).send({
       id: req.params.clientId,
     });
@@ -71,7 +70,7 @@ interface MeasurementBody {
 const measurementRouter = express.Router();
 
 measurementRouter.route('/')
-  .post(async (req, res) => {
+  .post(async (req: Request, res: Response) => {
     const { clientID, data }: Partial<MeasurementBody> = req.body;
     if (!data) {
       res.status(400).send({

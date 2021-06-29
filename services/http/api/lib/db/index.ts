@@ -34,8 +34,8 @@ export class Database {
       {
         // use your connection details
         url: `bolt://${process.env.DB_ADDR}:7687`,
-        username: 'neo4j',
-        password: 'password',
+        username: process.env.DB_USER,
+        password: process.env.DB_PASS,
       },
       {
         logger: debug,
