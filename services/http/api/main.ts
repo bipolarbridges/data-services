@@ -1,5 +1,4 @@
 import dotenv from 'dotenv';
-
 import express, { Application, Request, Response } from 'express';
 import cors from 'cors';
 import { database, Database } from './lib/db';
@@ -7,6 +6,7 @@ import api, { CreateMeasurementArgs } from './lib/interface';
 import accept from './lib/requests';
 import { handle } from './lib/errors';
 import auth from './lib/auth';
+
 dotenv.config();
 
 const app: Application = express();

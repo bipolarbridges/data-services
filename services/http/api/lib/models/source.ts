@@ -4,7 +4,7 @@ export type SourceProperties = {
   name: string
 };
 
-export type SourceRelatedNodes = { };
+export type SourceRelatedNodes = unknown;
 
 export type SourceInstance = NeogmaInstance<SourceProperties, SourceRelatedNodes>;
 

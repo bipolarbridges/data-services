@@ -4,7 +4,7 @@ export type HourProperties = {
   hour: number
 };
 
-export type HourRelatedNodes = { };
+export type HourRelatedNodes = unknown;
 
 export type HourInstance = NeogmaInstance<HourProperties, HourRelatedNodes>;
 
@@ -18,7 +18,7 @@ export type TimestampProperties = {
   time: number
 };
 
-export type TimestampRelatedNodes = { };
+export type TimestampRelatedNodes = unknown;
 
 export type TimestampInstance = NeogmaInstance<TimestampProperties, TimestampRelatedNodes>;
 
@@ -31,7 +31,7 @@ export type DayProperties = {
   day: number
 };
 
-export type DayRelatedNodes = { };
+export type DayRelatedNodes = unknown;
 
 export type DayInstance = NeogmaInstance<DayProperties, DayRelatedNodes>;
 
@@ -45,7 +45,7 @@ export type MonthProperties = {
 };
 
 export type MonthRelatedNodes = {
-  Day: ModelRelatedNodesI<DayModel, DayInstance>;
+  Day: ModelRelatedNodesI<DayModel, DayInstance>,
 };
 
 export type MonthInstance = NeogmaInstance<MonthProperties, MonthRelatedNodes>;
@@ -59,7 +59,7 @@ export type YearProperties = {
   year: number
 };
 
-export type YearRelatedNodes = { };
+export type YearRelatedNodes = unknown;
 
 export type YearInstance = NeogmaInstance<YearProperties, YearRelatedNodes>;
 

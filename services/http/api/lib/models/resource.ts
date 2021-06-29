@@ -4,8 +4,7 @@ export type ResourceProperties = {
   path: string
 };
 
-export type ResourceRelatedNodes = {
-};
+export type ResourceRelatedNodes = unknown;
 
 export type ResourceInstance = NeogmaInstance<ResourceProperties, ResourceRelatedNodes>;
 
