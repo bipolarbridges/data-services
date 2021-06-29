@@ -1,4 +1,4 @@
-import { Session } from 'neo4j-driver';
+import { Session } from 'neogma/node_modules/neo4j-driver';
 import { AllModels } from 'lib/models';
 import {
   DayProperties, HourProperties, TimestampProperties, YearProperties,
@@ -205,7 +205,7 @@ function transformDate(input: number) {
   const month = date.getMonth();
   const day = date.getDate();
   const time = date.getTime();
-  const hour = date.getHours(); // 3600 * date.getHours() + 60 * date.getMinutes() + date.getSeconds();
+  const hour = date.getHours();
 
   return {
     year,

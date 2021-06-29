@@ -296,7 +296,8 @@ export function initAllModels(db: Neogma): AllModels {
   const yearModel = initYearModel(db);
   const timestampModel = initTimestampModel(db);
 
-  const measurementModel = initMeasurementModel(db, hourModel, dayModel, monthModel, yearModel, timestampModel);
+  const measurementModel = initMeasurementModel(db, hourModel, dayModel, monthModel,
+    yearModel, timestampModel);
   const measurementTypeModel = initMeasurementTypeModel(db, measurementModel);
   const sourceModel = initSourceModel(db, measurementTypeModel);
   const userModel = initUserModel(db, measurementModel, resourceModel);

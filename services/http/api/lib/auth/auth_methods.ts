@@ -9,7 +9,7 @@ import { Session } from 'neo4j-driver';
 import { InternalError } from '../errors';
 import { info } from '../logging';
 
-const __dirname = path.resolve();
+const DIR_NAME = path.resolve();
 
 class AuthError extends InternalError {
   constructor(error: string) {
@@ -30,7 +30,7 @@ type Configuration = {
   }
 };
 
-const configFile: Configuration = JSON.parse(readFileSync(join(__dirname, 'lib/auth', 'config.json'), 'utf8'));
+const configFile: Configuration = JSON.parse(readFileSync(join(DIR_NAME, 'lib/auth', 'config.json'), 'utf8'));
 const config = configFile.auth_server;
 info('Config: ', config);
 
