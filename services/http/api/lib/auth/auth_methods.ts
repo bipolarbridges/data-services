@@ -5,7 +5,7 @@ import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
 
 // import {Database} from '../db';
 import { Request } from 'express';
-import { Session } from 'neo4j-driver';
+import { Session } from 'neogma/node_modules/neo4j-driver';
 import { InternalError } from '../errors';
 import { info } from '../logging';
 
