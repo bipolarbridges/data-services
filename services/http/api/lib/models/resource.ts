@@ -1,8 +1,4 @@
-import {
-// ModelRelatedNodesI,
-  NeogmaInstance, NeogmaModel,
-} from 'neogma';
-// import { UserInstance, UserModel } from './user';
+import { NeogmaInstance, NeogmaModel } from 'neogma';
 
 export type ResourceProperties = {
   path: string

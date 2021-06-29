@@ -223,7 +223,6 @@ export function initMeasurementTypeModel(db: Neogma, valueModel: measurement.Mea
 }
 
 export function initUserModel(db: Neogma,
-  // measurementModel: measurement.MeasurementModel,
   resourceModel: resource.ResourceModel)
   : user.UserModel {
   return ModelFactory<user.UserProperties, user.UserRelatedNodes>(
@@ -236,11 +235,6 @@ export function initUserModel(db: Neogma,
         },
       },
       relationships: {
-        // Measurement: {
-        //   model: measurementModel,
-        //   direction: 'out',
-        //   name: 'Recorded',
-        // },
         Resource: {
           model: resourceModel,
           direction: 'out',
@@ -289,7 +283,6 @@ export function initAllModels(db: Neogma): AllModels {
   const resourceModel = initResourceModel(db);
   const identityModel = initIdentityModel(db, resourceModel);
 
-  // const date = initDateModel(db);
   const hourModel = initHourModel(db);
   const dayModel = initDayModel(db);
   const monthModel = initMonthModel(db, dayModel);
@@ -300,9 +293,7 @@ export function initAllModels(db: Neogma): AllModels {
     yearModel, timestampModel);
   const measurementTypeModel = initMeasurementTypeModel(db, measurementModel);
   const sourceModel = initSourceModel(db, measurementTypeModel);
-  const userModel = initUserModel(db,
-    // measurementModel,
-    resourceModel);
+  const userModel = initUserModel(db, resourceModel);
 
   measurementTypeModel.addRelationships(
     {

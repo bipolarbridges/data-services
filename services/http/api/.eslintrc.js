@@ -7,8 +7,7 @@ module.exports = {
         "airbnb-typescript/base",
         "plugin:@typescript-eslint/recommended"
     ],
-    //"parser": "@typescript-eslint/parser",
-     "parserOptions": {
+    "parserOptions": {
         "ecmaVersion": 12,
         "sourceType": "module",
         "project": ["./tsconfig.json", "./tests/mocks/auth_server/tsconfig.json"]

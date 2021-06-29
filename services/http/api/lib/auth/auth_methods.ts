@@ -2,8 +2,6 @@ import { readFileSync } from 'fs';
 import path, { join } from 'path';
 import { BinaryLike, createHash } from 'crypto';
 import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
-
-// import {Database} from '../db';
 import { Request } from 'express';
 import { Session } from 'neogma/node_modules/neo4j-driver';
 import { InternalError } from '../errors';

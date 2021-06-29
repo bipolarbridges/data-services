@@ -7,9 +7,7 @@ import api, { CreateMeasurementArgs } from './lib/interface';
 import accept from './lib/requests';
 import { handle } from './lib/errors';
 import auth from './lib/auth';
-
 dotenv.config();
-// import logs from './lib/logging';
 
 const app = express();
 const db: Database = database();
