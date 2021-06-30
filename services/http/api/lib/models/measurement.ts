@@ -47,7 +47,6 @@ export type MeasurementRelatedNodes = {
   Month: ModelRelatedNodesI<MonthModel, MonthInstance>,
   Year: ModelRelatedNodesI<YearModel, YearInstance>,
   Timestamp: ModelRelatedNodesI<TimestampModel, TimestampInstance>,
-  MeasurementType: ModelRelatedNodesI<MeasurementTypeModel, MeasurementTypeInstance>,
 };
 
 export type MeasurementInstance = NeogmaInstance<MeasurementProperties, MeasurementRelatedNodes>;
