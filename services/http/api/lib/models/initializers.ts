@@ -155,7 +155,8 @@ export function initYearModel(db: Neogma): time.YearModel {
 
 export function initMeasurementModel(db: Neogma,
   hourModel: time.HourModel, dayModel: time.DayModel, monthModel: time.MonthModel,
-  yearModel: time.YearModel, timestampModel: time.TimestampModel, userModel: user.UserModel): measurement.MeasurementModel {
+  yearModel: time.YearModel, timestampModel: time.TimestampModel, userModel: user.UserModel)
+  : measurement.MeasurementModel {
   return ModelFactory<measurement.MeasurementProperties, measurement.MeasurementRelatedNodes>(
     {
       label: 'Measurement',
@@ -202,8 +203,9 @@ export function initMeasurementModel(db: Neogma,
   );
 }
 
-export function initMeasurementTypeModel(db: Neogma, valueModel: measurement.MeasurementModel, sourceModel: source.SourceModel)
-  : measurement.MeasurementTypeModel {
+export function initMeasurementTypeModel(db: Neogma,
+  valueModel: measurement.MeasurementModel,
+  sourceModel: source.SourceModel): measurement.MeasurementTypeModel {
   return ModelFactory<measurement.MeasurementTypeProperties,
   measurement.MeasurementTypeRelatedNodesI>(
     {
@@ -219,7 +221,7 @@ export function initMeasurementTypeModel(db: Neogma, valueModel: measurement.Mea
           model: valueModel,
           direction: 'out',
           name: 'Includes',
-        }, 
+        },
         Source: {
           model: sourceModel,
           direction: 'in',
