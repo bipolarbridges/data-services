@@ -1,8 +1,8 @@
 import { Neogma } from 'neogma';
 import { DatabaseResponse } from 'lib/auth/auth_methods';
-import { Parameters } from 'neogma/node_modules/neo4j-driver/types/query-runner';
-import { Driver, Result, Session } from 'neogma/node_modules/neo4j-driver';
-import { TransactionConfig } from 'neogma/node_modules/neo4j-driver-core';
+import { Parameters } from 'neo4j-driver/types/query-runner';
+import { Driver, Result, Session } from 'neo4j-driver';
+import { TransactionConfig } from 'neo4j-driver-core';
 import { AllModels } from 'lib/models';
 import { debug } from '../logging';
 import { initAllModels } from '../models/initializers';

@@ -5,6 +5,7 @@ import axios, {
   AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse,
 } from 'axios';
 import { fail } from 'assert';
+import * as logs from '../lib/logging';
 
 const ax = axios.create({
   baseURL: 'http://127.0.0.1:8888',
@@ -32,8 +33,8 @@ function spec(method: string, path: string) {
 
 function match(method: string, path: string, body: unknown, opts: AxiosRequestConfig, status: number, desc = 'Unspecified') {
   describe(`${method} ${path} [ ${status}: ${desc} ]`, () => {
-    const fn = methods[method];
-    if (!fn) {
+    const fnc = methods[method];
+    if (!fnc) {
       console.log(`WARNING: invalid method specified ${method}`);
     } else {
       it('Should match API spec', async () => methods[method](`${path}`, body, opts)
@@ -337,7 +338,6 @@ describe('Paths', () => {
           expect(res.status).toEqual(400);
         })));
       });
-
     it('Should respond properly upon success', async () => {
       await ax.post('/measurement', validExampleData, {
         headers: {
@@ -352,7 +352,6 @@ describe('Paths', () => {
         fail();
       });
     });
-
     it('Should reject if client does not exist', async () => {
       await ax.post('/measurement', {
         clientID: 'doesnotexist@email.com',
@@ -366,7 +365,7 @@ describe('Paths', () => {
         fail('Should have rejected');
       }).catch((err) => {
         if (!err.response) {
-          console.log(err);
+          logs.error(err);
           fail();
         }
         const res = err.response;

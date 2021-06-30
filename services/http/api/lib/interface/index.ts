@@ -1,4 +1,4 @@
-import { Session } from 'neogma/node_modules/neo4j-driver';
+import { Session } from 'neo4j-driver';
 import { AllModels } from 'lib/models';
 import {
   DayProperties, HourProperties, TimestampProperties, YearProperties,

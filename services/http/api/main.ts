@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-globals */
 import dotenv from 'dotenv';
 import express, { Application, Request, Response } from 'express';
 import cors from 'cors';
@@ -11,7 +12,7 @@ dotenv.config();
 
 const app: Application = express();
 const db: Database = database();
-app.use(express.json);
+app.use(express.json());
 app.use(cors());
 app.use(accept());
 
