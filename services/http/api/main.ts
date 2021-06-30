@@ -51,7 +51,7 @@ clientRouter.route('/')
   });
 
 clientRouter.route('/:clientId')
-  .get(async (req: Request, res: Response) => {
+  .get((req: Request, res: Response) => {
     res.status(200).send({
       id: req.params.clientId,
     });
