@@ -3,8 +3,15 @@ import { DatabaseResponse } from 'lib/auth/auth_methods';
 import { Parameters } from 'neo4j-driver/types/query-runner';
 import { Driver, Result, Session } from 'neo4j-driver';
 import { TransactionConfig } from 'neo4j-driver-core';
-import { AllModels } from 'lib/models';
-import { initAllModels } from '../models/initializers';
+import {
+  identity,
+  measurement,
+  resource,
+  source,
+  time,
+  user,
+  AllModels,
+} from '../models';
 import { debug } from '../logging';
 import { InternalError } from '../errors';
 
@@ -41,7 +48,7 @@ export class Database {
         logger: debug,
       },
     );
-    this.models = initAllModels(this.neogma);
+    this.initAllModels(this.neogma);
     this.driver = this.neogma.driver;
     this.initialized = true;
   }
@@ -70,6 +77,54 @@ export class Database {
 
   async stop(): Promise<void> {
     await this.driver.close();
+  }
+
+  initAllModels(db: Neogma): void {
+    const resourceModel = resource.initResourceModel(db);
+    const identityModel = identity.initIdentityModel(db, resourceModel);
+    const userModel = user.initUserModel(db, resourceModel);
+
+    const hourModel = time.initHourModel(db);
+    const dayModel = time.initDayModel(db);
+    const monthModel = time.initMonthModel(db, dayModel);
+    const yearModel = time.initYearModel(db);
+    const timestampModel = time.initTimestampModel(db);
+    const sourceModel = source.initSourceModel(db);
+
+    const measurementModel = measurement.initMeasurementModel(db,
+      hourModel,
+      dayModel,
+      monthModel,
+      yearModel,
+      timestampModel,
+      userModel);
+    const measurementTypeModel = measurement.initMeasurementTypeModel(db,
+      measurementModel,
+      sourceModel);
+
+    measurementModel.addRelationships(
+      {
+        MeasurementType: {
+          model: measurementTypeModel,
+          direction: 'in',
+          name: 'Includes',
+        },
+      },
+    );
+
+    this.models = {
+      source: sourceModel,
+      resource: resourceModel,
+      measurementType: measurementTypeModel,
+      identity: identityModel,
+      user: userModel,
+      measurement: measurementModel,
+      hour: hourModel,
+      day: dayModel,
+      month: monthModel,
+      year: yearModel,
+      timestamp: timestampModel,
+    };
   }
 }
 

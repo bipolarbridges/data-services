@@ -1,5 +1,7 @@
 /* eslint-disable import/no-cycle */
-import { ModelRelatedNodesI, NeogmaInstance, NeogmaModel } from 'neogma';
+import {
+  ModelFactory, ModelRelatedNodesI, Neogma, NeogmaInstance, NeogmaModel,
+} from 'neogma';
 import {
   DayInstance, DayModel,
   HourInstance, HourModel,
@@ -10,6 +12,9 @@ import {
 import { SourceInstance, SourceModel } from './source';
 import { UserInstance, UserModel } from './user';
 
+/**
+ * MeasurementType
+ */
 export type MeasurementTypeProperties = {
   name: string,
 };
@@ -25,8 +30,38 @@ NeogmaInstance<MeasurementTypeProperties, MeasurementTypeRelatedNodesI>;
 export type MeasurementTypeModel =
 NeogmaModel<MeasurementTypeProperties, MeasurementTypeRelatedNodesI>;
 
-// -------------------------------------------------------------------------------------------------
+export function initMeasurementTypeModel(db: Neogma,
+  valueModel: MeasurementModel, sourceModel: SourceModel): MeasurementTypeModel {
+  return ModelFactory<MeasurementTypeProperties, MeasurementTypeRelatedNodesI>(
+    {
+      label: 'MeasurementType',
+      schema: {
+        name: {
+          type: 'string',
+          required: true,
+        },
+      },
+      relationships: {
+        Measurement: {
+          model: valueModel,
+          direction: 'out',
+          name: 'Includes',
+        },
+        Source: {
+          model: sourceModel,
+          direction: 'in',
+          name: 'Includes',
+        },
+      },
+      primaryKeyField: 'name',
+    },
+    db,
+  );
+}
 
+/**
+ * Measurement
+ */
 export type MeasurementProperties = {
   value: number,
 };
@@ -44,3 +79,53 @@ export type MeasurementRelatedNodes = {
 export type MeasurementInstance = NeogmaInstance<MeasurementProperties, MeasurementRelatedNodes>;
 
 export type MeasurementModel = NeogmaModel<MeasurementProperties, MeasurementRelatedNodes>;
+
+export function initMeasurementModel(db: Neogma,
+  hourModel: HourModel, dayModel: DayModel, monthModel: MonthModel,
+  yearModel: YearModel, timestampModel: TimestampModel,
+  userModel: UserModel): MeasurementModel {
+  return ModelFactory<MeasurementProperties, MeasurementRelatedNodes>(
+    {
+      label: 'Measurement',
+      schema: {
+        value: {
+          type: 'number',
+          required: true,
+        },
+      },
+      relationships: {
+        Hour: {
+          model: hourModel,
+          direction: 'out',
+          name: 'RecordedAt',
+        },
+        Day: {
+          model: dayModel,
+          direction: 'out',
+          name: 'RecordedOn',
+        },
+        Month: {
+          model: monthModel,
+          direction: 'out',
+          name: 'RecordedOn',
+        },
+        Year: {
+          model: yearModel,
+          direction: 'out',
+          name: 'RecordedOn',
+        },
+        Timestamp: {
+          model: timestampModel,
+          direction: 'out',
+          name: 'RecordedAt',
+        },
+        User: {
+          model: userModel,
+          direction: 'in',
+          name: 'Recorded',
+        },
+      },
+    },
+    db,
+  );
+}

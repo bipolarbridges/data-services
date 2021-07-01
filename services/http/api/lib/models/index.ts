@@ -6,7 +6,6 @@ import * as source from './source';
 import * as time from './time';
 
 type AllModels = {
-  // date: date.DateModel,
   identity: identity.IdentityModel,
   measurementType: measurement.MeasurementTypeModel,
   resource: resource.ResourceModel,

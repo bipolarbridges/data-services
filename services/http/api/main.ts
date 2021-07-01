@@ -9,7 +9,6 @@ import { handle } from './lib/errors';
 import auth from './lib/auth';
 
 dotenv.config();
-// import logs from './lib/logging';
 
 const app = express();
 const db: Database = database();

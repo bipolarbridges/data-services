@@ -36,6 +36,6 @@ Models are added by using Neogma's typed ModelFactory function. To make a new mo
 2. Define the properties, the related node type (with ModelRelatedNodesI type), then define the instance & neogma model by using `NeogmaInstance` and `NeogmaModel` type. 
     > Note that in order for Neogma to recognize the model, the property declared in the ModelRelatedNodeI type has to match the model's label.
 3. Add it to the `models/index.ts` file and add the model to the `AllModels` type.
-4. Define a init**ModelName**Model function that returns the Neogma ModelFactory value. Include the db as it requires a valid session when creating the model, and add any dependencies (models that it has relations to) as a parameter.
+4. Define a init**ModelName**Model function in the **ModelName**.ts file that returns the Neogma ModelFactory value. Include the db as it requires a valid session when creating the model, and add any dependencies (models that it has relations to) as a parameter.
     > If you have a circular dependency issue (2 models rely on each other to initilialize) use the `.addRelationship({...})` method.
-5. Use the init**ModelName**Model in the initAllModels function. Add it to the return value. 
+5. Use the init**ModelName**Model in the initAllModels function. Add it to the `this.models = {...}` value. 
