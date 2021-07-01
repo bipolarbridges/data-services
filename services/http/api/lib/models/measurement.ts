@@ -1,3 +1,4 @@
+/* eslint-disable import/no-cycle */
 import { ModelRelatedNodesI, NeogmaInstance, NeogmaModel } from 'neogma';
 import {
   DayInstance, DayModel,
