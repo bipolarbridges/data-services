@@ -3,7 +3,7 @@ import { DatabaseResponse } from 'lib/auth/auth_methods';
 import { Parameters } from 'neo4j-driver/types/query-runner';
 import { Driver, Result, Session } from 'neo4j-driver';
 import { TransactionConfig } from 'neo4j-driver-core';
-import { allModels } from 'lib/models';
+import { AllModels } from 'lib/models';
 import { initAllModels } from '../models/initializers';
 import { debug } from '../logging';
 import { InternalError } from '../errors';
@@ -21,7 +21,7 @@ export class Database {
 
   neogma: Neogma;
 
-  models: allModels;
+  models: AllModels;
 
   constructor() {
     this.driver = null;
@@ -46,7 +46,8 @@ export class Database {
     this.initialized = true;
   }
 
-  async exec(proc: (session: Session, all: allModels) => DatabaseResponse): Promise<boolean | null> {
+  async exec(proc: (session: Session, all: AllModels) => DatabaseResponse)
+    : Promise<boolean | null> {
     const session: Session = this.driver.session();
     try {
       const ret = await proc(session, this.models);

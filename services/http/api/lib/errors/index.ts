@@ -2,8 +2,8 @@ import { Response } from 'express';
 import { error } from '../logging';
 
 export class InternalError extends Error {
-  constructor(error: string) {
-    super(error);
+  constructor(err: string) {
+    super(err);
   }
 }
 

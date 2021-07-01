@@ -5,7 +5,7 @@ import * as identity from './identity';
 import * as source from './source';
 import * as time from './time';
 
-type allModels = {
+type AllModels = {
   // date: date.DateModel,
   identity: identity.IdentityModel,
   measurementType: measurement.MeasurementTypeModel,
@@ -27,5 +27,5 @@ export {
   identity,
   source,
   time,
-  allModels,
+  AllModels,
 };

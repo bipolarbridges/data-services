@@ -9,6 +9,7 @@ import { Session } from 'neo4j-driver';
 import { InternalError } from '../errors';
 import { info } from '../logging';
 
+/* eslint-disable @typescript-eslint/naming-convention */
 const __dirname = path.resolve();
 
 class AuthError extends InternalError {
@@ -46,7 +47,7 @@ async function getRemoteId(token: BinaryLike) {
         'Content-Type': 'application/json',
       },
     });
-    if (res.status != 200) {
+    if (res.status !== 200) {
       throw new Error('Wrong status code response from remote auth');
     } else if (!res.data.result) {
       return null;

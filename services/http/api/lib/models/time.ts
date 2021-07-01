@@ -1,14 +1,12 @@
 // import { Integer, Time } from "neo4j-driver";
 import { ModelRelatedNodesI, NeogmaInstance, NeogmaModel } from 'neogma';
-import { MeasurementInstance, MeasurementModel } from './measurement';
+// import { MeasurementInstance, MeasurementModel } from './measurement';
 
 export type HourProperties = {
   hour: number
 };
 
-export type HourRelatedNodes = {
-  measurement: ModelRelatedNodesI<MeasurementModel, MeasurementInstance>
-};
+export type HourRelatedNodes = unknown;
 
 export type HourInstance = NeogmaInstance<HourProperties, HourRelatedNodes>;
 
@@ -20,9 +18,7 @@ export type TimestampProperties = {
   time: number
 };
 
-export type TimestampRelatedNodes = {
-  Measurement: ModelRelatedNodesI<MeasurementModel, MeasurementInstance>
-};
+export type TimestampRelatedNodes = unknown;
 
 export type TimestampInstance = NeogmaInstance<TimestampProperties, TimestampRelatedNodes>;
 
@@ -34,9 +30,7 @@ export type DayProperties = {
   day: number
 };
 
-export type DayRelatedNodes = {
-  Measurement: ModelRelatedNodesI<MeasurementModel, MeasurementInstance>
-};
+export type DayRelatedNodes = unknown;
 
 export type DayInstance = NeogmaInstance<DayProperties, DayRelatedNodes>;
 
@@ -49,8 +43,7 @@ export type MonthProperties = {
 };
 
 export type MonthRelatedNodes = {
-  Measurement: ModelRelatedNodesI<MeasurementModel, MeasurementInstance>;
-  Day: ModelRelatedNodesI<DayModel, DayInstance>;
+  Day: ModelRelatedNodesI<DayModel, DayInstance>,
 };
 
 export type MonthInstance = NeogmaInstance<MonthProperties, MonthRelatedNodes>;
@@ -63,9 +56,7 @@ export type YearProperties = {
   year: number
 };
 
-export type YearRelatedNodes = {
-  Measurement: ModelRelatedNodesI<MeasurementModel, MeasurementInstance>
-};
+export type YearRelatedNodes = unknown;
 
 export type YearInstance = NeogmaInstance<YearProperties, YearRelatedNodes>;
 

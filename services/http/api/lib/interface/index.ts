@@ -1,5 +1,5 @@
 import { Session } from 'neo4j-driver';
-import { allModels } from 'lib/models';
+import { AllModels } from 'lib/models';
 import {
   DayProperties, HourProperties, TimestampProperties, YearProperties,
 } from 'lib/models/time';
@@ -9,7 +9,7 @@ import { SourceProperties } from 'lib/models/source';
 import * as loggers from '../logging';
 
 function userExists(id: string) {
-  return async (session: Session, models: allModels): Promise<boolean> => {
+  return async (session: Session, models: AllModels): Promise<boolean> => {
     try {
       const user = await models.user.findOne({
         where: {
@@ -28,7 +28,7 @@ function userExists(id: string) {
 }
 
 function createUser(id: string) {
-  return async (session: Session, models: allModels): Promise<null> => {
+  return async (session: Session, models: AllModels): Promise<null> => {
     try {
       await models.user.createOne(
         {
@@ -66,67 +66,73 @@ export type CreateMeasurementArgs = {
   date: number,
 };
 
-type mergeConfig = {
+type MergeConfig = {
   nodes: boolean,
   relationship: boolean,
 };
 
-type mergeProperties = {
+type MergeProperties = {
   Hour: {
-    propertiesMergeConfig: mergeConfig,
+    propertiesMergeConfig: MergeConfig,
     properties: HourProperties[]
   },
-  Day: dayMergeProperties,
-  Month: monthMergeProperties,
+  Day: DayMergeProperties,
+  Month: MonthMergeProperties,
   Year: {
-    propertiesMergeConfig: mergeConfig,
+    propertiesMergeConfig: MergeConfig,
     properties: YearProperties[]
   },
   Timestamp: {
-    propertiesMergeConfig: mergeConfig,
+    propertiesMergeConfig: MergeConfig,
     properties: TimestampProperties[]
   },
-  User?: userMergeProperties,
+  User?: UserMergeProperties,
   MeasurementType?: {
-    propertiesMergeConfig: mergeConfig,
-    properties: combinedTypeSource[]
+    propertiesMergeConfig: MergeConfig,
+    properties: CombinedTypeSource[]
   }
 };
 
-type userMergeProperties = {
-  propertiesMergeConfig: mergeConfig,
+type UserMergeProperties = {
+  propertiesMergeConfig: MergeConfig,
   properties: UserProperties[]
 };
 
-type measurementTypeMergeProperties = {
-  propertiesMergeConfig: mergeConfig,
-  properties: combinedTypeSource[],
+type MeasurementTypeMergeProperties = {
+  propertiesMergeConfig: MergeConfig,
+  properties: CombinedTypeSource[],
 };
 
-type dayMergeProperties = {
-  propertiesMergeConfig: mergeConfig,
+type DayMergeProperties = {
+  propertiesMergeConfig: MergeConfig,
   properties: DayProperties[]
 };
 
-type monthMergeProperties = {
-  propertiesMergeConfig: mergeConfig,
+type MonthMergeProperties = {
+  propertiesMergeConfig: MergeConfig,
   properties: {
     month: number,
-    Day?: dayMergeProperties
+    Day?: DayMergeProperties
   }[]
 };
 
-type sourceMergeProperties = {
-  propertiesMergeConfig: mergeConfig,
+type SourceMergeProperties = {
+  propertiesMergeConfig: MergeConfig,
   properties: SourceProperties[],
 };
 
-type combinedTypeSource = MeasurementTypeProperties & { Source: sourceMergeProperties };
+type CombinedTypeSource = MeasurementTypeProperties & { Source: SourceMergeProperties };
 
-export type mergedMeasurement = MeasurementProperties & mergeProperties;
+export type MergedMeasurement = MeasurementProperties & MergeProperties;
 
-export function makeMeasurementProperties(value: number, hour: number, day: number, month: number,
-  year: number, time: number, User?: userMergeProperties, MeasurementType?: measurementTypeMergeProperties): mergedMeasurement {
+export function makeMeasurementProperties(value: number,
+  hour: number,
+  day: number,
+  month: number,
+  year: number,
+  time: number,
+  User?: UserMergeProperties,
+  MeasurementType?: MeasurementTypeMergeProperties): MergedMeasurement {
   return {
     value,
     Hour: {
@@ -191,8 +197,31 @@ export function makeMeasurementProperties(value: number, hour: number, day: numb
   };
 }
 
+// Takes in a second number input, converts it to milliseconds
+// and returns
+// - the year
+// - the month (0-11)
+// - the day of the month (1-31)
+// - the time in milliseconds
+function transformDate(input: number) {
+  const date = new Date(input * 1000);
+  const year = date.getFullYear();
+  const month = date.getMonth();
+  const day = date.getDate();
+  const time = date.getTime();
+  const hour = date.getHours();
+
+  return {
+    year,
+    month,
+    day,
+    hour,
+    time,
+  };
+}
+
 function createMeasurement(m: CreateMeasurementArgs) {
-  return async (session: Session, models: allModels): Promise<boolean> => {
+  return async (session: Session, models: AllModels): Promise<boolean> => {
     try {
       const {
         year, month, day, hour, time,
@@ -247,29 +276,6 @@ function createMeasurement(m: CreateMeasurementArgs) {
       loggers.error(err?.data?.errors);
       return false;
     }
-  };
-}
-
-// Takes in a second number input, converts it to milliseconds
-// and returns
-// - the year
-// - the month (0-11)
-// - the day of the month (1-31)
-// - the time in milliseconds
-function transformDate(input: number) {
-  const date = new Date(input * 1000);
-  const year = date.getFullYear();
-  const month = date.getMonth();
-  const day = date.getDate();
-  const time = date.getTime();
-  const hour = date.getHours(); // 3600 * date.getHours() + 60 * date.getMinutes() + date.getSeconds();
-
-  return {
-    year,
-    month,
-    day,
-    hour,
-    time,
   };
 }
 

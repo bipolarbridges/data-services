@@ -1,10 +1,10 @@
 import { Request, Response, NextFunction } from 'express';
 import { authMethods } from './auth_methods';
-import { findOne } from '../util/misc';
+import findOne from '../util/misc';
 import { warn } from '../logging';
 import { Database } from '../db';
 
-export function auth(db: Database) {
+export default function auth(db: Database) {
   return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const provided = req.get('Authorization');
     if (!provided

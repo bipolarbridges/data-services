@@ -6,7 +6,7 @@ import { database, Database } from './lib/db';
 import api, { CreateMeasurementArgs } from './lib/interface';
 import accept from './lib/requests';
 import { handle } from './lib/errors';
-import { auth } from './lib/auth';
+import auth from './lib/auth';
 
 dotenv.config();
 // import logs from './lib/logging';
@@ -61,7 +61,7 @@ clientRouter.route('/:clientId')
 
 app.use('/client', clientRouter);
 
-interface measurementBody {
+interface MeasurementBody {
   clientID: string,
   data: {
     name: string,
@@ -74,7 +74,7 @@ const measurementRouter = express.Router();
 
 measurementRouter.route('/')
   .post(async (req, res) => {
-    const { clientID, data }: Partial<measurementBody> = req.body;
+    const { clientID, data }: Partial<MeasurementBody> = req.body;
     if (!data) {
       res.status(400).send({
         message: 'Missing data object',
@@ -87,6 +87,7 @@ measurementRouter.route('/')
         res.status(400).send({
           message: 'Missing data fields',
         });
+      /* eslint-disable no-restricted-globals */
       } else if (isNaN(data.date)) {
         res.status(400).send({
           message: 'date must be a number',

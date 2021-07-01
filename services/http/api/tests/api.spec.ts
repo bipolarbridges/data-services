@@ -32,6 +32,7 @@ function spec(method: string, path: string) {
 
 function match(method: string, path: string, body: unknown, opts: AxiosRequestConfig, status: number, desc = 'Unspecified') {
   describe(`${method} ${path} [ ${status}: ${desc} ]`, () => {
+    /* eslint-disable @typescript-eslint/naming-convention */
     const _f_ = methods[method];
     if (!_f_) {
       console.log(`WARNING: invalid method specified ${method}`);
@@ -117,16 +118,16 @@ describe('Paths', () => {
                 'Content-Type': 'application/json',
                 Authorization: 'apikey1',
               },
-            }).then((res) => {
+            }).then((res2) => {
               fail('Should have rejected');
             }).catch((err) => {
               if (!err.response) {
                 fail();
               }
-              const res = err.response;
-              spec('POST', '/client').match(res);
-              expect(res.status).toEqual(403);
-              expect(res.data.message).toEqual('Already exists');
+              const res3 = err.response;
+              spec('POST', '/client').match(res3);
+              expect(res3.status).toEqual(403);
+              expect(res3.data.message).toEqual('Already exists');
             });
           }).catch((err: AxiosError) => {
             console.log(err?.response?.data);
@@ -214,9 +215,9 @@ describe('Paths', () => {
               Authorization: 'client3token',
             },
           })
-            .then(async (res) => {
-              spec('GET', '/client').match(res);
-              expect(res.status).toEqual(200);
+            .then(async (res2) => {
+              spec('GET', '/client').match(res2);
+              expect(res2.status).toEqual(200);
             })
             .catch((err) => {
               console.log(err?.response?.error);
