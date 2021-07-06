@@ -255,7 +255,7 @@ describe("Paths", () => {
                 spec("POST", "/measurement").match(res)
                 expect(res.status).toEqual(403)
             })
-        })
+        });
 
         const invalidData = [
             // Missing fields
@@ -276,7 +276,7 @@ describe("Paths", () => {
             {
                 clientID: "client2@email.com",
                 data: {
-                    // data: ...
+                    // date: ...
                     name: 'sentiment',
                     value: 0.8,
                     source: 'measurement'
@@ -337,77 +337,67 @@ describe("Paths", () => {
                     spec("POST", "/measurement").match(res)
                     expect(res.status).toEqual(400)
                 })))
-        })
-
-        describe('201 /measurement', () => {
-
-            it('Should respond properly with the first ever piece of measurement', async () => {
-                await ax.post("/measurement", validExampleData, {
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": "apikey1"
-                    }
-                }).then(async (res) => {
-                    spec("POST", "/measurement").match(res)
-                    expect(res.status).toEqual(201)
-                }).catch((err) => {
-                    console.log(err.response.data)
-                    fail()
-                });
-            });
-            
-            it('Should accept measurement with similar but with different name', async () => {
-                const similar = {
-                    clientID: validExampleData.clientID,
-                    data: {
-                        date:  ((new Date().getTime()) / 1000) + 100,
-                        name: 'mindfulness',
-                        value: validExampleData.data.value,
-                        source: validExampleData.data.source,
-                    }
-                };
-
-                await ax.post("/measurement", similar, {
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": "apikey1"
-                    }
-                }).then(async (res) => {
-                    spec("POST", "/measurement").match(res)
-                    expect(res.status).toEqual(201)
-                }).catch((err) => {
-                    console.log(err.response.data)
-                    fail()
-                });
-            });
-
-            it('Should accept measurement with different source but same value', async () => {
-                const similar = {
-                    clientID: validExampleData.clientID,
-                    data: {
-                        date:  ((new Date().getTime()) / 1000) + 200,
-                        name: 'cognition',
-                        value: validExampleData.data.value,
-                        source: 'qolSurvey',
-                    }
-                };
-                await ax.post("/measurement", similar, {
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": "apikey1"
-                    }
-                }).then(async (res) => {
-                    spec("POST", "/measurement").match(res)
-                    expect(res.status).toEqual(201)
-                }).catch((err) => {
-                    console.log(err.response.data)
-                    fail()
-                });
-            });
-
         });
-        
-        
+
+        const validData = [
+          validExampleData,
+          {
+            // different client
+            clientID: 'client2@email.com',
+            data: {
+              ...validExampleData.data,
+            },
+          },
+          {
+            // different time
+            ...validExampleData,
+            data: {
+              ...validExampleData.data,
+              date: (new Date()).getTime() + 100,            
+            }
+          },
+          {
+            // different measurement name
+            ...validExampleData,
+            data: {
+              ...validExampleData.data,
+              name: 'mindfulness',
+            },
+          },
+          {
+            // different source
+            ...validExampleData,
+            data: {
+              ...validExampleData.data,
+              source: 'qolSurvey',
+            },
+          },
+          {
+            // different value
+            ...validExampleData,
+            data: {
+              ...validExampleData.data,
+              value: 8,
+            }
+          }
+
+        ];
+        it('Should respond properly with valid measurements', async () => {
+          await Promise.all(validData.map((dat) => {
+            ax.post("/measurement", dat, {
+              headers: {
+                  "Content-Type": "application/json",
+                  "Authorization": "apikey1"
+              }
+            }).then(async (res) => {
+                spec("POST", "/measurement").match(res)
+                expect(res.status).toEqual(201)
+            }).catch((err) => {
+                fail(`Should have not rejected (${JSON.stringify(dat)})`);
+            });
+          }));
+        });
+
         it("Should reject if client does not exist", async () => {
             await ax.post("/measurement", {
                 clientID: "doesnotexist@email.com",
@@ -422,7 +412,7 @@ describe("Paths", () => {
             }).catch((err) => {
                 if (!err['response']) {
                     console.log(err);
-                    fail()
+                    fail();
                 }
                 const res = err['response']
                 spec("POST", "/measurement").match(res)

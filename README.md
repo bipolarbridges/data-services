@@ -18,7 +18,7 @@ A lot of the setup uses docker to encapsulate some of the dependencies, networki
 ### Testing the API
 1. Initialize the database and run the development server using `yarn run api:start:test`. This will delete what is currently in the database and replace it with fixtures for testing.
     
-    > You can also do all of this with 1 line of commands, using `yarn api:start:lazy`. This will spin up the db, the mock_auth server, and the api service.
+    > You can also do all of this with 1 line of commands, using `yarn api:start:all:lazy`. This will spin up the db, the mock_auth server, and the api service.
 2. In another terminal, run `yarn test:api`.
 3. When done, use `yarn stop` or `docker-compose down` to shut everything down.
 

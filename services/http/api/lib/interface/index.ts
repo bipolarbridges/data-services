@@ -215,8 +215,8 @@ function createMeasurement(m: CreateMeasurementArgs) {
 
             const Measurement = {
                 propertiesMergeConfig: {
-                    nodes: false,
-                    relationship: false,
+                    nodes: true,
+                    relationship: true,
                 },
                 properties: [makeMeasurementProperties(value, hour, day, month, year, time, User)]
             };
