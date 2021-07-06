@@ -28,7 +28,7 @@
     "db:reset": "docker compose run --rm db_shell execute delete_all",
     "db:reset:deep": "docker compose down && docker volume rm bb_data_services_store",
     "db:reset:test": "yarn db:reset && yarn db:load:test",
-    "test:api": "yarn db:reset:test && cd services/http/api && yarn build && yarn test",
+    "test:api": "yarn api:load:test && cd services/http/api && yarn build && yarn test",
     "all": "yarn install && cd services/http/api && yarn all"
   },
   "repository": {
