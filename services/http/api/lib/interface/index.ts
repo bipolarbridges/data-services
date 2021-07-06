@@ -9,7 +9,7 @@ import { SourceProperties } from 'lib/models/source';
 import { DatabaseProcedure } from 'lib/db';
 import * as loggers from '../logging';
 
-function userExists(id: string) {
+function userExists(id: string): DatabaseProcedure<boolean> {
   return async (session: Session, models: AllModels): Promise<boolean> => {
     try {
       const user = await models.user.findOne({
@@ -28,7 +28,7 @@ function userExists(id: string) {
   };
 }
 
-function createUser(id: string) {
+function createUser(id: string): DatabaseProcedure<boolean> {
   return async (session: Session, models: AllModels): Promise<null> => {
     try {
       await models.user.createOne(
