@@ -1,12 +1,12 @@
 import { Session } from 'neo4j-driver';
-import { AllModels } from 'lib/models';
+import { AllModels } from '../models';
 import {
   DayProperties, HourProperties, TimestampProperties, YearProperties,
-} from 'lib/models/time';
-import { MeasurementProperties, MeasurementTypeProperties } from 'lib/models/measurement';
-import { UserProperties } from 'lib/models/user';
-import { SourceProperties } from 'lib/models/source';
-import { DatabaseProcedure } from 'lib/db';
+} from '../models/time';
+import { MeasurementProperties, MeasurementTypeProperties } from '../models/measurement';
+import { UserProperties } from '../models/user';
+import { SourceProperties } from '../models/source';
+import { DatabaseProcedure } from '../db';
 import * as loggers from '../logging';
 
 function userExists(id: string): DatabaseProcedure<boolean> {
