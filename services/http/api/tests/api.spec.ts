@@ -292,54 +292,16 @@ describe('Paths', () => {
             value,
           },
         },
+        {
+          clientID,
+          data: {
+            date: (new Date()).getTime() + 4000,
+            source: 'appleHealth',
+            name: 'heartRate',
+            value: 80,
+          },
+        },
       ];
-      // const validData = [
-      //   validExampleData,
-      //   {
-      //     // different client
-      //     clientID: 'client2@email.com',
-      //     data: {
-      //       ...validExampleData.data,
-      //       date: (new Date()).getTime() + 100,
-      //     },
-      //   },
-      //   {
-      //     // different time
-      //     ...validExampleData,
-      //     data: {
-      //       ...validExampleData.data,
-      //       date: (new Date()).getTime() + 200,
-      //     },
-      //   },
-      //   {
-      //     // different measurement name
-      //     ...validExampleData,
-      //     data: {
-      //       ...validExampleData.data,
-      //       name: 'mindfulness',
-      //       date: (new Date()).getTime() + 300,
-      //     },
-      //   },
-      //   {
-      //     // different source
-      //     ...validExampleData,
-      //     data: {
-      //       ...validExampleData.data,
-      //       source: 'qolSurvey',
-      //       name: 'home',
-      //       date: (new Date()).getTime() + 400,
-      //     },
-      //   },
-      //   {
-      //     // different value
-      //     ...validExampleData,
-      //     data: {
-      //       ...validExampleData.data,
-      //       value: 8,
-      //       date: (new Date()).getTime() + 500,
-      //     },
-      //   },
-      // ];
 
       it('Should respond properly with valid measurements', async () => {
         await Promise.all(validData.map((dat) => {
