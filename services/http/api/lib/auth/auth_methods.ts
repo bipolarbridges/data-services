@@ -7,10 +7,10 @@ import { Request } from 'express';
 import { Session } from 'neo4j-driver-core';
 import { DatabaseProcedure } from 'lib/db';
 import { IdentityInstance } from 'lib/models/identity';
-import { UserInstance } from '../models/user';
-import { InternalError } from '../errors';
-import { AllModels } from '../models';
-import { info } from '../logging';
+import { UserInstance } from 'lib/models/user';
+import { InternalError } from 'lib/errors';
+import { AllModels } from 'lib/models';
+import { info } from 'lib/logging';
 
 /* eslint-disable @typescript-eslint/naming-convention */
 const __dirname = path.resolve();

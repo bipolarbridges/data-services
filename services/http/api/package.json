@@ -9,7 +9,7 @@
     "lint:fix": "eslint . --ext .ts --fix",
     "test": "jest tests --testPathPattern=/dist/tests/*",
     "start": "node ./dist/main.js",
-    "start:lazy": "ts-node main.ts",
+    "start:lazy": "ts-node -r tsconfig-paths/register main.ts",
     "start:dev:lazy": "nodemon",
     "mock:api": "prism mock ./reference/bb-api.v0.yaml",
     "mock:auth": "cd tests/mocks/auth_server && yarn start",
@@ -48,6 +48,7 @@
     "jest-openapi": "^0.11.0",
     "nodemon": "^2.0.7",
     "ts-jest": "^27.0.1",
-    "ts-node": "^10.0.0"
+    "ts-node": "^10.0.0",
+    "tsconfig-paths": "^3.10.1"
   }
 }
