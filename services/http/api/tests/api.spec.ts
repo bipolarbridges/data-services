@@ -255,49 +255,92 @@ describe('Paths', () => {
           })));
         });
 
+      const { clientID, data: { source, name, value } } = validExampleData;
+
       const validData = [
         validExampleData,
-        {
-          // different client
-          clientID: 'client2@email.com',
-          data: {
-            ...validExampleData.data,
-          },
-        },
-        {
-          // different time
-          ...validExampleData,
-          data: {
-            ...validExampleData.data,
-            date: (new Date()).getTime() + 100,
-          },
-        },
-        {
-          // different measurement name
-          ...validExampleData,
-          data: {
-            ...validExampleData.data,
-            name: 'mindfulness',
-          },
-        },
-        {
-          // different source
-          ...validExampleData,
-          data: {
-            ...validExampleData.data,
-            source: 'qolSurvey',
-          },
-        },
-        {
-          // different value
-          ...validExampleData,
-          data: {
-            ...validExampleData.data,
-            value: 8,
-          },
-        },
+        // all have different date
 
+        // different name
+        {
+          clientID,
+          data: {
+            date: (new Date()).getTime() + 1000,
+            source,
+            name: 'mindfulness',
+            value,
+
+          },
+        },
+        // different value
+        {
+          clientID,
+          data: {
+            date: (new Date()).getTime() + 2000,
+            source,
+            name,
+            value: 3,
+          },
+        },
+        // different source & name
+        {
+          clientID,
+          data: {
+            date: (new Date()).getTime() + 3000,
+            source: 'qolSurvey',
+            name: 'home',
+            value,
+          },
+        },
       ];
+      // const validData = [
+      //   validExampleData,
+      //   {
+      //     // different client
+      //     clientID: 'client2@email.com',
+      //     data: {
+      //       ...validExampleData.data,
+      //       date: (new Date()).getTime() + 100,
+      //     },
+      //   },
+      //   {
+      //     // different time
+      //     ...validExampleData,
+      //     data: {
+      //       ...validExampleData.data,
+      //       date: (new Date()).getTime() + 200,
+      //     },
+      //   },
+      //   {
+      //     // different measurement name
+      //     ...validExampleData,
+      //     data: {
+      //       ...validExampleData.data,
+      //       name: 'mindfulness',
+      //       date: (new Date()).getTime() + 300,
+      //     },
+      //   },
+      //   {
+      //     // different source
+      //     ...validExampleData,
+      //     data: {
+      //       ...validExampleData.data,
+      //       source: 'qolSurvey',
+      //       name: 'home',
+      //       date: (new Date()).getTime() + 400,
+      //     },
+      //   },
+      //   {
+      //     // different value
+      //     ...validExampleData,
+      //     data: {
+      //       ...validExampleData.data,
+      //       value: 8,
+      //       date: (new Date()).getTime() + 500,
+      //     },
+      //   },
+      // ];
+
       it('Should respond properly with valid measurements', async () => {
         await Promise.all(validData.map((dat) => {
           ax.post('/measurement', dat, {
