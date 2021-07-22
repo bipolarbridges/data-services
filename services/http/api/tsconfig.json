@@ -16,9 +16,9 @@
         "skipLibCheck": true
     },
     "exclude": [
+        "./dist",
         "./tests/mocks/auth_server",
         "node_modules",
-        ".eslintrc.js"
+        ".eslintrc.js",
     ]
-    
 }
