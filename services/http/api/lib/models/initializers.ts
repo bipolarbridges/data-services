@@ -4,37 +4,7 @@ import {
   measurement,
   resource,
   identity,
-  date,
 } from '.';
-
-export function initDateModel(db: Neogma): date.DateModel {
-  return ModelFactory<date.DateProperties, date.DateRelatedNodes>(
-    {
-      label: 'Date',
-      primaryKeyField: 'id',
-      schema: {
-        id: {
-          type: 'string',
-          required: true,
-        },
-        day: {
-          type: 'number',
-          required: true,
-        },
-        month: {
-          type: 'number',
-          required: true,
-        },
-        year: {
-          type: 'number',
-          required: true,
-        },
-      },
-      // relationships: {},
-    },
-    db,
-  );
-}
 
 export function initIdentityModel(db: Neogma, resourceModel: resource.ResourceModel)
   : identity.IdentityModel {
@@ -77,16 +47,12 @@ export function initIdentityModel(db: Neogma, resourceModel: resource.ResourceMo
   );
 }
 
-export function initMeasurementModel(db: Neogma,
-  dateModel: date.DateModel, userModel: user.UserModel): measurement.MeasurementModel {
+export function initMeasurementModel(db: Neogma, userModel: user.UserModel)
+  : measurement.MeasurementModel {
   return ModelFactory<measurement.MeasurementProperties, measurement.MeasurementRelatedNodes>(
     {
       label: 'Measurement',
       schema: {
-        type: {
-          type: 'string',
-          required: true,
-        },
         value: {
           type: 'number',
           required: true,
@@ -98,21 +64,8 @@ export function initMeasurementModel(db: Neogma,
           direction: 'in',
           name: 'Recorded',
         },
-        Date: {
-          model: dateModel,
-          direction: 'out',
-          name: 'RecordedAt',
-          properties: {
-            time: {
-              property: 'time',
-              schema: {
-                type: 'number',
-              },
-            },
-          },
-        },
       },
-      primaryKeyField: 'type',
+      primaryKeyField: 'value',
     },
     db,
   );
@@ -174,21 +127,19 @@ export function initUserModel(db: Neogma,
 }
 
 export type AllModels = {
-  date: date.DateModel,
   identity: identity.IdentityModel,
   measurement: measurement.MeasurementModel,
   resource: resource.ResourceModel,
   user: user.UserModel,
 };
+
 export function initAllModels(db: Neogma): AllModels {
-  const dateModel = initDateModel(db);
   const resourceModel = initResourceModel(db);
   const userModel = initUserModel(db, resourceModel);
   const identityModel = initIdentityModel(db, resourceModel);
-  const measurementModel = initMeasurementModel(db, dateModel, userModel);
+  const measurementModel = initMeasurementModel(db, userModel);
 
   return {
-    date: dateModel,
     resource: resourceModel,
     measurement: measurementModel,
     identity: identityModel,
