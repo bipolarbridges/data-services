@@ -2,10 +2,8 @@ import { readFileSync } from 'fs';
 import path, { join } from 'path';
 import { BinaryLike, createHash } from 'crypto';
 import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
-
-// import {Database} from '../db';
 import { Request } from 'express';
-import { Session } from 'neo4j-driver-core';
+import { Session } from 'neogma/node_modules/neo4j-driver';
 import { InternalError } from '../errors';
 import { info } from '../logging';
 
@@ -73,6 +71,7 @@ export type DatabaseResponse = Promise<boolean | null>;
 export const authMethods: AuthMethod[] = [
   (req: Request, auth: BinaryLike) => async (db: Session): Promise<boolean | null> => {
     // KEY AUTHENTICATION
+    info(`Path: ${req.path}`);
     const results = await db.run(
       "MATCH (i:Identity{type: 'key', check: $check}) "
             + 'MATCH (r:Resource{path: $path}) '
