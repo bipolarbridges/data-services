@@ -1,10 +1,16 @@
 import { Neogma } from 'neogma';
-import { DatabaseResponse } from 'lib/auth/auth_methods';
 import { Parameters } from 'neo4j-driver/types/query-runner';
+import { Driver, Result, Session } from 'neo4j-driver';
+import { TransactionConfig } from 'neo4j-driver-core';
 import {
-  Result, Session, TransactionConfig, Driver,
-} from 'neo4j-driver-core';
-import { AllModels, initAllModels } from '../models/initializers';
+  identity,
+  measurement,
+  resource,
+  source,
+  time,
+  user,
+  AllModels,
+} from '../models';
 import { debug } from '../logging';
 import { InternalError } from '../errors';
 
@@ -13,6 +19,8 @@ class DatabaseError extends InternalError {
     super(error);
   }
 }
+
+export type DatabaseProcedure<T> = (session: Session, all: AllModels) => Promise<T>;
 
 export class Database {
   driver: Driver | null;
@@ -41,27 +49,26 @@ export class Database {
         logger: debug,
       },
     );
-    this.models = initAllModels(this.neogma);
+    this.initAllModels(this.neogma);
     this.driver = this.neogma.driver;
     this.initialized = true;
   }
 
-  async exec(proc: (session: Session, all: AllModels) => DatabaseResponse)
-    : Promise<boolean | null> {
-    const session = this.driver.session();
-    try {
-      const ret = await proc(session, this.models);
-      return ret;
-    } catch (e) {
-      if (e instanceof InternalError) {
-        throw e;
-      } else {
-        throw new DatabaseError(e);
-      }
-    } finally {
-      await session.close();
+  async exec<T> (proc: DatabaseProcedure<T>): Promise<T> {
+        const session = this.driver.session();
+        try {
+            const ret = await proc(session, this.models);
+            return ret
+        } catch (e) {
+            if (e instanceof InternalError) {
+                throw e;
+            } else {
+                throw new DatabaseError(e);
+            }
+        } finally {
+            await session.close();
+        }
     }
-  }
 
   run(query: string, parameters?: Parameters, config?: TransactionConfig): Result {
     const session: Session = this.driver.session();
@@ -70,6 +77,54 @@ export class Database {
 
   async stop(): Promise<void> {
     await this.driver.close();
+  }
+
+  initAllModels(db: Neogma): void {
+    const resourceModel = resource.initResourceModel(db);
+    const identityModel = identity.initIdentityModel(db, resourceModel);
+    const userModel = user.initUserModel(db, resourceModel);
+
+    const hourModel = time.initHourModel(db);
+    const dayModel = time.initDayModel(db);
+    const monthModel = time.initMonthModel(db, dayModel);
+    const yearModel = time.initYearModel(db);
+    const timestampModel = time.initTimestampModel(db);
+    const sourceModel = source.initSourceModel(db);
+
+    const measurementModel = measurement.initMeasurementModel(db,
+      hourModel,
+      dayModel,
+      monthModel,
+      yearModel,
+      timestampModel,
+      userModel);
+    const measurementTypeModel = measurement.initMeasurementTypeModel(db,
+      measurementModel,
+      sourceModel);
+
+    measurementModel.addRelationships(
+      {
+        MeasurementType: {
+          model: measurementTypeModel,
+          direction: 'in',
+          name: 'Includes',
+        },
+      },
+    );
+
+    this.models = {
+      source: sourceModel,
+      resource: resourceModel,
+      measurementType: measurementTypeModel,
+      identity: identityModel,
+      user: userModel,
+      measurement: measurementModel,
+      hour: hourModel,
+      day: dayModel,
+      month: monthModel,
+      year: yearModel,
+      timestamp: timestampModel,
+    };
   }
 }
 
