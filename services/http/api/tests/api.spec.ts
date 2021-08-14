@@ -32,9 +32,8 @@ function spec(method: string, path: string) {
 
 function match(method: string, path: string, body: unknown, opts: AxiosRequestConfig, status: number, desc = 'Unspecified') {
   describe(`${method} ${path} [ ${status}: ${desc} ]`, () => {
-    /* eslint-disable @typescript-eslint/naming-convention */
-    const _f_ = methods[method];
-    if (!_f_) {
+    const fn = methods[method];
+    if (!fn) {
       console.log(`WARNING: invalid method specified ${method}`);
     } else {
       it('Should match API spec', async () => methods[method](`${path}`, body, opts)
@@ -219,8 +218,8 @@ describe('Paths', () => {
               spec('GET', '/client').match(res2);
               expect(res2.status).toEqual(200);
             })
-            .catch((err) => {
-              console.log(err?.response?.error);
+            .catch((err2) => {
+              console.log(err2?.response?.error);
               fail();
             });
         }).catch((err) => {

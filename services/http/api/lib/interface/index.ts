@@ -1,4 +1,5 @@
-import { Session } from 'neogma/node_modules/neo4j-driver';
+import { DatabaseProcedure } from 'lib/db';
+import { Session } from 'neo4j-driver';
 import { AllModels } from 'lib/models';
 import {
   DayProperties, HourProperties, TimestampProperties, YearProperties,
@@ -8,7 +9,7 @@ import { UserProperties } from 'lib/models/user';
 import { SourceProperties } from 'lib/models/source';
 import * as loggers from '../logging';
 
-function userExists(id: string) {
+function userExists(id: string): DatabaseProcedure<boolean> {
   return async (session: Session, models: AllModels): Promise<boolean> => {
     try {
       const user = await models.user.findOne({
@@ -27,7 +28,7 @@ function userExists(id: string) {
   };
 }
 
-function createUser(id: string) {
+function createUser(id: string): DatabaseProcedure<boolean> {
   return async (session: Session, models: AllModels): Promise<null> => {
     try {
       await models.user.createOne(

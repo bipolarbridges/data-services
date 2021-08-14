@@ -9,6 +9,8 @@
         "checkJs": true,
         "strictBindCallApply": true,
         "moduleResolution": "node",
+        "baseUrl": ".",
+        "skipLibCheck": true
     },
     "exclude": [
         "./node_modules",
