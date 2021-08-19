@@ -188,8 +188,83 @@ paths:
               required:
                 - clientID
                 - data
+  /domain: 
+    post:
+      summary: Records domains. 
+      tags: []
+      responses:
+        '201':
+          $ref: '#/components/responses/Created'
+        '400':
+          $ref: '#/components/responses/BadFormat'
+        '403':
+          $ref: '#/components/responses/NotAuthorized'
+      operationId: post-domain
+      security:
+        - import-key: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              description: 'Domain Request Contents'
+              type: object
+              required:
+                - id
+                - data
+              properties:
+                id:
+                  type: string
+                data:
+                  type: object
+                  required:
+                    - bullets
+                    - importance
+                    - name
+                    - scope
+                  properties:
+                    bullets: 
+                      type: array
+                      items:
+                        type: string
+                    importance:
+                      type: string
+                    name:
+                      type: string
+                    scope:
+                      type: string
 components:
-  schemas: {}
+  schemas: 
+    Message:
+      type: object
+      properties:
+        message:
+          type: string
+          minLength: 1
+      required:
+        - message
+  responses:
+    BadFormat:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            description: 'Error Cause'
+            $ref: '#/components/schemas/Message'
+    Created:
+      description: Created
+      content:
+        application/json:
+          schema:
+            description: 'Creation message'
+            $ref: '#/components/schemas/Message'
+    NotAuthorized:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            description: 'Error Cause'
+            $ref: '#/components/schemas/Message'
+            
   securitySchemes:
     import-key:
       name: Authorization

@@ -4,6 +4,7 @@ import * as resource from './resource';
 import * as identity from './identity';
 import * as source from './source';
 import * as time from './time';
+import * as domain from './domain';
 
 type AllModels = {
   identity: identity.IdentityModel,
@@ -16,7 +17,9 @@ type AllModels = {
   month: time.MonthModel,
   year: time.YearModel,
   timestamp: time.TimestampModel,
-  measurement: measurement.MeasurementModel
+  measurement: measurement.MeasurementModel,
+  domain: domain.DomainModel,
+  domainBullet: domain.DomainBulletModel,
 };
 
 export {
@@ -26,5 +29,6 @@ export {
   identity,
   source,
   time,
+  domain,
   AllModels,
 };

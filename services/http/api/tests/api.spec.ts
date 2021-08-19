@@ -5,6 +5,7 @@ import axios, {
   AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse,
 } from 'axios';
 import { fail } from 'assert';
+import { DomainBody } from 'main';
 
 const ax = axios.create({
   baseURL: 'http://127.0.0.1:8888',
@@ -481,6 +482,122 @@ describe('Paths', () => {
         const res = err.response;
         spec('POST', '/measurement').match(res);
         expect(res.status).toEqual(404);
+      });
+    });
+  });
+  describe('/domain', () => {
+    it('Should reject if a bad key is provided', async () => {
+      await ax.post('/measurement', validExampleData, {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: 'apikey2',
+        },
+      }).then(async (res) => {
+        fail('Should have rejected');
+      }).catch((err) => {
+        if (!err.response) {
+          fail();
+        }
+        const res = err.response;
+        spec('POST', '/measurement').match(res);
+        expect(res.status).toEqual(403);
+      });
+    });
+
+    const invalidDomains: Partial<DomainBody>[] = [
+      {
+        // id: 'domain-none',
+        data: {
+          bullets: ['example-text'],
+          importance: 'very important',
+          name: 'exampleName',
+          scope: 'all',
+        },
+      },
+      {
+        id: 'domain2',
+        // data: {
+        //   bullets: [],
+        //   importance: '',
+        //   name: '',
+        //   scope: '',
+        // },
+      },
+      {
+        id: 'domain3',
+        data: {
+          // bullets: [],
+          importance: 'very important',
+          name: 'exampleName',
+          scope: 'all',
+        },
+      },
+      {
+        id: 'domain4',
+        data: {
+          bullets: ['example-text'],
+          // importance: '',
+          name: 'exampleName',
+          scope: 'all',
+        },
+      },
+      {
+        id: 'domain5',
+        data: {
+          bullets: ['example-text'],
+          importance: 'very important',
+          // name: '',
+          scope: 'all',
+        },
+      },
+      {
+        id: 'domain6',
+        data: {
+          bullets: ['example-text'],
+          importance: 'very important',
+          name: 'exampleName',
+          // scope: '',
+        },
+      },
+    ];
+    it('Should reject if data fields are missing or have wrong type',
+      async () => {
+        await Promise.all(invalidDomains.map((dat) => ax.post('/domain', dat, {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: 'apikey1',
+          },
+        }).then(async (res) => {
+          fail(`Should have rejected (${JSON.stringify(dat)})`);
+        }).catch((err) => {
+          if (!err.response) {
+            fail(`Error: ${err}`);
+          }
+          const res = err.response;
+          spec('POST', '/domain').match(res);
+          expect(res.status).toEqual(400);
+        })));
+      });
+    it('Should respond properly upon success', async () => {
+      await ax.post('/domain', {
+        id: 'domain1',
+        data: {
+          bullets: ['example-text'],
+          importance: 'very important',
+          name: 'exampleName',
+          scope: 'all',
+        },
+      }, {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: 'apikey1',
+        },
+      }).then(async (res) => {
+        spec('POST', '/domain').match(res);
+        expect(res.status).toEqual(201);
+      }).catch((err) => {
+        console.log(err.response.data);
+        fail();
       });
     });
   });
