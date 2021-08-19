@@ -11,6 +11,7 @@ import {
   time,
   user,
   AllModels,
+  domain,
 } from '../models';
 import { InternalError } from '../errors';
 import { debug } from '../logging';
@@ -85,6 +86,8 @@ export class Database {
     const identityModel = identity.initIdentityModel(db, resourceModel);
     const userModel = user.initUserModel(db, resourceModel);
 
+    const domainBulletModel = domain.initDomainBulletModel(db);
+    const domainModel = domain.initDomainModel(db, domainBulletModel);
     const hourModel = time.initHourModel(db);
     const dayModel = time.initDayModel(db);
     const monthModel = time.initMonthModel(db, dayModel);
@@ -114,6 +117,8 @@ export class Database {
     );
 
     this.models = {
+      domain: domainModel,
+      domainBullet: domainBulletModel,
       source: sourceModel,
       resource: resourceModel,
       measurementType: measurementTypeModel,
