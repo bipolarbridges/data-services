@@ -244,25 +244,22 @@ components:
         - message
   responses:
     BadFormat:
-      description: Bad Request
+      description: 'Error Cause'
       content:
         application/json:
           schema:
-            description: 'Error Cause'
             $ref: '#/components/schemas/Message'
     Created:
-      description: Created
+      description: 'Creation message'
       content:
         application/json:
           schema:
-            description: 'Creation message'
             $ref: '#/components/schemas/Message'
     NotAuthorized:
       description: Forbidden
       content:
         application/json:
           schema:
-            description: 'Error Cause'
             $ref: '#/components/schemas/Message'
             
   securitySchemes:

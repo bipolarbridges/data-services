@@ -147,7 +147,7 @@ domainRouter.route('/')
       } = data;
       if (!bullets || !importance || !name || !scope) {
         res.status(400).send({
-          message: 'Missing data fields',
+          message: `Missing data fields: ${bullets}, ${importance}, ${name}, ${scope}`,
         });
       } else {
         const me: CreateDomainArgs = {
@@ -174,6 +174,7 @@ domainRouter.route('/')
       }
     }
   });
+app.use('/domain', domainRouter);
 
 app.use(handle());
 

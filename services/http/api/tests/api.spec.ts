@@ -596,6 +596,7 @@ describe('Paths', () => {
         spec('POST', '/domain').match(res);
         expect(res.status).toEqual(201);
       }).catch((err) => {
+        // console.log(err);
         console.log(err.response.data);
         fail();
       });

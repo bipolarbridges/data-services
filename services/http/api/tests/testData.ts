@@ -10,7 +10,7 @@ type Resource = {
   method: string
 };
 
-const paths: Resource[] = [{ path: '/client', method: 'POST' }, { path: '/measurement', method: 'POST' }];
+const paths: Resource[] = [{ path: '/client', method: 'POST' }, { path: '/measurement', method: 'POST' }, { path: '/domain', method: 'POST' }];
 
 new FixtureLoader().load(async (session: Session, models: AllModels) => {
   await models.identity.createOne({
