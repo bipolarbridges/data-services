@@ -1,9 +1,9 @@
 import dotenv from 'dotenv';
 
-import express from 'express';
+import express, { Request, Response } from 'express';
 import cors from 'cors';
 import { database, Database } from './lib/db';
-import api, { CreateMeasurementArgs } from './lib/interface';
+import api, { CreateMeasurementArgs, CreateDomainArgs } from './lib/interface';
 import accept from './lib/requests';
 import { handle } from './lib/errors';
 import auth from './lib/auth';
@@ -117,6 +117,64 @@ measurementRouter.route('/')
   });
 
 app.use('/measurement', measurementRouter);
+
+const domainRouter = express.Router();
+
+export interface DomainBody {
+  id: string,
+  data: {
+    bullets?: string[],
+    importance?: string,
+    name?: string,
+    scope?: string,
+  },
+}
+
+domainRouter.route('/')
+  .post(async (req: Request, res: Response) => {
+    const { id, data }: Partial<DomainBody> = req.body;
+    if (!data) {
+      res.status(400).send({
+        message: 'Missing data object',
+      });
+    } else if (!id) {
+      res.status(400).send({
+        message: 'Missing id',
+      });
+    } else {
+      const {
+        bullets, importance, name, scope,
+      } = data;
+      if (!bullets || !importance || !name || !scope) {
+        res.status(400).send({
+          message: 'Missing data fields',
+        });
+      } else {
+        const me: CreateDomainArgs = {
+          id,
+          bullets,
+          importance,
+          name,
+          scope,
+        };
+
+        if ((await db.exec(api.domainExists(id)))) {
+          res.status(400).send({
+            message: 'Domain already exists.',
+          });
+        } else if (!(await db.exec(api.createDomain(me)))) {
+          res.status(400).send({
+            message: 'measurement could not be created',
+          });
+        } else {
+          res.status(201).send({
+            message: 'Created',
+          });
+        }
+      }
+    }
+  });
+
 app.use(handle());
 
 const port = 8888;
