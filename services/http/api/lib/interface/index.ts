@@ -1,4 +1,5 @@
 import { Session } from 'neo4j-driver';
+import { DomainBulletProperties } from 'lib/models/domain';
 import { AllModels } from '../models';
 import {
   DayProperties, HourProperties, TimestampProperties, YearProperties,
@@ -29,7 +30,7 @@ function userExists(id: string): DatabaseProcedure<boolean> {
 }
 
 function createUser(id: string): DatabaseProcedure<boolean> {
-  return async (session: Session, models: AllModels): Promise<null> => {
+  return async (session: Session, models: AllModels): Promise<boolean> => {
     try {
       await models.user.createOne(
         {
@@ -50,10 +51,10 @@ function createUser(id: string): DatabaseProcedure<boolean> {
         { merge: true, session },
       );
 
-      return null;
+      return true;
     } catch (err) {
       loggers.error(err);
-      return null;
+      return false;
     }
   };
 }
@@ -280,8 +281,67 @@ function createMeasurement(m: CreateMeasurementArgs): DatabaseProcedure<boolean>
   };
 }
 
+export type CreateDomainArgs = {
+  id: string,
+  bullets: string[],
+  importance: string,
+  name: string,
+  scope: string,
+};
+
+function createDomain(m: CreateDomainArgs): DatabaseProcedure<boolean> {
+  return async (session: Session, models: AllModels): Promise<boolean> => {
+    try {
+      const bullets: DomainBulletProperties[] = m.bullets
+        .map((point: string) => ({ content: point }));
+      await models.domain.createOne(
+        {
+          uid: m.id,
+          importance: m.importance,
+          name: m.name,
+          scope: m.scope,
+          DomainBullet: {
+            propertiesMergeConfig: {
+              nodes: true,
+              relationship: true,
+            },
+            properties: bullets,
+          },
+        },
+        { merge: true, session },
+      );
+
+      return true;
+    } catch (err) {
+      loggers.error(err);
+      return false;
+    }
+  };
+}
+
+function domainExists(id: string): DatabaseProcedure<boolean> {
+  return async (session: Session, models: AllModels): Promise<boolean> => {
+    try {
+      const domain = await models.domain.findOne({
+        where: {
+          uid: id,
+        },
+        session,
+      });
+      const exist = domain ? domain?.__existsInDatabase : false;
+      loggers.info(`User exists: ${exist}`);
+      return exist;
+    } catch (err) {
+      loggers.error(err);
+      return false;
+    }
+  };
+}
+
 export default {
   userExists,
   createUser,
   createMeasurement,
+  createDomain,
+  domainExists,
 };
