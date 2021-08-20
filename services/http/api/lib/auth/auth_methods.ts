@@ -4,7 +4,7 @@ import { BinaryLike, createHash } from 'crypto';
 import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
 
 import { Request } from 'express';
-import { Session } from 'neo4j-driver-core';
+import { Session } from 'neogma/node_modules/neo4j-driver-core';
 import { AllModels } from 'lib/models';
 import { DatabaseProcedure } from 'lib/db';
 import { IdentityInstance } from 'lib/models/identity';
