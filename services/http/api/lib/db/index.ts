@@ -54,21 +54,21 @@ export class Database {
     this.initialized = true;
   }
 
-  async exec<T> (proc: DatabaseProcedure<T>): Promise<T> {
-        const session = this.driver.session();
-        try {
-            const ret = await proc(session, this.models);
-            return ret
-        } catch (e) {
-            if (e instanceof InternalError) {
-                throw e;
-            } else {
-                throw new DatabaseError(e);
-            }
-        } finally {
-            await session.close();
-        }
+  async exec<T>(proc: DatabaseProcedure<T>): Promise<T> {
+    const session = this.driver.session();
+    try {
+      const ret = await proc(session, this.models);
+      return ret;
+    } catch (e) {
+      if (e instanceof InternalError) {
+        throw e;
+      } else {
+        throw new DatabaseError(e);
+      }
+    } finally {
+      await session.close();
     }
+  }
 
   run(query: string, parameters?: Parameters, config?: TransactionConfig): Result {
     const session: Session = this.driver.session();
