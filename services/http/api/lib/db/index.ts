@@ -68,7 +68,7 @@ export class Database {
         } finally {
             await session.close();
         }
-  }
+    }
 
   run(query: string, parameters?: Parameters, config?: TransactionConfig): Result {
     const session: Session = this.driver.session();
