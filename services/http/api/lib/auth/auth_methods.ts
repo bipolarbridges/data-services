@@ -5,11 +5,11 @@ import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
 
 import { Request } from 'express';
 import { Session } from 'neogma/node_modules/neo4j-driver-core';
-import { AllModels } from 'lib/models';
-import { DatabaseProcedure } from 'lib/db';
-import { IdentityInstance } from 'lib/models/identity';
-import { UserInstance } from 'lib/models/user';
-import { info } from 'lib/logging';
+import { AllModels } from '../models';
+import { DatabaseProcedure } from '../db';
+import { IdentityInstance } from '../models/identity';
+import { UserInstance } from '../models/user';
+import { info } from '../logging';
 import { InternalError } from '../errors';
 
 const DIR_NAME = path.resolve();
