@@ -1,4 +1,4 @@
-import { Session } from 'neo4j-driver';
+import { Session } from 'neogma/node_modules/neo4j-driver';
 import dotenv from 'dotenv';
 import { AllModels } from '../models';
 import { error } from '../logging';
