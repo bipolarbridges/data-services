@@ -4,17 +4,19 @@
   "main": "main.ts",
   "scripts": {
     "build": "rm -rf ./dist && tsc",
-    "build:mock:auth": "cd tests/mocks/auth_server && yarn build",
+    "start": "node ./dist/main.js",
+    "start:dev": "ts-node ./main.ts",
+    "start:lazy": "nodemon",
+    "start:con": "concurrently --kill-others 'yarn start:lazy:dev' 'yarn mock:auth:start'",
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
+    "mock:auth:build": "cd tests/mocks/auth_server && yarn build",
+    "mock:auth:start": "cd tests/mocks/auth_server && yarn start",
+    "prism:api": "prism mock ./reference/bb-api.v0.yaml",        
+    "all": "yarn install && cd tests/mocks/auth_server && yarn install",
     "test": "jest tests --testPathPattern=/dist/tests/*",
-    "start": "node ./dist/main.js",
-    "start:lazy": "ts-node main.ts",
-    "start:dev:lazy": "nodemon",
-    "mock:api": "prism mock ./reference/bb-api.v0.yaml",
-    "mock:auth": "cd tests/mocks/auth_server && yarn start",
-    "start:dev": "concurrently --kill-others 'yarn start:lazy' 'yarn mock:auth'",
-    "all": "yarn install && cd tests/mocks/auth_server && yarn install"
+    "load:test": "ts-node tests/testData.ts",
+    "load:examples": "ts-node ./lib/fixtures/example.ts"
   },
   "author": "bipolarbridges",
   "license": "MIT",
@@ -27,7 +29,7 @@
     "express": "^5.0.0-alpha.8",
     "neo4j-driver": "^4.3.2",
     "neo4j-driver-core": "^4.3.2",
-    "neogma": "^1.8.4",
+    "neogma": "^1.9.1",
     "typescript": "^4.3.2"
   },
   "devDependencies": {

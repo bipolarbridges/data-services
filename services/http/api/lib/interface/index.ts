@@ -1,14 +1,15 @@
 import { Session } from 'neogma/node_modules/neo4j-driver';
-import { AllModels } from 'lib/models';
 import {
   DayProperties, HourProperties, TimestampProperties, YearProperties,
-} from 'lib/models/time';
-import { MeasurementProperties, MeasurementTypeProperties } from 'lib/models/measurement';
-import { UserProperties } from 'lib/models/user';
-import { SourceProperties } from 'lib/models/source';
+} from '../models/time';
+import { MeasurementProperties, MeasurementTypeProperties } from '../models/measurement';
+import { UserProperties } from '../models/user';
+import { SourceProperties } from '../models/source';
 import * as loggers from '../logging';
+import { DatabaseProcedure } from '../db';
+import { AllModels } from '../models';
 
-function userExists(id: string) {
+function userExists(id: string): DatabaseProcedure<boolean> {
   return async (session: Session, models: AllModels): Promise<boolean> => {
     try {
       const user = await models.user.findOne({
@@ -27,7 +28,7 @@ function userExists(id: string) {
   };
 }
 
-function createUser(id: string) {
+function createUser(id: string): DatabaseProcedure<boolean> {
   return async (session: Session, models: AllModels): Promise<null> => {
     try {
       await models.user.createOne(
@@ -220,7 +221,7 @@ function transformDate(input: number) {
   };
 }
 
-function createMeasurement(m: CreateMeasurementArgs) {
+function createMeasurement(m: CreateMeasurementArgs): DatabaseProcedure<boolean> {
   return async (session: Session, models: AllModels): Promise<boolean> => {
     try {
       const {

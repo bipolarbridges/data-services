@@ -1,5 +1,4 @@
 import { Neogma } from 'neogma';
-import { DatabaseResponse } from 'lib/auth/auth_methods';
 import { Parameters } from 'neogma/node_modules/neo4j-driver/types/query-runner';
 import { Driver, Result, Session } from 'neogma/node_modules/neo4j-driver';
 import { TransactionConfig } from 'neogma/node_modules/neo4j-driver-core';
@@ -12,14 +11,16 @@ import {
   user,
   AllModels,
 } from '../models';
-import { debug } from '../logging';
 import { InternalError } from '../errors';
+import { debug } from '../logging';
 
 class DatabaseError extends InternalError {
   constructor(error: string) {
     super(error);
   }
 }
+
+export type DatabaseProcedure<T> = (session: Session, all: AllModels) => Promise<T>;
 
 export class Database {
   driver: Driver | null;
@@ -41,8 +42,8 @@ export class Database {
       {
         // use your connection details
         url: `bolt://${process.env.DB_ADDR}:7687`,
-        username: process.env.DB_USER,
-        password: process.env.DB_PASS,
+        username: 'neo4j',
+        password: 'password',
       },
       {
         logger: debug,
@@ -53,9 +54,8 @@ export class Database {
     this.initialized = true;
   }
 
-  async exec(proc: (session: Session, all: AllModels) => DatabaseResponse)
-    : Promise<boolean | null> {
-    const session: Session = this.driver.session();
+  async exec<T>(proc: DatabaseProcedure<T>): Promise<T> {
+    const session = this.driver.session();
     try {
       const ret = await proc(session, this.models);
       return ret;

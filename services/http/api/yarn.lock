@@ -3019,6 +3019,25 @@ is-ci@^2.0.0:
   dependencies:
     ci-info "^2.0.0"
 
+is-boolean-object@^1.1.0:
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/is-boolean-object/-/is-boolean-object-1.1.1.tgz#3c0878f035cb821228d350d2e1e36719716a3de8"
+  integrity sha512-bXdQWkECBUIAcCkeH1unwJLIpZYaa5VvuygSyS/c2lf719mTKZDU5UdDRlpd01UjADgmW8RfqaP+mRaVPdr/Ng==
+  dependencies:
+    call-bind "^1.0.2"
+
+is-callable@^1.1.4, is-callable@^1.2.3:
+  version "1.2.3"
+  resolved "https://registry.yarnpkg.com/is-callable/-/is-callable-1.2.3.tgz#8b1e0500b73a1d76c70487636f368e519de8db8e"
+  integrity sha512-J1DcMe8UYTBSrKezuIUTUwjXsho29693unXM2YhJUTR2txK/eG47bvNa/wipPFmZFgr/N6f1GA66dv0mEyTIyQ==
+
+is-ci@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/is-ci/-/is-ci-2.0.0.tgz#6bc6334181810e04b5c22b3d589fdca55026404c"
+  integrity sha512-YfJT7rkpQB0updsdHLGWrvhBJfcfzNNawYDNIyQXJz0IViGf75O8EBPKSdvw2rF+LGCsX4FZ8tcr3b19LcZq4w==
+  dependencies:
+    ci-info "^2.0.0"
+
 is-ci@^3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/is-ci/-/is-ci-3.0.0.tgz#c7e7be3c9d8eef7d0fa144390bd1e4b88dc4c994"
@@ -4181,7 +4200,7 @@ neo4j-driver@^4.3.2:
     neo4j-driver-core "^4.3.2"
     rxjs "^6.6.3"
 
-neogma@^1.8.4:
+neogma@^1.9.1:
   version "1.9.1"
   resolved "https://registry.yarnpkg.com/neogma/-/neogma-1.9.1.tgz#bb64d3761a3782fd6106dafb045148657d9a696a"
   integrity sha512-esF+lQlZpZ4+QDdaOgg3JotvEKAysllXwm8X1nleHQdcOInisAJU87nko0ZFu83yn6XWVp7cg3TYisVPkz+6AA==
