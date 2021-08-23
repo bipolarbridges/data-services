@@ -1,6 +1,6 @@
 import { Session } from 'neo4j-driver';
 import dotenv from 'dotenv';
-import { makeMeasurementProperties, MergedMeasurement } from '../interface';
+import { makeMeasurementProperties, MergedMeasurement } from 'lib/interface/measurement';
 import FixtureLoader from './FixtureLoader';
 import { AllModels } from '../models';
 import { error } from '../logging';
@@ -39,11 +39,11 @@ type MeasurementList = {
 
 const measurements: MeasurementList = {
   [`${users[0]}`]: [
-    makeMeasurementProperties(90, 8, 13, 9, 2021, 1890237291, undefined, createMergeProperties('heartrate', 'measurement')),
-    makeMeasurementProperties(0.8, 3, 1, 9, 2021, 18966712291, undefined, createMergeProperties('sentiment', 'measurement')),
+    makeMeasurementProperties(90, 1890237291, undefined, createMergeProperties('heartrate', 'measurement')),
+    makeMeasurementProperties(0.8, 18966712291, undefined, createMergeProperties('sentiment', 'measurement')),
   ],
   [`${users[1]}`]: [
-    makeMeasurementProperties(6, 12, 27, 3, 2021, 189667111111, undefined, createMergeProperties('sentiment', 'measurement')),
+    makeMeasurementProperties(6, 189667111111, undefined, createMergeProperties('sentiment', 'measurement')),
   ],
 };
 
