@@ -10,7 +10,7 @@ export type DomainProperties = {
 };
 
 export type DomainRelatedNodes = {
-  DomainBullet: ModelRelatedNodesI<DomainBulletModel, DomainInstance>,
+  DomainBullet: ModelRelatedNodesI<DomainBulletModel, DomainBulletInstance>,
 };
 
 export type DomainInstance = NeogmaInstance<DomainProperties, DomainRelatedNodes>;
@@ -45,7 +45,7 @@ export function initDomainModel(db: Neogma, bulletModel: DomainBulletModel): Dom
           name: 'Includes',
         },
       },
-      primaryKeyField: 'uid',
+      primaryKeyField: 'name',
     },
     db,
   );
