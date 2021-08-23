@@ -12,6 +12,7 @@ import {
   user,
   AllModels,
   domain,
+  affirmation,
 } from '../models';
 import { InternalError } from '../errors';
 import { debug } from '../logging';
@@ -95,6 +96,17 @@ export class Database {
     const timestampModel = time.initTimestampModel(db);
     const sourceModel = source.initSourceModel(db);
 
+    const keywordModel = affirmation.initKeywordModel(db);
+    const affirmationModel = affirmation.initAffirmationModel(db, domainModel, keywordModel);
+    const affirmationNotifModel = affirmation.initAffirmationNotifModel(db,
+      hourModel,
+      dayModel,
+      monthModel,
+      yearModel,
+      timestampModel,
+      userModel,
+      affirmationModel);
+
     const measurementModel = measurement.initMeasurementModel(db,
       hourModel,
       dayModel,
@@ -130,6 +142,9 @@ export class Database {
       month: monthModel,
       year: yearModel,
       timestamp: timestampModel,
+      keyword: keywordModel,
+      affirmation: affirmationModel,
+      affirmationNotif: affirmationNotifModel,
     };
   }
 }

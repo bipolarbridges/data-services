@@ -5,6 +5,7 @@ import * as identity from './identity';
 import * as source from './source';
 import * as time from './time';
 import * as domain from './domain';
+import * as affirmation from './affirmation';
 
 type AllModels = {
   identity: identity.IdentityModel,
@@ -20,6 +21,9 @@ type AllModels = {
   measurement: measurement.MeasurementModel,
   domain: domain.DomainModel,
   domainBullet: domain.DomainBulletModel,
+  keyword: affirmation.KeywordModel,
+  affirmation: affirmation.AffirmationModel,
+  affirmationNotif: affirmation.AffirmationNotifModel,
 };
 
 export {
@@ -30,5 +34,6 @@ export {
   source,
   time,
   domain,
+  affirmation,
   AllModels,
 };

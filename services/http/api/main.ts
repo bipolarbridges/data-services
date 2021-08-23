@@ -3,10 +3,11 @@ import dotenv from 'dotenv';
 import express, { Request, Response } from 'express';
 import cors from 'cors';
 import { database, Database } from './lib/db';
-import api, { CreateMeasurementArgs, CreateDomainArgs } from './lib/interface';
+import api, { CreateDomainArgs, CreateAffirmationArgs, CreateAffirmationNotifArgs } from './lib/interface';
 import accept from './lib/requests';
 import { handle } from './lib/errors';
 import auth from './lib/auth';
+import { CreateMeasurementArgs } from './lib/interface/measurement';
 
 dotenv.config();
 
@@ -78,16 +79,20 @@ measurementRouter.route('/')
       res.status(400).send({
         message: 'Missing data object',
       });
+    } else if (!clientID) {
+      res.status(400).send({
+        message: 'Missing clientID',
+      });
     } else {
       const {
         name, value, date, source,
       } = data;
-      if (!clientID || !date || !value || !name || !source) {
+      if (!date || !value || !name || !source) {
         res.status(400).send({
           message: 'Missing data fields',
         });
       /* eslint-disable no-restricted-globals */
-      } else if (isNaN(data.date)) {
+      } else if (Number.isNaN(data.date)) {
         res.status(400).send({
           message: 'date must be a number',
         });
@@ -99,7 +104,7 @@ measurementRouter.route('/')
           name,
           value,
         };
-        if (!(await db.exec(api.userExists(me.uid)))) {
+        if (!(await db.exec(api.userExists(clientID)))) {
           res.status(404).send({
             message: 'Specified client does not exist',
           });
@@ -158,13 +163,13 @@ domainRouter.route('/')
           scope,
         };
 
-        if ((await db.exec(api.domainExists(id)))) {
+        if ((await db.exec(api.domainExists(name)))) {
           res.status(400).send({
-            message: 'Domain already exists.',
+            message: 'Domain already exists with that name.',
           });
         } else if (!(await db.exec(api.createDomain(me)))) {
           res.status(400).send({
-            message: 'measurement could not be created',
+            message: 'Domain could not be created',
           });
         } else {
           res.status(201).send({
@@ -175,6 +180,127 @@ domainRouter.route('/')
     }
   });
 app.use('/domain', domainRouter);
+
+const affirmationRouter = express.Router();
+export interface AffirmationBody {
+  id: string,
+  data: {
+    content: string,
+    domains: string[],
+    keywords: string[],
+  },
+}
+
+export interface AffirmationNotifBody {
+  id: string,
+  data: {
+    affirmationId: string,
+    userId: string,
+    date: number,
+  },
+}
+
+affirmationRouter
+  .route('/')
+  .post(async (req: Request, res: Response) => {
+    const { id, data }: Partial<AffirmationBody> = req.body;
+    if (!id) {
+      res.status(400).send({
+        message: 'Missing id',
+      });
+    } else if (!data) {
+      res.status(400).send({
+        message: 'Missing data',
+      });
+    } else {
+      const {
+        content, domains, keywords,
+      } = data;
+
+      if (!content || !domains || !keywords) {
+        res.status(400).send({
+          message: `Missing data fields: ${content}, ${domains}, ${keywords}`,
+        });
+      } else {
+        const me: CreateAffirmationArgs = {
+          uid: id,
+          content,
+          domains,
+          keywords,
+        };
+
+        if ((await db.exec(api.affirmationExists(id)))) {
+          res.status(400).send({
+            message: 'Affirmation already exists.',
+          });
+        } else if (!(await db.exec(api.createAffirmation(me)))) {
+          res.status(400).send({
+            message: 'Affirmation could not be created',
+          });
+        } else {
+          res.status(201).send({
+            message: 'Created',
+          });
+        }
+      }
+    }
+  });
+affirmationRouter
+  .route('/notif')
+  .post(async (req: Request, res: Response) => {
+    const { id, data }: Partial<AffirmationNotifBody> = req.body;
+    if (!data) {
+      res.status(400).send({
+        message: 'Missing data object',
+      });
+    } else if (!id) {
+      res.status(400).send({
+        message: 'Missing id',
+      });
+    } else {
+      const {
+        affirmationId, userId, date,
+      } = data;
+      if (!date || !affirmationId || !userId) {
+        res.status(400).send({
+          message: 'Missing data fields',
+        });
+      /* eslint-disable no-restricted-globals */
+      } else if (Number.isNaN(data.date)) {
+        res.status(400).send({
+          message: 'date must be a number',
+        });
+      } else {
+        const an: CreateAffirmationNotifArgs = {
+          date,
+          notifId: id,
+          affirmationId,
+          userId,
+        };
+        if (!(await db.exec(api.userExists(userId)))) {
+          res.status(404).send({
+            message: 'Specified client does not exist',
+          });
+        } else if (!(await db.exec(api.affirmationExists(affirmationId)))) {
+          res.status(404).send({
+            message: 'Specified affirmation does not exist',
+          });
+        } else if ((await db.exec(api.affirmationNotifExists(id)))) {
+          res.status(404).send({
+            message: 'Affirmation notif already exists.',
+          });
+        } else if (!(await db.exec(api.createAffirmationNotif(an)))) {
+          res.status(400).send({
+            message: 'Affirmation notif could not be created',
+          });
+        } else {
+          res.status(201).send({
+            message: 'Created',
+          });
+        }
+      }
+    }
+  });
 
 app.use(handle());
 
