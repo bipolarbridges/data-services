@@ -5,7 +5,9 @@ import axios, {
   AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse,
 } from 'axios';
 import { fail } from 'assert';
-import { DomainBody } from 'main';
+import {
+  AffirmationBody, AffirmationNotifBody, DomainBody, MeasurementBody,
+} from 'main';
 
 const ax = axios.create({
   baseURL: 'http://127.0.0.1:8888',
@@ -58,16 +60,14 @@ function match(method: string, path: string, body: unknown, opts: AxiosRequestCo
   });
 }
 
+function matchList(method: string, path: string, bodies: unknown[],
+  opts: AxiosRequestConfig, status: number, desc = 'Unspecified') {
+  bodies.forEach((body) => {
+    match(method, path, body, opts, status, desc);
+  });
+}
+
 describe('Paths', () => {
-  const validExampleData = {
-    clientID: 'client0@email.com',
-    data: {
-      date: 1610997441,
-      name: 'sentiment',
-      value: 0.2,
-      source: 'measurement',
-    },
-  };
   describe('/client', () => {
     describe('POST', () => {
       match('POST', '/client',
@@ -157,25 +157,42 @@ describe('Paths', () => {
             }
           });
       });
-      it('Should reject if a bad key is provided', async () => {
-        await ax.post('/measurement', validExampleData, {
+    });
+  });
+  describe('/measurement', () => {
+    const validExampleData = {
+      clientID: 'client0@email.com',
+      data: {
+        date: 1610997441,
+        name: 'sentiment',
+        value: 0.2,
+        source: 'measurement',
+      },
+    };
+    describe('POST', () => {
+      match('POST', '/measurement',
+        {
+          clientID: 'doesnotexist@email.com',
+          data: validExampleData.data,
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: 'apikey1',
+          },
+        }, 404,
+        'Missing client');
+      match('POST', '/measurement',
+        validExampleData,
+        {
           headers: {
             'Content-Type': 'application/json',
             Authorization: 'apikey2',
           },
-        }).then(async (res) => {
-          fail('Should have rejected');
-        }).catch((err) => {
-          if (!err.response) {
-            fail();
-          }
-          const res = err.response;
-          spec('POST', '/measurement').match(res);
-          expect(res.status).toEqual(403);
-        });
-      });
+        }, 403,
+        'Bad key case');
 
-      const invalidData = [
+      const invalidData: Partial<MeasurementBody>[] = [
         // Missing fields
         {
           // clientID: ...
@@ -227,41 +244,18 @@ describe('Paths', () => {
             // source: ...
           },
         },
-        // Bad typing examples
-        {
-          clientID: 'client0@email.com',
-          data: {
-            date: 'Jun 1st',
-            dataType: 'sentiment',
-            value: 0.8,
-          },
-        },
       ];
-      it('Should reject if data fields are missing or have wrong type',
-        async () => {
-          await Promise.all(invalidData.map((dat) => ax.post('/measurement', dat, {
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: 'apikey1',
-            },
-          }).then(async (res) => {
-            fail(`Should have rejected (${JSON.stringify(dat)})`);
-          }).catch((err) => {
-            if (!err.response) {
-              fail(`Error: ${err}`);
-            }
-            const res = err.response;
-            spec('POST', '/measurement').match(res);
-            expect(res.status).toEqual(400);
-          })));
-        });
-
+      matchList('POST', '/measurement', invalidData,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: 'apikey1',
+          },
+        }, 400, 'Data fields are missing or have wrong type');
       const { clientID, data: { source, name, value } } = validExampleData;
-
       const validData = [
         validExampleData,
         // all have different date
-
         // different name
         {
           clientID,
@@ -303,283 +297,18 @@ describe('Paths', () => {
           },
         },
       ];
-
-      it('Should respond properly with valid measurements', async () => {
-        await Promise.all(validData.map((dat) => {
-          ax.post('/measurement', dat, {
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: 'apikey1',
-            },
-          }).then(async (res) => {
-            spec('POST', '/measurement').match(res);
-            expect(res.status).toEqual(201);
-          }).catch((err) => {
-            fail(`Should have not rejected (${JSON.stringify(dat)})`);
-          });
-          return null;
-        }));
-      });
-
-      it('Should reject if client does not exist', async () => {
-        await ax.post('/measurement', {
-          clientID: 'doesnotexist@email.com',
-          data: validExampleData.data,
-        }, {
+      matchList('POST', '/measurement', validData,
+        {
           headers: {
             'Content-Type': 'application/json',
             Authorization: 'apikey1',
           },
-        }).then(async (res) => {
-          fail('Should have rejected');
-        }).catch((err) => {
-          if (!err.response) {
-            console.log(err);
-            fail();
-          }
-          const res = err.response;
-          spec('POST', '/measurement').match(res);
-          expect(res.status).toEqual(404);
-        })
-          .catch((err) => {
-            console.log(err?.response?.error);
-            fail();
-          });
-      });
-    });
-  });
-  describe('/measurement', () => {
-    it('Should reject if a bad key is provided', async () => {
-      await ax.post('/measurement', validExampleData, {
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: 'apikey2',
-        },
-      }).then(async (res) => {
-        fail('Should have rejected');
-      }).catch((err) => {
-        if (!err.response) {
-          fail();
-        }
-        const res = err.response;
-        spec('POST', '/measurement').match(res);
-        expect(res.status).toEqual(403);
-      });
-    });
-
-    const invalidData = [
-      // Missing fields
-      {
-        // clientID: ...
-        data: {
-          date: 1610997441,
-          name: 'sentiment',
-          value: 0.8,
-          source: 'measurement',
-
-        },
-      },
-      {
-        clientID: 'client2@email.com',
-        // data: ...
-      },
-      {
-        clientID: 'client2@email.com',
-        data: {
-          // data: ...
-          name: 'sentiment',
-          value: 0.8,
-          source: 'measurement',
-        },
-      },
-      {
-        clientID: 'client2@email.com',
-        data: {
-          date: 1610997441,
-          // name: ...
-          value: 1.3,
-          source: 'measurement',
-        },
-      },
-      {
-        clientID: 'client2@email.com',
-        data: {
-          date: 1610997441,
-          name: 'sentiment',
-          // value: ...,
-          source: 'measurement',
-        },
-      },
-      {
-        clientID: 'client2@email.com',
-        data: {
-          date: 1610997433,
-          name: 'sentiment',
-          value: 1.3,
-          // source: ...
-        },
-      },
-      // Bad typing examples
-      {
-        clientID: 'client0@email.com',
-        data: {
-          date: 'Jun 1st',
-          dataType: 'sentiment',
-          value: 0.8,
-        },
-      },
-    ];
-    it('Should reject if data fields are missing or have wrong type',
-      async () => {
-        await Promise.all(invalidData.map((dat) => ax.post('/measurement', dat, {
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: 'apikey1',
-          },
-        }).then(async (res) => {
-          fail(`Should have rejected (${JSON.stringify(dat)})`);
-        }).catch((err) => {
-          if (!err.response) {
-            fail(`Error: ${err}`);
-          }
-          const res = err.response;
-          spec('POST', '/measurement').match(res);
-          expect(res.status).toEqual(400);
-        })));
-      });
-
-    it('Should respond properly upon success', async () => {
-      await ax.post('/measurement', validExampleData, {
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: 'apikey1',
-        },
-      }).then(async (res) => {
-        spec('POST', '/measurement').match(res);
-        expect(res.status).toEqual(201);
-      }).catch((err) => {
-        console.log(err.response.data);
-        fail();
-      });
-    });
-
-    it('Should reject if client does not exist', async () => {
-      await ax.post('/measurement', {
-        clientID: 'doesnotexist@email.com',
-        data: validExampleData.data,
-      }, {
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: 'apikey1',
-        },
-      }).then(async (res) => {
-        fail('Should have rejected');
-      }).catch((err) => {
-        if (!err.response) {
-          console.log(err);
-          fail();
-        }
-        const res = err.response;
-        spec('POST', '/measurement').match(res);
-        expect(res.status).toEqual(404);
-      });
+        }, 201, 'Normal happy cases');
     });
   });
   describe('/domain', () => {
-    it('Should reject if a bad key is provided', async () => {
-      await ax.post('/measurement', validExampleData, {
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: 'apikey2',
-        },
-      }).then(async (res) => {
-        fail('Should have rejected');
-      }).catch((err) => {
-        if (!err.response) {
-          fail();
-        }
-        const res = err.response;
-        spec('POST', '/measurement').match(res);
-        expect(res.status).toEqual(403);
-      });
-    });
-
-    const invalidDomains: Partial<DomainBody>[] = [
-      {
-        // id: 'domain-none',
-        data: {
-          bullets: ['example-text'],
-          importance: 'very important',
-          name: 'exampleName',
-          scope: 'all',
-        },
-      },
-      {
-        id: 'domain2',
-        // data: {
-        //   bullets: [],
-        //   importance: '',
-        //   name: '',
-        //   scope: '',
-        // },
-      },
-      {
-        id: 'domain3',
-        data: {
-          // bullets: [],
-          importance: 'very important',
-          name: 'exampleName',
-          scope: 'all',
-        },
-      },
-      {
-        id: 'domain4',
-        data: {
-          bullets: ['example-text'],
-          // importance: '',
-          name: 'exampleName',
-          scope: 'all',
-        },
-      },
-      {
-        id: 'domain5',
-        data: {
-          bullets: ['example-text'],
-          importance: 'very important',
-          // name: '',
-          scope: 'all',
-        },
-      },
-      {
-        id: 'domain6',
-        data: {
-          bullets: ['example-text'],
-          importance: 'very important',
-          name: 'exampleName',
-          // scope: '',
-        },
-      },
-    ];
-    it('Should reject if data fields are missing or have wrong type',
-      async () => {
-        await Promise.all(invalidDomains.map((dat) => ax.post('/domain', dat, {
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: 'apikey1',
-          },
-        }).then(async (res) => {
-          fail(`Should have rejected (${JSON.stringify(dat)})`);
-        }).catch((err) => {
-          if (!err.response) {
-            fail(`Error: ${err}`);
-          }
-          const res = err.response;
-          spec('POST', '/domain').match(res);
-          expect(res.status).toEqual(400);
-        })));
-      });
-    it('Should respond properly upon success', async () => {
-      await ax.post('/domain', {
+    describe('POST', () => {
+      const validExampleData = {
         id: 'domain1',
         data: {
           bullets: ['example-text'],
@@ -587,19 +316,168 @@ describe('Paths', () => {
           name: 'exampleName',
           scope: 'all',
         },
-      }, {
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: 'apikey1',
+      };
+      match('POST', '/domain',
+        validExampleData,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: 'apikey1',
+          },
+        }, 201,
+        'Normal happy case');
+      match('POST', '/domain',
+        validExampleData,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: 'apikey2',
+          },
+        }, 403,
+        'Bad key case');
+      const invalidDomains: Partial<DomainBody>[] = [
+        {
+          // id: 'domain-none',
+          data: {
+            bullets: ['example-text'],
+            importance: 'very important',
+            name: 'exampleName',
+            scope: 'all',
+          },
         },
-      }).then(async (res) => {
-        spec('POST', '/domain').match(res);
-        expect(res.status).toEqual(201);
-      }).catch((err) => {
-        // console.log(err);
-        console.log(err.response.data);
-        fail();
-      });
+        {
+          id: 'domain2',
+          // data: {
+          //   bullets: [],
+          //   importance: '',
+          //   name: '',
+          //   scope: '',
+          // },
+        },
+        {
+          id: 'domain3',
+          data: {
+            // bullets: [],
+            importance: 'very important',
+            name: 'exampleName',
+            scope: 'all',
+          },
+        },
+        {
+          id: 'domain4',
+          data: {
+            bullets: ['example-text'],
+            // importance: '',
+            name: 'exampleName',
+            scope: 'all',
+          },
+        },
+        {
+          id: 'domain5',
+          data: {
+            bullets: ['example-text'],
+            importance: 'very important',
+            // name: '',
+            scope: 'all',
+          },
+        },
+        {
+          id: 'domain6',
+          data: {
+            bullets: ['example-text'],
+            importance: 'very important',
+            name: 'exampleName',
+            // scope: '',
+          },
+        },
+      ];
+      it('Should reject if data fields are missing or have wrong type',
+        async () => {
+          await Promise.all(invalidDomains.map((dat) => ax.post('/domain', dat, {
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: 'apikey1',
+            },
+          }).then(async (res) => {
+            fail(`Should have rejected (${JSON.stringify(dat)})`);
+          }).catch((err) => {
+            if (!err.response) {
+              fail(`Error: ${err}`);
+            }
+            const res = err.response;
+            spec('POST', '/domain').match(res);
+            expect(res.status).toEqual(400);
+          })));
+        });
+    });
+  });
+  describe('/affirmation', () => {
+    describe('POST', () => {
+      const validExampleData: AffirmationBody = {
+        id: 'affirmation1',
+        data: {
+          content: 'testing content',
+          domains: ['domain1'],
+          keywords: ['keyword1'],
+        },
+      };
+      match('POST', '/affirmation',
+        validExampleData,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: 'apikey1',
+          },
+        }, 201,
+        'Normal happy case');
+      match('POST', '/affirmation',
+        validExampleData,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: 'apikey2',
+          },
+        }, 403,
+        'Bad key case');
+      const invalidData: Partial<AffirmationBody>[] = [
+
+      ];
+      matchList('POST', '/affirmation', invalidData,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: 'apikey1',
+          },
+        }, 400, 'Data fields are missing or have wrong type');
+    });
+
+    describe('/affirmation/notif', () => {
+      const validExampleData: AffirmationNotifBody = {
+        id: 'affirmation1',
+        data: {
+          affirmationId: 'affirmation1',
+          userId: 'client1@email.com',
+          date: new Date().getTime(),
+        },
+      };
+      match('POST', '/affirmation/notif',
+        validExampleData,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: 'apikey1',
+          },
+        }, 201,
+        'Normal happy case');
+      match('POST', '/affirmation/notif',
+        validExampleData,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: 'apikey2',
+          },
+        }, 403,
+        'Bad key case');
     });
   });
 });

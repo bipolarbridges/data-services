@@ -23,8 +23,8 @@ app.get('/', (req, res) => res.status(200).end());
 app.use(auth(db));
 
 const clientRouter = express.Router();
-clientRouter.route('/')
-  .post(async (req, res) => {
+clientRouter
+  .post('/', async (req, res) => {
     const data = req.body;
     if (!data.id) {
       res.status(400).send({
@@ -50,10 +50,8 @@ clientRouter.route('/')
         });
       }
     }
-  });
-
-clientRouter.route('/:clientId')
-  .get(async (req, res) => {
+  })
+  .get('/:clientId', async (req, res) => {
     res.status(200).send({
       id: req.params.clientId,
     });
@@ -61,19 +59,19 @@ clientRouter.route('/:clientId')
 
 app.use('/client', clientRouter);
 
-interface MeasurementBody {
+export interface MeasurementBody {
   clientID: string,
   data: {
-    name: string,
-    value: number,
-    date: number,
-    source: string
+    name?: string,
+    value?: number,
+    date?: (string | number),
+    source?: string
   },
 }
 const measurementRouter = express.Router();
 
-measurementRouter.route('/')
-  .post(async (req, res) => {
+measurementRouter
+  .post('/', async (req, res) => {
     const { clientID, data }: Partial<MeasurementBody> = req.body;
     if (!data) {
       res.status(400).send({
@@ -98,7 +96,7 @@ measurementRouter.route('/')
         });
       } else {
         const me: CreateMeasurementArgs = {
-          date,
+          date: (date as number),
           uid: clientID,
           source,
           name,
@@ -135,8 +133,8 @@ export interface DomainBody {
   },
 }
 
-domainRouter.route('/')
-  .post(async (req: Request, res: Response) => {
+domainRouter
+  .post('/', async (req: Request, res: Response) => {
     const { id, data }: Partial<DomainBody> = req.body;
     if (!data) {
       res.status(400).send({
@@ -201,8 +199,7 @@ export interface AffirmationNotifBody {
 }
 
 affirmationRouter
-  .route('/')
-  .post(async (req: Request, res: Response) => {
+  .post('/', async (req: Request, res: Response) => {
     const { id, data }: Partial<AffirmationBody> = req.body;
     if (!id) {
       res.status(400).send({
@@ -246,8 +243,7 @@ affirmationRouter
     }
   });
 affirmationRouter
-  .route('/notif')
-  .post(async (req: Request, res: Response) => {
+  .post('/notif', async (req: Request, res: Response) => {
     const { id, data }: Partial<AffirmationNotifBody> = req.body;
     if (!data) {
       res.status(400).send({
@@ -301,6 +297,7 @@ affirmationRouter
       }
     }
   });
+app.use('/affirmation', affirmationRouter);
 
 app.use(handle());
 
