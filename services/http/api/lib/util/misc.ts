@@ -6,5 +6,6 @@ export default async function findOne<T>(a: T[], cond: (a: T) => Promise<boolean
     }
     i++;
   }
+  i++;
   return null;
 }
