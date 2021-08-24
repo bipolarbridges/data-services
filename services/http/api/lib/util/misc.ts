@@ -1,7 +1,4 @@
-import { AuthMethod, DatabaseResponse } from '../auth/auth_methods';
-
-export default async function findOne(a: AuthMethod[],
-  cond: (a: AuthMethod) => DatabaseResponse): Promise<AuthMethod> {
+export default async function findOne<T>(a: T[], cond: (a: T) => Promise<boolean>): Promise<T> {
   let i = 0;
   while (i < a.length) {
     if (await cond(a[i])) {
@@ -9,5 +6,6 @@ export default async function findOne(a: AuthMethod[],
     }
     i++;
   }
+  i++;
   return null;
 }

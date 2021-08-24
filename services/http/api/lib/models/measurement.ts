@@ -21,7 +21,7 @@ export type MeasurementTypeProperties = {
 
 export type MeasurementTypeRelatedNodesI = {
   Measurement: ModelRelatedNodesI<MeasurementModel, MeasurementInstance>,
-  Source: ModelRelatedNodesI<SourceModel, SourceInstance>;
+  Source: ModelRelatedNodesI<SourceModel, SourceInstance>,
 };
 
 export type MeasurementTypeInstance =

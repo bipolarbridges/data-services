@@ -1,5 +1,4 @@
 import { Neogma } from 'neogma';
-import { DatabaseResponse } from 'lib/auth/auth_methods';
 import { Parameters } from 'neogma/node_modules/neo4j-driver/types/query-runner';
 import { Driver, Result, Session } from 'neogma/node_modules/neo4j-driver';
 import { TransactionConfig } from 'neogma/node_modules/neo4j-driver-core';
@@ -20,6 +19,8 @@ class DatabaseError extends InternalError {
     super(error);
   }
 }
+
+export type DatabaseProcedure<T> = (session: Session, all: AllModels) => Promise<T>;
 
 export class Database {
   driver: Driver | null;
@@ -53,9 +54,8 @@ export class Database {
     this.initialized = true;
   }
 
-  async exec(proc: (session: Session, all: AllModels) => DatabaseResponse)
-    : Promise<boolean | null> {
-    const session: Session = this.driver.session();
+  async exec<T>(proc: DatabaseProcedure<T>): Promise<T> {
+    const session = this.driver.session();
     try {
       const ret = await proc(session, this.models);
       return ret;

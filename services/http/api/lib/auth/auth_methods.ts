@@ -2,10 +2,15 @@ import { readFileSync } from 'fs';
 import path, { join } from 'path';
 import { BinaryLike, createHash } from 'crypto';
 import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
+
 import { Request } from 'express';
-import { Session } from 'neogma/node_modules/neo4j-driver';
-import { InternalError } from '../errors';
+import { Session } from 'neogma/node_modules/neo4j-driver-core';
+import { AllModels } from '../models';
+import { DatabaseProcedure } from '../db';
+import { IdentityInstance } from '../models/identity';
+import { UserInstance } from '../models/user';
 import { info } from '../logging';
+import { InternalError } from '../errors';
 
 const DIR_NAME = path.resolve();
 
@@ -58,50 +63,65 @@ async function getRemoteId(token: BinaryLike) {
   }
 }
 
-export interface AuthMethod {
-  (req: Request, auth: BinaryLike): DatabaseCallback
-}
-
-export interface DatabaseCallback {
-  (db: Session): DatabaseResponse
-}
-
-export type DatabaseResponse = Promise<boolean | null>;
+export type AuthResult = DatabaseProcedure<boolean>;
+export type AuthMethod = (req: Request, auth: BinaryLike) => AuthResult;
 
 export const authMethods: AuthMethod[] = [
-  (req: Request, auth: BinaryLike) => async (db: Session): Promise<boolean | null> => {
-    // KEY AUTHENTICATION
-    info(`Path: ${req.path}`);
-    const results = await db.run(
-      "MATCH (i:Identity{type: 'key', check: $check}) "
-            + 'MATCH (r:Resource{path: $path}) '
-            + 'MATCH (i)-[c:Can{method: $method}]->(r)'
-            + 'RETURN i,r,c;',
-      {
+  // KEY AUTHENTICATION
+  (req: Request, auth: BinaryLike) => async (db: Session, models: AllModels) => {
+    const ident: IdentityInstance = await models.identity.findOne({
+      where: {
+        type: 'key',
         check: basicHash(auth),
-        path: req.path,
-        method: req.method,
       },
-    );
-    return results.records.length > 0;
+      session: db,
+    });
+    if (ident) {
+      const perms = await ident.findRelationships({
+        alias: 'Resource',
+        where: {
+          target: {
+            path: req.path,
+          },
+          relationship: {
+            method: req.method,
+          },
+        },
+        session: db,
+        limit: 1,
+      });
+      return perms.length === 1;
+    }
+    return false;
   },
-  (req: Request, auth: BinaryLike) => async (db: Session): Promise<boolean | null> => {
+  // USER AUTHENTICATION
+  (req: Request, auth: BinaryLike) => async (db: Session, models: AllModels) => {
     const id = await getRemoteId(auth);
     if (!id) {
       return false;
     }
-    info('Authenticated: ', id);
-    const results = await db.run(
-      'MATCH (u:User{uid: $uid}) '
-                + 'MATCH (r:Resource{path: $path}) '
-                + 'MATCH (u)-[c:Can{method: $method}]->(r)'
-                + 'RETURN u,r,c;',
-      {
+    const user: UserInstance = await models.user.findOne({
+      where: {
         uid: id,
-        path: req.path,
-        method: req.method,
       },
-    );
-    return results.records.length > 0;
+      session: db,
+    });
+    if (!user) {
+      return false;
+    }
+    const perms = await user.findRelationships({
+      alias: 'Resource',
+      where: {
+        target: {
+          path: req.path,
+        },
+        relationship: {
+          method: req.method,
+        },
+      },
+      session: db,
+      limit: 1,
+    });
+    return perms.length === 1;
   },
 ];
