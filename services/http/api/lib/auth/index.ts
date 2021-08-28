@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { AuthMethod, authMethods } from './auth_methods';
 import findOne from '../util/misc';
-import { warn } from '../logging';
+import { info, warn } from '../logging';
 import { Database } from '../db';
 
 export default function auth(db: Database) {
@@ -10,6 +10,7 @@ export default function auth(db: Database) {
     if (!provided
             || !(await findOne(authMethods, async (m: AuthMethod) => db.exec(m(req, provided))))) {
       warn('Unauthorized request attempted');
+      info(`requested path: ${req.path}`);
       res.status(403).send({
         message: 'Not authorized',
       });

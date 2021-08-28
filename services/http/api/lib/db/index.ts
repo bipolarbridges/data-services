@@ -11,6 +11,8 @@ import {
   time,
   user,
   AllModels,
+  domain,
+  affirmation,
 } from '../models';
 import { InternalError } from '../errors';
 import { debug } from '../logging';
@@ -85,12 +87,25 @@ export class Database {
     const identityModel = identity.initIdentityModel(db, resourceModel);
     const userModel = user.initUserModel(db, resourceModel);
 
+    const domainBulletModel = domain.initDomainBulletModel(db);
+    const domainModel = domain.initDomainModel(db, domainBulletModel);
     const hourModel = time.initHourModel(db);
     const dayModel = time.initDayModel(db);
     const monthModel = time.initMonthModel(db, dayModel);
     const yearModel = time.initYearModel(db);
     const timestampModel = time.initTimestampModel(db);
     const sourceModel = source.initSourceModel(db);
+
+    const keywordModel = affirmation.initKeywordModel(db);
+    const affirmationModel = affirmation.initAffirmationModel(db, domainModel, keywordModel);
+    const affirmationNotifModel = affirmation.initAffirmationNotifModel(db,
+      hourModel,
+      dayModel,
+      monthModel,
+      yearModel,
+      timestampModel,
+      userModel,
+      affirmationModel);
 
     const measurementModel = measurement.initMeasurementModel(db,
       hourModel,
@@ -114,6 +129,8 @@ export class Database {
     );
 
     this.models = {
+      domain: domainModel,
+      domainBullet: domainBulletModel,
       source: sourceModel,
       resource: resourceModel,
       measurementType: measurementTypeModel,
@@ -125,6 +142,9 @@ export class Database {
       month: monthModel,
       year: yearModel,
       timestamp: timestampModel,
+      keyword: keywordModel,
+      affirmation: affirmationModel,
+      affirmationNotif: affirmationNotifModel,
     };
   }
 }

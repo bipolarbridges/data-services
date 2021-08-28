@@ -16,44 +16,11 @@ paths:
       tags: []
       responses:
         '201':
-          description: Created
-          content:
-            application/json:
-                schema:
-                  description: 'Creation message'
-                  type: object
-                  properties:
-                    message:
-                      type: string
-                      minLength: 1
-                  required:
-                    - message
+          $ref: '#/components/responses/Created'
         '400':
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                description: 'Error Cause'
-                type: object
-                properties:
-                  message:
-                    type: string
-                    minLength: 1
-                required:
-                  - message
+          $ref: '#/components/responses/BadFormat'
         '403':
-          description: Forbidden
-          content:
-            application/json:
-              schema:
-                description: 'Error Cause'
-                type: object
-                properties:
-                  message:
-                    type: string
-                    minLength: 1
-                required:
-                  - message
+          $ref: '#/components/responses/NotAuthorized'
       operationId: post-client
       requestBody:
         content:
@@ -75,18 +42,7 @@ paths:
       tags: []
       responses:
         '403':
-          description: Forbidden
-          content:
-            application/json:
-                schema:
-                  description: 'Message'
-                  type: object
-                  properties:
-                    message:
-                      type: string
-                      minLength: 1
-                  required:
-                    - message
+          $ref: '#/components/responses/NotAuthorized'
         '200':
           description: Good
           content:
@@ -106,57 +62,13 @@ paths:
       tags: []
       responses:
         '201':
-          description: Created
-          content:
-            application/json:
-                schema:
-                  description: 'Creation message'
-                  type: object
-                  properties:
-                    message:
-                      type: string
-                      minLength: 1
-                  required:
-                    - message
+          $ref: '#/components/responses/Created'
         '400':
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                description: 'Error Cause'
-                type: object
-                properties:
-                  message:
-                    type: string
-                    minLength: 1
-                required:
-                  - message
+          $ref: '#/components/responses/BadFormat'
         '403':
-          description: Forbidden
-          content:
-            application/json:
-              schema:
-                description: 'Error Cause'
-                type: object
-                properties:
-                  message:
-                    type: string
-                    minLength: 1
-                required:
-                  - message
+          $ref: '#/components/responses/NotAuthorized'
         '404':
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                description: 'Error Cause'
-                type: object
-                properties:
-                  message:
-                    type: string
-                    minLength: 1
-                required:
-                  - message
+          $ref: '#/components/responses/NotFound'
       operationId: post-measurement
       security:
         - import-key: []
@@ -188,8 +100,168 @@ paths:
               required:
                 - clientID
                 - data
+  /domain: 
+    post:
+      summary: Records domains. 
+      tags: []
+      responses:
+        '201':
+          $ref: '#/components/responses/Created'
+        '400':
+          $ref: '#/components/responses/BadFormat'
+        '403':
+          $ref: '#/components/responses/NotAuthorized'
+      operationId: post-domain
+      security:
+        - import-key: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              description: 'Domain Request Contents'
+              type: object
+              required:
+                - id
+                - data
+              properties:
+                id:
+                  type: string
+                data:
+                  type: object
+                  required:
+                    - bullets
+                    - importance
+                    - name
+                    - scope
+                  properties:
+                    bullets: 
+                      type: array
+                      items:
+                        type: string
+                    importance:
+                      type: string
+                    name:
+                      type: string
+                    scope:
+                      type: string
+  /affirmation:
+    post:
+      summary: Records affirmations.
+      tags: []
+      responses:
+        '201':
+          $ref: '#/components/responses/Created'
+        '400':
+          $ref: '#/components/responses/BadFormat'
+        '403':
+          $ref: '#/components/responses/NotAuthorized'
+      operationId: post-affirmation
+      security:
+        - import-key: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              description: 'Affirmation Request Contents'
+              type: object
+              required:
+                - id
+                - data
+              properties:
+                id:
+                  type: string
+                data:
+                  type: object
+                  required:
+                    - content
+                    - domains
+                    - keywords
+                  properties:
+                    domains: 
+                      type: array
+                      items:
+                        type: string
+                    keywords: 
+                      type: array
+                      items:
+                        type: string
+                    content:
+                      type: string
+  /affirmation/notif:
+    post:
+      summary: Record affirmation notifs.
+      tags: []
+      responses: 
+        '201':
+          $ref: '#/components/responses/Created'
+        '400':
+          $ref: '#/components/responses/BadFormat'
+        '403':
+          $ref: '#/components/responses/NotAuthorized'
+      operationId: post-affirmation-notif
+      security:
+        - import-key: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              description: 'Affirmation Notif Request Contents'
+              type: object
+              required:
+                - id
+                - data
+              properties:
+                id:
+                  type: string
+                data:
+                  type: object
+                  required:
+                    - affirmationId
+                    - userId
+                    - date
+                  properties:
+                    affirmationId:
+                      type: string
+                    userId:
+                      type: string
+                    date:
+                      type: number
 components:
-  schemas: {}
+  schemas: 
+    Message:
+      type: object
+      properties:
+        message:
+          type: string
+          minLength: 1
+      required:
+        - message
+  responses:
+    NotFound:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Message'
+    BadFormat:
+      description: 'Error Cause'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Message'
+    Created:
+      description: 'Creation message'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Message'
+    NotAuthorized:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Message'
+            
   securitySchemes:
     import-key:
       name: Authorization

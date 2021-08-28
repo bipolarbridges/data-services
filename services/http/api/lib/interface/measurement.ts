@@ -1,0 +1,227 @@
+import { Session } from 'neo4j-driver';
+
+import { DatabaseProcedure } from '../db';
+import { AllModels } from '../models';
+import { MeasurementTypeProperties, MeasurementProperties } from '../models/measurement';
+import { SourceProperties } from '../models/source';
+import {
+  HourProperties, YearProperties, TimestampProperties, DayProperties,
+} from '../models/time';
+import { UserProperties } from '../models/user';
+import * as loggers from '../logging';
+
+// named with format VerbModelArgs
+export type CreateMeasurementArgs = {
+  uid: string,
+  value: number,
+  name: string,
+  source: string,
+  date: number,
+};
+
+type MergeConfig = {
+  nodes: boolean,
+  relationship: boolean,
+};
+
+type MergeProperties = {
+  Hour: {
+    propertiesMergeConfig: MergeConfig,
+    properties: HourProperties[]
+  },
+  Day: DayMergeProperties,
+  Month: MonthMergeProperties,
+  Year: {
+    propertiesMergeConfig: MergeConfig,
+    properties: YearProperties[]
+  },
+  Timestamp: {
+    propertiesMergeConfig: MergeConfig,
+    properties: TimestampProperties[]
+  },
+  User?: UserMergeProperties,
+  MeasurementType?: {
+    propertiesMergeConfig: MergeConfig,
+    properties: CombinedTypeSource[]
+  }
+};
+
+type UserMergeProperties = {
+  propertiesMergeConfig: MergeConfig,
+  properties: UserProperties[]
+};
+
+type MeasurementTypeMergeProperties = {
+  propertiesMergeConfig: MergeConfig,
+  properties: CombinedTypeSource[],
+};
+
+type DayMergeProperties = {
+  propertiesMergeConfig: MergeConfig,
+  properties: DayProperties[]
+};
+
+type MonthMergeProperties = {
+  propertiesMergeConfig: MergeConfig,
+  properties: {
+    month: number,
+    Day?: DayMergeProperties
+  }[]
+};
+
+type SourceMergeProperties = {
+  propertiesMergeConfig: MergeConfig,
+  properties: SourceProperties[],
+};
+
+type CombinedTypeSource = MeasurementTypeProperties & { Source: SourceMergeProperties };
+
+export type MergedMeasurement = MeasurementProperties & MergeProperties;
+
+// Takes in a second number input, converts it to milliseconds
+// and returns
+// - the year
+// - the month (0-11)
+// - the day of the month (1-31)
+// - the time in milliseconds
+function transformDate(input: number) {
+  const date = new Date(input * 1000);
+  const year = date.getFullYear();
+  const month = date.getMonth();
+  const day = date.getDate();
+  const time = date.getTime();
+  const hour = date.getHours();
+
+  return {
+    year,
+    month,
+    day,
+    hour,
+    time,
+  };
+}
+
+export function makeTimeProperties(date: number) {
+  const {
+    year, month, day, hour, time,
+  } = transformDate(date);
+  return {
+    Hour: {
+      propertiesMergeConfig: {
+        nodes: true,
+        relationship: false,
+      },
+      properties: [
+        { hour },
+      ],
+    },
+    Day: {
+      propertiesMergeConfig: {
+        nodes: true,
+        relationship: false,
+      },
+      properties: [
+        { day },
+      ],
+    },
+    Month: {
+      propertiesMergeConfig: {
+        nodes: true,
+        relationship: false,
+      },
+      properties: [
+        {
+          month,
+          Day: {
+            propertiesMergeConfig: {
+              nodes: true,
+              relationship: true,
+            },
+            properties: [
+              { day },
+            ],
+          },
+        },
+      ],
+    },
+    Year: {
+      propertiesMergeConfig: {
+        nodes: true,
+        relationship: true,
+      },
+      properties: [
+        { year },
+      ],
+    },
+    Timestamp: {
+      propertiesMergeConfig: {
+        nodes: true,
+        relationship: false,
+      },
+      properties: [
+        { time },
+      ],
+    },
+  };
+}
+
+export function makeMeasurementProperties(value: number,
+  date: number,
+  User?: UserMergeProperties,
+  MeasurementType?: MeasurementTypeMergeProperties): MergedMeasurement {
+  return {
+    value,
+    ...makeTimeProperties(date),
+    User,
+    MeasurementType,
+  };
+}
+
+export function createMeasurement(m: CreateMeasurementArgs): DatabaseProcedure<boolean> {
+  return async (session: Session, models: AllModels): Promise<boolean> => {
+    try {
+      const {
+        uid, source, value, name,
+      } = m;
+
+      const User = {
+        propertiesMergeConfig: {
+          nodes: true,
+          relationship: true,
+        },
+        properties: [{
+          uid,
+        }],
+      };
+
+      await models.measurementType.createOne(
+        {
+          name,
+          Measurement: {
+            propertiesMergeConfig: {
+              nodes: false,
+              relationship: false,
+            },
+            properties: [makeMeasurementProperties(value, m.date, User)],
+          },
+          Source: {
+            propertiesMergeConfig: {
+              nodes: true,
+              relationship: true,
+            },
+            properties: [
+              {
+                name: source,
+              },
+            ],
+          },
+        },
+        { session, merge: true },
+      );
+      return true;
+    } catch (err) {
+      loggers.error(err);
+      return false;
+    }
+  };
+}
