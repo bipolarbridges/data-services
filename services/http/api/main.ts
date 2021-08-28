@@ -23,6 +23,11 @@ app.get('/', (req, res) => res.status(200).end());
 app.use(auth(db));
 
 const clientRouter = express.Router();
+
+export interface ClientBody {
+  id: string,
+}
+
 clientRouter
   .post('/', async (req, res) => {
     const data = req.body;
@@ -31,7 +36,7 @@ clientRouter
         message: 'Missing id field',
       });
     } else {
-      const { id } = data;
+      const { id }: ClientBody = data;
       try {
         const exists = await db.exec(api.userExists(id));
         if (exists) {
@@ -183,18 +188,18 @@ const affirmationRouter = express.Router();
 export interface AffirmationBody {
   id: string,
   data: {
-    content: string,
-    domains: string[],
-    keywords: string[],
+    content?: string,
+    domains?: string[],
+    keywords?: string[],
   },
 }
 
 export interface AffirmationNotifBody {
   id: string,
   data: {
-    affirmationId: string,
-    userId: string,
-    date: number,
+    affirmationId?: string,
+    userId?: string,
+    date?: number,
   },
 }
 

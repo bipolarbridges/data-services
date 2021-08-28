@@ -6,7 +6,7 @@ import axios, {
 } from 'axios';
 import { fail } from 'assert';
 import {
-  AffirmationBody, AffirmationNotifBody, DomainBody, MeasurementBody,
+  AffirmationBody, AffirmationNotifBody, ClientBody, DomainBody, MeasurementBody,
 } from 'main';
 
 const ax = axios.create({
@@ -67,48 +67,69 @@ function matchList(method: string, path: string, bodies: unknown[],
   });
 }
 
+type PostMatch = {
+  body: unknown,
+  opts: AxiosRequestConfig,
+  status: number,
+  desc?: string,
+};
+
+function testPost<T>(path: string, validData: T, invalidData: Partial<T>[],
+  extraMatches?: PostMatch[]) {
+  const correctHeader = {
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: 'apikey1',
+    },
+  };
+
+  match('POST', path,
+    validData,
+    correctHeader,
+    201,
+    'Normal happy case');
+  match('POST', path,
+    validData,
+    {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'apikey2',
+      },
+    }, 403,
+    'Bad key case');
+  matchList('POST', path,
+    invalidData,
+    correctHeader,
+    400,
+    'Data fields are missing or have wrong type');
+  extraMatches?.forEach((m) => {
+    if (Array.isArray(m.body)) {
+      matchList('POST', path, m.body, m.opts, m.status, (m?.desc || 'Unspecified'));
+    } else {
+      match('POST', path, m.body, m.opts, m.status, (m?.desc || 'Unspecified'));
+    }
+  });
+}
+
 describe('Paths', () => {
   describe('/client', () => {
     describe('POST', () => {
-      match('POST', '/client',
+      const validExampleData: ClientBody = {
+        id: 'client1@email.com',
+      };
+      const extraCases: PostMatch[] = [
         {
-          id: 'client1@email.com',
+          body: "I'm not JSON",
+          opts: {
+            headers: {
+              Authorization: 'apikey1',
+            },
+          },
+          status: 400,
+          desc: 'Invalid JSON in body',
         },
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: 'apikey1',
-          },
-        }, 201,
-        'Normal happy case');
-      match('POST', '/client',
-        {},
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: 'apikey1',
-          },
-        }, 400,
-        'Missing data fields');
-      match('POST', '/client',
-        "I'm not JSON",
-        {
-          headers: {
-            Authorization: 'apikey1',
-          },
-        }, 400,
-        'Invalid JSON in body');
-      match('POST', '/client',
-        {
-          id: 'client1@email.com',
-        },
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: 'apikey2',
-          },
-        }, 403,
-        'Bad key');
+      ];
+      testPost<ClientBody>('/client', validExampleData, [{}], extraCases);
       it('Should disallow creation of clients with the same id',
         async () => {
           await ax.post('/client', {
@@ -160,38 +181,16 @@ describe('Paths', () => {
     });
   });
   describe('/measurement', () => {
-    const validExampleData = {
-      clientID: 'client0@email.com',
-      data: {
-        date: 1610997441,
-        name: 'sentiment',
-        value: 0.2,
-        source: 'measurement',
-      },
-    };
     describe('POST', () => {
-      match('POST', '/measurement',
-        {
-          clientID: 'doesnotexist@email.com',
-          data: validExampleData.data,
+      const validExampleData: MeasurementBody = {
+        clientID: 'client0@email.com',
+        data: {
+          date: 1610997441,
+          name: 'sentiment',
+          value: 0.2,
+          source: 'measurement',
         },
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: 'apikey1',
-          },
-        }, 404,
-        'Missing client');
-      match('POST', '/measurement',
-        validExampleData,
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: 'apikey2',
-          },
-        }, 403,
-        'Bad key case');
-
+      };
       const invalidData: Partial<MeasurementBody>[] = [
         // Missing fields
         {
@@ -201,7 +200,6 @@ describe('Paths', () => {
             name: 'sentiment',
             value: 0.8,
             source: 'measurement',
-
           },
         },
         {
@@ -245,13 +243,6 @@ describe('Paths', () => {
           },
         },
       ];
-      matchList('POST', '/measurement', invalidData,
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: 'apikey1',
-          },
-        }, 400, 'Data fields are missing or have wrong type');
       const { clientID, data: { source, name, value } } = validExampleData;
       const validData = [
         validExampleData,
@@ -264,7 +255,6 @@ describe('Paths', () => {
             source,
             name: 'mindfulness',
             value,
-
           },
         },
         // different value
@@ -297,18 +287,39 @@ describe('Paths', () => {
           },
         },
       ];
-      matchList('POST', '/measurement', validData,
+      const otherCases: PostMatch[] = [
         {
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: 'apikey1',
+          body: {
+            clientID: 'doesnotexist@email.com',
+            data: validExampleData.data,
           },
-        }, 201, 'Normal happy cases');
+          opts: {
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: 'apikey1',
+            },
+          },
+          status: 404,
+          desc: 'Missing client',
+        },
+        {
+          body: validData,
+          opts: {
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: 'apikey1',
+            },
+          },
+          status: 201,
+          desc: 'Normal happy cases',
+        },
+      ];
+      testPost<MeasurementBody>('/measurement', validExampleData, invalidData, otherCases);
     });
   });
   describe('/domain', () => {
     describe('POST', () => {
-      const validExampleData = {
+      const validDomain: DomainBody = {
         id: 'domain1',
         data: {
           bullets: ['example-text'],
@@ -317,24 +328,6 @@ describe('Paths', () => {
           scope: 'all',
         },
       };
-      match('POST', '/domain',
-        validExampleData,
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: 'apikey1',
-          },
-        }, 201,
-        'Normal happy case');
-      match('POST', '/domain',
-        validExampleData,
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: 'apikey2',
-          },
-        }, 403,
-        'Bad key case');
       const invalidDomains: Partial<DomainBody>[] = [
         {
           // id: 'domain-none',
@@ -347,12 +340,7 @@ describe('Paths', () => {
         },
         {
           id: 'domain2',
-          // data: {
-          //   bullets: [],
-          //   importance: '',
-          //   name: '',
-          //   scope: '',
-          // },
+          // data
         },
         {
           id: 'domain3',
@@ -391,29 +379,12 @@ describe('Paths', () => {
           },
         },
       ];
-      it('Should reject if data fields are missing or have wrong type',
-        async () => {
-          await Promise.all(invalidDomains.map((dat) => ax.post('/domain', dat, {
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: 'apikey1',
-            },
-          }).then(async (res) => {
-            fail(`Should have rejected (${JSON.stringify(dat)})`);
-          }).catch((err) => {
-            if (!err.response) {
-              fail(`Error: ${err}`);
-            }
-            const res = err.response;
-            spec('POST', '/domain').match(res);
-            expect(res.status).toEqual(400);
-          })));
-        });
+      testPost<DomainBody>('/domain', validDomain, invalidDomains);
     });
   });
   describe('/affirmation', () => {
     describe('POST', () => {
-      const validExampleData: AffirmationBody = {
+      const validAffirmation: AffirmationBody = {
         id: 'affirmation1',
         data: {
           content: 'testing content',
@@ -421,38 +392,50 @@ describe('Paths', () => {
           keywords: ['keyword1'],
         },
       };
-      match('POST', '/affirmation',
-        validExampleData,
+      const invalidAffirmations: Partial<AffirmationBody>[] = [
         {
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: 'apikey1',
+          // id: 'affirmation1',
+          data: {
+            content: 'testing content',
+            domains: ['domain1'],
+            keywords: ['keyword1'],
           },
-        }, 201,
-        'Normal happy case');
-      match('POST', '/affirmation',
-        validExampleData,
+        },
         {
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: 'apikey2',
+          id: 'affirmation1',
+          // data
+        },
+        {
+          id: 'affirmation1',
+          data: {
+            // content: 'testing content',
+            domains: ['domain1'],
+            keywords: ['keyword1'],
           },
-        }, 403,
-        'Bad key case');
-      const invalidData: Partial<AffirmationBody>[] = [
-
+        },
+        {
+          id: 'affirmation1',
+          data: {
+            content: 'testing content',
+            // domains: ['domain1'],
+            keywords: ['keyword1'],
+          },
+        },
+        {
+          id: 'affirmation1',
+          data: {
+            content: 'testing content',
+            domains: ['domain1'],
+            // keywords: ['keyword1'],
+          },
+        },
       ];
-      matchList('POST', '/affirmation', invalidData,
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: 'apikey1',
-          },
-        }, 400, 'Data fields are missing or have wrong type');
+      testPost<AffirmationBody>('/affirmation', validAffirmation, invalidAffirmations);
     });
-
-    describe('/affirmation/notif', () => {
-      const validExampleData: AffirmationNotifBody = {
+  });
+  describe('/affirmation/notif', () => {
+    describe('POST', () => {
+      const validNotif: AffirmationNotifBody = {
         id: 'affirmation1',
         data: {
           affirmationId: 'affirmation1',
@@ -460,24 +443,45 @@ describe('Paths', () => {
           date: new Date().getTime(),
         },
       };
-      match('POST', '/affirmation/notif',
-        validExampleData,
+      const invalidNotifs: Partial<AffirmationNotifBody>[] = [
         {
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: 'apikey1',
+          // id: 'affirmation1',
+          data: {
+            affirmationId: 'affirmation1',
+            userId: 'client1@email.com',
+            date: new Date().getTime(),
           },
-        }, 201,
-        'Normal happy case');
-      match('POST', '/affirmation/notif',
-        validExampleData,
+        },
         {
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: 'apikey2',
+          id: 'affirmation1',
+          // data
+        },
+        {
+          id: 'affirmation1',
+          data: {
+            // affirmationId: 'affirmation1',
+            userId: 'client1@email.com',
+            date: new Date().getTime(),
           },
-        }, 403,
-        'Bad key case');
+        },
+        {
+          id: 'affirmation1',
+          data: {
+            affirmationId: 'affirmation1',
+            // userId: 'client1@email.com',
+            date: new Date().getTime(),
+          },
+        },
+        {
+          id: 'affirmation1',
+          data: {
+            affirmationId: 'affirmation1',
+            userId: 'client1@email.com',
+            // date: new Date().getTime(),
+          },
+        },
+      ];
+      testPost<AffirmationNotifBody>('/affirmation/notif', validNotif, invalidNotifs);
     });
   });
 });
