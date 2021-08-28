@@ -22,14 +22,51 @@ app.get('/', (req, res) => res.status(200).end());
 
 app.use(auth(db));
 
-const clientRouter = express.Router();
-
 export interface ClientBody {
   id: string,
 }
 
+export interface MeasurementBody {
+  clientID: string,
+  data: {
+    name?: string,
+    value?: number,
+    date?: (string | number),
+    source?: string
+  },
+}
+
+export interface DomainBody {
+  id: string,
+  data: {
+    bullets?: string[],
+    importance?: string,
+    name?: string,
+    scope?: string,
+  },
+}
+
+export interface AffirmationBody {
+  id: string,
+  data: {
+    content?: string,
+    domains?: string[],
+    keywords?: string[],
+  },
+}
+
+export interface AffirmationNotifBody {
+  id: string,
+  data: {
+    affirmationId?: string,
+    userId?: string,
+    date?: number,
+  },
+}
+
+const clientRouter = express.Router();
 clientRouter
-  .post('/', async (req, res) => {
+  .post('/', async (req: Request, res: Response) => {
     const data = req.body;
     if (!data.id) {
       res.status(400).send({
@@ -56,7 +93,7 @@ clientRouter
       }
     }
   })
-  .get('/:clientId', async (req, res) => {
+  .get('/:clientId', async (req: Request, res: Response) => {
     res.status(200).send({
       id: req.params.clientId,
     });
@@ -64,19 +101,9 @@ clientRouter
 
 app.use('/client', clientRouter);
 
-export interface MeasurementBody {
-  clientID: string,
-  data: {
-    name?: string,
-    value?: number,
-    date?: (string | number),
-    source?: string
-  },
-}
 const measurementRouter = express.Router();
-
 measurementRouter
-  .post('/', async (req, res) => {
+  .post('/', async (req: Request, res: Response) => {
     const { clientID, data }: Partial<MeasurementBody> = req.body;
     if (!data) {
       res.status(400).send({
@@ -127,17 +154,6 @@ measurementRouter
 app.use('/measurement', measurementRouter);
 
 const domainRouter = express.Router();
-
-export interface DomainBody {
-  id: string,
-  data: {
-    bullets?: string[],
-    importance?: string,
-    name?: string,
-    scope?: string,
-  },
-}
-
 domainRouter
   .post('/', async (req: Request, res: Response) => {
     const { id, data }: Partial<DomainBody> = req.body;
@@ -185,24 +201,6 @@ domainRouter
 app.use('/domain', domainRouter);
 
 const affirmationRouter = express.Router();
-export interface AffirmationBody {
-  id: string,
-  data: {
-    content?: string,
-    domains?: string[],
-    keywords?: string[],
-  },
-}
-
-export interface AffirmationNotifBody {
-  id: string,
-  data: {
-    affirmationId?: string,
-    userId?: string,
-    date?: number,
-  },
-}
-
 affirmationRouter
   .post('/', async (req: Request, res: Response) => {
     const { id, data }: Partial<AffirmationBody> = req.body;
