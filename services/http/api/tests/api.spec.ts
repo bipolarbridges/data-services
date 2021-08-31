@@ -118,6 +118,7 @@ describe('Paths', () => {
                 Authorization: 'apikey1',
               },
             }).then((res2) => {
+              console.warn(res2);
               fail('Should have rejected');
             }).catch((err) => {
               if (!err.response) {

@@ -25,6 +25,7 @@ module.exports = {
         "no-underscore-dangle": 0,
         "@typescript-eslint/no-useless-constructor": 0,
         "linebreak-style": 0,
+        'import/no-cycle': 0,
     },
     "settings": {
         "import/parsers": {
@@ -38,6 +39,5 @@ module.exports = {
         "typescript": {
             "directory": "packages/*/tsconfig.json"
           },
-
     },
 };

@@ -2,6 +2,6 @@
     "watch": ["lib", "./"],
     "ext": "ts,json",
     "ignore": ["src/**/*.spec.ts"],
-    "exec": "yarn start:lazy"      
+    "exec": "yarn start:dev"      
   }
   

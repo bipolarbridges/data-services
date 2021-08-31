@@ -221,7 +221,7 @@ function transformDate(input: number) {
   };
 }
 
-function createMeasurement(m: CreateMeasurementArgs) {
+function createMeasurement(m: CreateMeasurementArgs): DatabaseProcedure<boolean> {
   return async (session: Session, models: AllModels): Promise<boolean> => {
     try {
       const {

@@ -11,8 +11,8 @@ import {
   user,
   AllModels,
 } from '../models';
-import { debug } from '../logging';
 import { InternalError } from '../errors';
+import { debug } from '../logging';
 
 class DatabaseError extends InternalError {
   constructor(error: string) {
@@ -42,8 +42,8 @@ export class Database {
       {
         // use your connection details
         url: `bolt://${process.env.DB_ADDR}:7687`,
-        username: process.env.DB_USER,
-        password: process.env.DB_PASS,
+        username: 'neo4j',
+        password: 'password',
       },
       {
         logger: debug,
