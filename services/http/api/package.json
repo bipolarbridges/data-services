@@ -12,7 +12,7 @@
     "lint:fix": "eslint . --ext .ts --fix",
     "mock:auth:build": "cd tests/mocks/auth_server && yarn build",
     "mock:auth:start": "cd tests/mocks/auth_server && yarn start",
-    "prism:api": "prism mock ./reference/bb-api.v0.yaml",        
+    "prism:api": "prism mock ./reference/bb-api.v0.yaml",
     "all": "yarn install && cd tests/mocks/auth_server && yarn install",
     "test": "jest tests --testPathPattern=/dist/tests/*",
     "load:test": "ts-node tests/testData.ts",
@@ -48,6 +48,7 @@
     "jest-openapi": "^0.11.0",
     "nodemon": "^2.0.7",
     "ts-jest": "^27.0.1",
-    "ts-node": "^10.0.0"
+    "ts-node": "^10.0.0",
+    "tsconfig-paths": "^3.10.1"
   }
 }

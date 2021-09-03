@@ -120,7 +120,7 @@ app.use('/measurement', measurementRouter);
 app.use(handle());
 
 const port = 8888;
-const host: string = process.env.API_ADDR;
+const host = process.env.API_ADDR;
 
 const server = app.listen(port, host, () => {
   console.log(`Example app listening at http://${host}:${port}`);
