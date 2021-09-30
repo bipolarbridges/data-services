@@ -30,9 +30,6 @@ jobs:
         uses: actions/checkout@v2
       - name: Create network
         run: docker network create bb_default
-      - name: Create auth config
-        working-directory: services/http/api/lib/auth
-        run: cp ci-config.json docker-config.json
       - name: Build service images
         run: docker-compose build
       - name: Start database container
