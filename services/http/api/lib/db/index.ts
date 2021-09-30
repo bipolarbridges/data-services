@@ -1,7 +1,8 @@
 import { Neogma } from 'neogma';
-import { Parameters } from 'neogma/node_modules/neo4j-driver/types/query-runner';
-import { Driver, Result, Session } from 'neogma/node_modules/neo4j-driver';
-import { TransactionConfig } from 'neogma/node_modules/neo4j-driver-core';
+
+import { Parameters } from 'neo4j-driver/types/query-runner';
+import { Driver, Result, Session } from 'neo4j-driver';
+import { TransactionConfig } from 'neo4j-driver-core';
 import {
   identity,
   measurement,

@@ -13,9 +13,9 @@ A lot of the setup uses docker to encapsulate some of the dependencies, networki
     MATCH (n) RETURN n;
     ```
     no nodes should be returned since the database is empty. Close the shell using the `:exit` command.
-4. We can execute query-sets from the `services/db_shell/fixtures` directory by calling a script inside the database shell container. Try `yarn api:load:examples`. You should see the queries run and some statistics show up when it is complete. Try using the shell and running the match query again. You should see nodes from the example dataset. It's worth noting that the example query set used here (`lib/fixtures/example.ts`) is a comprehensive example of our current data model. 
+4. We can execute query-sets from the `services/db_shell/fixtures` directory by calling a script inside the database shell container. Try `yarn api:load:examples`. You should see the queries run and some statistics show up when it is complete. Try using the shell and running the match query again. You should see nodes from the example dataset. It's worth noting that the example query set used here (`lib/fixtures/example.ts`) is a comprehensive example of our current data model.
 
-### Run The API 
+### Run The API
 This is a setup to run the API as in similar conditions to the Docker container outside of the container. This does not use dev-tools such as nodemon and tsnode.
 1. Initialize the database and the mock auth server using `yarn run db:start` and `yarn run mock:start`.
 2. Build the api using `yarn run api:build`.
@@ -24,8 +24,8 @@ This is a setup to run the API as in similar conditions to the Docker container 
 ### Run the API the Lazy Way
 This is a setup that uses tsnode and nodemon to reduce the amount of time needed in building from Typescript, and automatically restarts the api upon file change. You can skip parts of step 1 depending on which Docker containers you  already have running.
 1. Initialize the database and the mock auth server using `yarn run db:start` and `yarn run mock:start`.
-2. Run the development server using `yarn run api:start:dev`. 
-> If you'd like to be lazy and do all of the above with one command, use `yarn api:start:all`. 
+2. Run the development server using `yarn run api:start:dev`.
+> If you'd like to be lazy and do all of the above with one command, use `yarn api:start:all`.
 
 ### Testing the API
 This assumes you have the api running in a terminal. If not, go through the steps of **"Run the API"** or **"Run the API the Lazy Way"**.
@@ -37,8 +37,8 @@ This assumes you have the api running in a terminal. If not, go through the step
 Models are added by using Neogma's typed ModelFactory function. To make a new model:
 1. Create a model `.ts` file in the `http/api/lib/models` folder.
 2. Define the properties, the related node type (with ModelRelatedNodesI type), then define the instance & neogma model by using `NeogmaInstance` and `NeogmaModel` type.
-    > Note that in order for Neogma to recognize the model, the property declared in the ModelRelatedNodeI type has to match the model label string.
-3. Add it to the `index.ts` file and add the model to the `AllModels` type.
-4. Define a init**ModelName**Model function in the **ModelName**.ts file that returns the Neogma ModelFactory model. Include the db as it requires a valid session when creating the model, and add any dependencies (models that it has relations to) as a parameter.
+    > Note that in order for Neogma to recognize the model, the property declared in the ModelRelatedNodeI type has to match the model's label.
+3. Add it to the `models/index.ts` file and add the model to the `AllModels` type.
+4. Define a init**ModelName**Model function in the **ModelName**.ts file that returns the Neogma ModelFactory value. Include the db as it requires a valid session when creating the model, and add any dependencies (models that it has relations to) as a parameter.
     > If you have a circular dependency issue (2 models rely on each other to initilialize) use the `.addRelationship({...})` method.
-5. Use the init**ModelName**Model function you have just created in the initAllModels method.
+5. Use the init**ModelName**Model in the initAllModels function. Add it to the `this.models = {...}` value.

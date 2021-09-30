@@ -1,9 +1,9 @@
-import { Session } from 'neogma/node_modules/neo4j-driver';
+import { Session } from 'neo4j-driver';
 import dotenv from 'dotenv';
-import { AllModels } from '../models';
-import { error } from '../logging';
 import { makeMeasurementProperties, MergedMeasurement } from '../interface';
 import FixtureLoader from './FixtureLoader';
+import { AllModels } from '../models';
+import { error } from '../logging';
 
 dotenv.config();
 

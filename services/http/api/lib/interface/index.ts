@@ -1,13 +1,13 @@
-import { Session } from 'neogma/node_modules/neo4j-driver';
+import { Session } from 'neo4j-driver';
+import { AllModels } from '../models';
 import {
   DayProperties, HourProperties, TimestampProperties, YearProperties,
 } from '../models/time';
 import { MeasurementProperties, MeasurementTypeProperties } from '../models/measurement';
 import { UserProperties } from '../models/user';
 import { SourceProperties } from '../models/source';
-import * as loggers from '../logging';
 import { DatabaseProcedure } from '../db';
-import { AllModels } from '../models';
+import * as loggers from '../logging';
 
 function userExists(id: string): DatabaseProcedure<boolean> {
   return async (session: Session, models: AllModels): Promise<boolean> => {

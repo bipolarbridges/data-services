@@ -21,10 +21,13 @@ app.get('/', (req: Request, res: Response) => res.status(200).end());
 
 app.use(auth(db));
 
+export interface ClientBody {
+  id: string,
+}
 const clientRouter = express.Router();
 clientRouter.route('/')
   .post(async (req: Request, res: Response) => {
-    const data = req.body;
+    const data: Partial<ClientBody> = req.body;
     if (!data.id) {
       res.status(400).send({
         message: 'Missing id field',
@@ -60,13 +63,13 @@ clientRouter.route('/:clientId')
 
 app.use('/client', clientRouter);
 
-interface MeasurementBody {
+export interface MeasurementBody {
   clientID: string,
   data: {
-    name: string,
-    value: number,
-    date: number,
-    source: string
+    name?: string,
+    value?: number,
+    date?: number,
+    source?: string
   },
 }
 const measurementRouter = express.Router();
@@ -120,7 +123,7 @@ app.use('/measurement', measurementRouter);
 app.use(handle());
 
 const port = 8888;
-const host: string = process.env.API_ADDR;
+const host = process.env.API_ADDR;
 
 const server = app.listen(port, host, () => {
   console.log(`Example app listening at http://${host}:${port}`);
