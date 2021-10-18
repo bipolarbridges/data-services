@@ -145,26 +145,9 @@ affirmationRouter.route('/')
         });
       /* eslint-disable no-restricted-globals */
       }
-        // const me: CreateMeasurementArgs = {
-        //   date,
-        //   uid: clientID,
-        //   source,
-        //   name,
-        //   value,
-        // };
-        // if (!(await db.exec(api.userExists(me.uid)))) {
-        //   res.status(404).send({
-        //     message: 'Specified client does not exist',
-        //   });
-        // } else if (!(await db.exec(api.createMeasurement(me)))) {
-        //   res.status(400).send({
-        //     message: 'measurement could not be created',
-        //   });
-        // } else {
           res.status(201).send({
             message: 'good good',
           });
-        // }
       }
   });
 
