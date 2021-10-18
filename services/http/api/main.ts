@@ -145,10 +145,10 @@ affirmationRouter.route('/')
         });
       /* eslint-disable no-restricted-globals */
       }
-          res.status(201).send({
-            message: 'good good',
-          });
-      }
+      res.status(201).send({
+        message: 'good good',
+      });
+    }
   });
 
 app.use('/affirmations', affirmationRouter);
