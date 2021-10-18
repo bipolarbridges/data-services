@@ -117,6 +117,59 @@ measurementRouter.route('/')
   });
 
 app.use('/measurement', measurementRouter);
+
+interface AffirmationBody {
+  affirmationID: string,
+  data: {
+    domains: string[],
+    keywords: string[],
+    content: string,
+  },
+}
+const affirmationRouter = express.Router();
+
+affirmationRouter.route('/')
+  .post(async (req: Request, res: Response) => {
+    const { affirmationID, data }: Partial<AffirmationBody> = req.body;
+    if (!data) {
+      res.status(400).send({
+        message: 'Missing data object',
+      });
+    } else {
+      const {
+        domains, keywords, content,
+      } = data;
+      if (!affirmationID || !domains || !keywords || !content) {
+        res.status(400).send({
+          message: 'Missing data fields',
+        });
+      /* eslint-disable no-restricted-globals */
+      }
+        // const me: CreateMeasurementArgs = {
+        //   date,
+        //   uid: clientID,
+        //   source,
+        //   name,
+        //   value,
+        // };
+        // if (!(await db.exec(api.userExists(me.uid)))) {
+        //   res.status(404).send({
+        //     message: 'Specified client does not exist',
+        //   });
+        // } else if (!(await db.exec(api.createMeasurement(me)))) {
+        //   res.status(400).send({
+        //     message: 'measurement could not be created',
+        //   });
+        // } else {
+          res.status(201).send({
+            message: 'good good',
+          });
+        // }
+      }
+  });
+
+app.use('/affirmations', affirmationRouter);
+
 app.use(handle());
 
 const port = 8888;
