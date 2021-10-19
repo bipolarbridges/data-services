@@ -128,7 +128,7 @@ interface AffirmationBody {
 }
 const affirmationRouter = express.Router();
 
-affirmationRouter.route('/:affirmationId')
+affirmationRouter.route('/')
   .post(async (req: Request, res: Response) => {
     const { affirmationID, data }: Partial<AffirmationBody> = req.body;
     if (!data) {
@@ -145,6 +145,7 @@ affirmationRouter.route('/:affirmationId')
         });
       /* eslint-disable no-restricted-globals */
       }
+      // TODO: - actually create affirmation
       res.status(201).send({
         message: 'good good',
       });
