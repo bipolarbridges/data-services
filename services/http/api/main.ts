@@ -128,7 +128,7 @@ interface AffirmationBody {
 }
 const affirmationRouter = express.Router();
 
-affirmationRouter.route('/')
+affirmationRouter.route('/:affirmationId')
   .post(async (req: Request, res: Response) => {
     const { affirmationID, data }: Partial<AffirmationBody> = req.body;
     if (!data) {
