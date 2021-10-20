@@ -150,6 +150,9 @@ affirmationRouter.route('/')
         message: 'good good',
       });
     }
+    res.status(909).send({
+      message: 'how did you get here',
+    });
   });
 
 app.use('/affirmations', affirmationRouter);
