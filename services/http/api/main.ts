@@ -155,7 +155,7 @@ affirmationRouter.route('/')
     });
   });
 
-app.use('/affirmations', affirmationRouter);
+app.use('/affirmations/:id', affirmationRouter);
 
 app.use(handle());
 
